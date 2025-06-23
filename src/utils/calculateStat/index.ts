@@ -1,0 +1,1 @@
+export { calculateStat } from "./calculateStat";

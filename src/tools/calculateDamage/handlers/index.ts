@@ -1,0 +1,1 @@
+export { calculateDamageHandler } from "./handler";

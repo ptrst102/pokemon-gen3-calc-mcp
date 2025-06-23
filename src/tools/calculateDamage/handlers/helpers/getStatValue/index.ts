@@ -1,0 +1,1 @@
+export { getStatValue } from "./getStatValue";

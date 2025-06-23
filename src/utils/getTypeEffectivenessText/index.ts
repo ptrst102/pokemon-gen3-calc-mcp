@@ -1,0 +1,1 @@
+export { getTypeEffectivenessText } from "./getTypeEffectivenessText";

@@ -1,0 +1,1 @@
+export { calculateHp } from "./calculateHp";
