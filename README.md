@@ -56,6 +56,20 @@ MCP クライアント（Claude Desktop など）の設定ファイルに以下�
 
 ## 開発者向け
 
+### 推奨開発環境
+
+このプロジェクトの開発には以下のツールの利用を推奨します：
+
+#### GitHub CLI (gh)
+
+GitHub との連携を効率化するため、GitHub CLI の導入を強く推奨します。
+
+[公式のインストール手順](https://github.com/cli/cli#installation)を参考にしてください。
+
+#### Claude Code
+
+AI 支援開発ツール [Claude Code](https://claude.ai/code) の活用を推奨します。このプロジェクトは CLAUDE.md による開発ガイドラインが整備されているため、Claude Code を使用することでコード生成が容易になります。
+
 ### コマンド
 
 ```bash
