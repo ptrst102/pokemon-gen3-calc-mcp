@@ -3,17 +3,19 @@ import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 export const calculateDamageDefinition: Tool = {
   name: "calculate_damage",
   description:
-    "ポケモンのダメージ計算を行います。タイプ相性、とくせい、もちもの、天候などを考慮した正確なダメージを算出します。\n\n使い方の例:\n1. わざ名を指定: move: \"じしん\"\n2. タイプと威力を指定: move: { type: \"じめん\", power: 100 }\n\n重要: moveパラメータは文字列（わざ名）またはオブジェクト（type と power）として指定してください。JSON文字列として渡さないでください。",
+    'ポケモンのダメージ計算を行います。タイプ相性、とくせい、もちもの、天候などを考慮した正確なダメージを算出します。\n\n使い方の例:\n1. わざ名を指定: move: "じしん"\n2. タイプと威力を指定: move: { type: "じめん", power: 100 }\n\n重要: moveパラメータは文字列（わざ名）またはオブジェクト（type と power）として指定してください。JSON文字列として渡さないでください。',
   inputSchema: {
     type: "object",
     properties: {
       move: {
-        description: "わざ名（文字列）、またはタイプと威力を含むオブジェクト。例: \"じしん\" または { type: \"じめん\", power: 100 }",
+        description:
+          'わざ名（文字列）、またはタイプと威力を含むオブジェクト。例: "じしん" または { type: "じめん", power: 100 }',
         oneOf: [
           {
             type: "string",
-            description: "わざ名（例: \"じしん\"、\"れいとうビーム\"、\"10まんボルト\"）",
-            examples: ["じしん", "れいとうビーム", "10まんボルト", "ストーンエッジ"],
+            description:
+              'わざ名（例: "じしん"、"れいとうビーム"、"10まんボルト"）',
+            examples: ["じしん", "れいとうビーム", "10まんボルト"],
           },
           {
             type: "object",
@@ -67,18 +69,19 @@ export const calculateDamageDefinition: Tool = {
           },
           pokemonName: {
             type: "string",
-            description: "ポケモン名（例: \"メタグロス\"、\"ボーマンダ\"）。省略時はタイプ不一致として計算",
+            description:
+              'ポケモン名（例: "メタグロス"、"ボーマンダ"）。省略時はタイプ不一致として計算',
             examples: ["メタグロス", "ボーマンダ", "ラティオス", "ヘラクロス"],
           },
           item: {
             type: "string",
-            description: "もちもの（例: \"こだわりハチマキ\"、\"いのちのたま\"）",
-            examples: ["こだわりハチマキ", "いのちのたま", "たつじんのおび", "もくたん"],
+            description: 'もちもの（例: "こだわりハチマキ"、"もくたん"）',
+            examples: ["こだわりハチマキ", "もくたん"],
           },
           ability: {
             type: "string",
-            description: "とくせい（例: \"ちからもち\"、\"いかく\"）",
-            examples: ["ちからもち", "いかく", "ふゆう", "もうか"],
+            description: 'とくせい（例: "ちからもち"、"もうか"）',
+            examples: ["ちからもち", "もうか"],
           },
           abilityActive: {
             type: "boolean",
@@ -112,7 +115,8 @@ export const calculateDamageDefinition: Tool = {
                   natureModifier: {
                     type: "string",
                     enum: ["up", "down", "neutral"],
-                    description: "せいかく補正（up: 1.1倍、down: 0.9倍、neutral: 1.0倍）",
+                    description:
+                      "せいかく補正（up: 1.1倍、down: 0.9倍、neutral: 1.0倍）",
                     default: "neutral",
                   },
                 },
@@ -137,7 +141,8 @@ export const calculateDamageDefinition: Tool = {
           },
           statModifier: {
             type: "number",
-            description: "能力ランク補正（-6～+6、省略時は0）。いかく=-1、つるぎのまい=+2など",
+            description:
+              "能力ランク補正（-6～+6、省略時は0）。いかく=-1、つるぎのまい=+2など",
             default: 0,
             minimum: -6,
             maximum: 6,
@@ -155,18 +160,19 @@ export const calculateDamageDefinition: Tool = {
           },
           pokemonName: {
             type: "string",
-            description: "ポケモン名（例: \"メタグロス\"、\"ボーマンダ\"）。省略時は弱点なし",
+            description:
+              'ポケモン名（例: "メタグロス"、"ボーマンダ"）。省略時は弱点なし',
             examples: ["メタグロス", "ボーマンダ", "ラティオス", "ヘラクロス"],
           },
           item: {
             type: "string",
-            description: "もちもの（例: \"しんかのこな\"、\"チイラのみ\"）",
-            examples: ["しんかのこな", "チイラのみ", "オボンのみ", "ソクノのみ"],
+            description: 'もちもの（例: "メタルパウダー"）',
+            examples: ["メタルパウダー"],
           },
           ability: {
             type: "string",
-            description: "とくせい（例: \"ふゆう\"、\"しんかのちから\"）",
-            examples: ["ふゆう", "しんかのちから", "あめうけざら", "むらむら"],
+            description: 'とくせい（例: "ちからもち"、"もうか"）',
+            examples: ["ちからもち", "もうか"],
           },
           abilityActive: {
             type: "boolean",
@@ -200,7 +206,8 @@ export const calculateDamageDefinition: Tool = {
                   natureModifier: {
                     type: "string",
                     enum: ["up", "down", "neutral"],
-                    description: "ぼうぎょまたはとくぼうのせいかく補正（up: 1.1倍、down: 0.9倍、neutral: 1.0倍）",
+                    description:
+                      "ぼうぎょまたはとくぼうのせいかく補正（up: 1.1倍、down: 0.9倍、neutral: 1.0倍）",
                     default: "neutral",
                   },
                 },
@@ -225,7 +232,8 @@ export const calculateDamageDefinition: Tool = {
           },
           statModifier: {
             type: "number",
-            description: "能力ランク補正（-6～+6、省略時は0）。いかく=-1、つるぎのまい=+2など",
+            description:
+              "能力ランク補正（-6～+6、省略時は0）。いかく=-1、つるぎのまい=+2など",
             default: 0,
             minimum: -6,
             maximum: 6,
