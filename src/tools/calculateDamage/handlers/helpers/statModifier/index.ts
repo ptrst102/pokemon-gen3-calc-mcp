@@ -1,4 +1,1 @@
-export {
-  getStatModifierRatio,
-  type StatModifierRatio,
-} from "./statModifier";
+export { getStatModifierRatio, type StatModifierRatio } from "./statModifier";

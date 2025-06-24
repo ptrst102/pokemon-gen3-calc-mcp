@@ -22,21 +22,19 @@ const isPhysicalType = (type: TypeName): boolean =>
 // わざの入力スキーマ
 const moveInputSchema = z.union([
   // 技名から変換
-  z
-    .string()
-    .transform((moveName) => {
-      const move = MOVES.find((m) => m.name === moveName);
-      if (!move) {
-        throw new Error(`わざ「${moveName}」が見つかりません`);
-      }
-      const moveType = move.type as TypeName;
-      return {
-        name: moveName,
-        type: moveType,
-        power: move.power,
-        isPhysical: isPhysicalType(moveType),
-      };
-    }),
+  z.string().transform((moveName) => {
+    const move = MOVES.find((m) => m.name === moveName);
+    if (!move) {
+      throw new Error(`わざ「${moveName}」が見つかりません`);
+    }
+    const moveType = move.type as TypeName;
+    return {
+      name: moveName,
+      type: moveType,
+      power: move.power,
+      isPhysical: isPhysicalType(moveType),
+    };
+  }),
   // タイプと威力を直接指定
   z
     .object({
