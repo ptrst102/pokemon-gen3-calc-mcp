@@ -3,7 +3,6 @@ import type { StatsObj } from "@/types";
 import { calculateHp } from "@/utils/calculateHp";
 import { calculateStat } from "@/utils/calculateStat";
 import { natureModifier } from "@/utils/natureModifier";
-import { statusFormatter } from "./formatters/statusFormatter";
 import { calculateStatusInputSchema } from "./schemas/statusSchema";
 
 export const calculateStatusHandler = async (args: unknown) => {
@@ -77,18 +76,7 @@ export const calculateStatusHandler = async (args: unknown) => {
 
   const stats: StatsObj = { hp, atk, def, spa, spd, spe };
 
-  const response = statusFormatter({
-    pokemon,
-    stats,
-  });
-
   return {
-    content: [
-      {
-        type: "text",
-        text: response,
-      },
-    ],
     structuredContent: {
       pokemonName: pokemon.name,
       stats,

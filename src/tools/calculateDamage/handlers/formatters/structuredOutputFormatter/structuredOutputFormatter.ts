@@ -148,6 +148,30 @@ export const createEvRangeDamageOutput = (
   }
 };
 
+interface ErrorStructuredOutput {
+  error: string;
+}
+
 export type StructuredOutput =
   | NormalDamageStructuredOutput
-  | EvRangeDamageStructuredOutput;
+  | EvRangeDamageStructuredOutput
+  | ErrorStructuredOutput;
+
+// Type guards
+export const isNormalDamageOutput = (
+  output: StructuredOutput,
+): output is NormalDamageStructuredOutput => {
+  return "damage" in output;
+};
+
+export const isEvRangeDamageOutput = (
+  output: StructuredOutput,
+): output is EvRangeDamageStructuredOutput => {
+  return "evRanges" in output;
+};
+
+export const isErrorOutput = (
+  output: StructuredOutput,
+): output is ErrorStructuredOutput => {
+  return "error" in output;
+};

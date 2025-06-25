@@ -1,1 +1,0 @@
-export { formatDamageResult } from "./damageFormatter";

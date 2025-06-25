@@ -14,11 +14,10 @@ describe("calculate-status tool", () => {
     const result = await calculateStatusHandler(input);
 
     expect(result).toBeDefined();
-    expect(result.content).toHaveLength(1);
-    expect(result.content[0].type).toBe("text");
-    expect(result.content[0].text).toContain("【フシギダネ】");
-    expect(result.content[0].text).toContain("HP: 112");
-    expect(result.content[0].text).toContain("こうげき: 61");
+    expect(result.structuredContent).toBeDefined();
+    expect(result.structuredContent?.pokemonName).toBe("フシギダネ");
+    expect(result.structuredContent?.stats?.hp).toBe(112);
+    expect(result.structuredContent?.stats?.atk).toBe(61);
   });
 
   it("存在しないポケモン名でエラーになること", async () => {
@@ -74,7 +73,7 @@ describe("calculate-status tool", () => {
 
     const result = await calculateStatusHandler(input);
 
-    expect(result.content[0].text).toContain("【ヌケニン】");
-    expect(result.content[0].text).toContain("HP: 1");
+    expect(result.structuredContent?.pokemonName).toBe("ヌケニン");
+    expect(result.structuredContent?.stats?.hp).toBe(1);
   });
 });
