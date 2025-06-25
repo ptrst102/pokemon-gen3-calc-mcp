@@ -46,35 +46,44 @@ const runIntegrationTests = async () => {
     // テスト1: calculate_status（ピカチュウのステータス計算）
     console.log("📊 テスト1: calculate_status (ピカチュウ)");
     try {
-      const statusResult = await client.callTool("calculate_status", {
-        pokemonName: "ピカチュウ",
-        level: 50,
-        nature: "ようき",
-        evs: {
-          hp: 6,
-          attack: 252,
-          defense: 0,
-          specialAttack: 0,
-          specialDefense: 0,
-          speed: 252,
-        },
-        ivs: {
-          hp: 31,
-          attack: 31,
-          defense: 31,
-          specialAttack: 31,
-          specialDefense: 31,
-          speed: 31,
+      const statusResult = await client.callTool({
+        name: "calculate_status",
+        arguments: {
+          pokemonName: "ピカチュウ",
+          level: 50,
+          nature: "ようき",
+          evs: {
+            hp: 6,
+            attack: 252,
+            defense: 0,
+            specialAttack: 0,
+            specialDefense: 0,
+            speed: 252,
+          },
+          ivs: {
+            hp: 31,
+            attack: 31,
+            defense: 31,
+            specialAttack: 31,
+            specialDefense: 31,
+            speed: 31,
+          },
         },
       });
 
       results.push({
         name: "calculate_status (ピカチュウ)",
         success: true,
-        response: statusResult.content[0],
+        response: statusResult.content,
       });
 
-      if (statusResult.content[0].type === "text") {
+      if (
+        Array.isArray(statusResult.content) &&
+        statusResult.content[0] &&
+        "type" in statusResult.content[0] &&
+        statusResult.content[0].type === "text" &&
+        "text" in statusResult.content[0]
+      ) {
         console.log(statusResult.content[0].text);
       }
     } catch (error) {
@@ -90,35 +99,44 @@ const runIntegrationTests = async () => {
     // テスト2: calculate_damage（ラティオスのサイコキネシス）
     console.log("🎯 テスト2: calculate_damage (ラティオスのサイコキネシス)");
     try {
-      const damageResult = await client.callTool("calculate_damage", {
-        attackerName: "ラティオス",
-        defenderName: "キノガッサ",
-        moveName: "サイコキネシス",
-        attackerLevel: 50,
-        defenderLevel: 50,
-        attackerNature: "ひかえめ",
-        defenderNature: "ようき",
-        attackerEvs: {
-          hp: 6,
-          specialAttack: 252,
-          speed: 252,
+      const damageResult = await client.callTool({
+        name: "calculate_damage",
+        arguments: {
+          attackerName: "ラティオス",
+          defenderName: "キノガッサ",
+          moveName: "サイコキネシス",
+          attackerLevel: 50,
+          defenderLevel: 50,
+          attackerNature: "ひかえめ",
+          defenderNature: "ようき",
+          attackerEvs: {
+            hp: 6,
+            specialAttack: 252,
+            speed: 252,
+          },
+          defenderEvs: {
+            hp: 6,
+            attack: 252,
+            speed: 252,
+          },
+          attackerItem: "こだわりメガネ",
+          defenderAbility: "ポイズンヒール",
         },
-        defenderEvs: {
-          hp: 6,
-          attack: 252,
-          speed: 252,
-        },
-        attackerItem: "こだわりメガネ",
-        defenderAbility: "ポイズンヒール",
       });
 
       results.push({
         name: "calculate_damage (ラティオス vs キノガッサ)",
         success: true,
-        response: damageResult.content[0],
+        response: damageResult.content,
       });
 
-      if (damageResult.content[0].type === "text") {
+      if (
+        Array.isArray(damageResult.content) &&
+        damageResult.content[0] &&
+        "type" in damageResult.content[0] &&
+        damageResult.content[0].type === "text" &&
+        "text" in damageResult.content[0]
+      ) {
         console.log(damageResult.content[0].text);
       }
     } catch (error) {
@@ -134,36 +152,45 @@ const runIntegrationTests = async () => {
     // テスト3: calculate_damage with calculateAllEvs（努力値別ダメージ計算）
     console.log("📈 テスト3: calculate_damage with calculateAllEvs");
     try {
-      const evDamageResult = await client.callTool("calculate_damage", {
-        attackerName: "メタグロス",
-        defenderName: "ハピナス",
-        moveName: "コメットパンチ",
-        attackerLevel: 50,
-        defenderLevel: 50,
-        attackerNature: "いじっぱり",
-        defenderNature: "ずぶとい",
-        attackerEvs: {
-          hp: 252,
-          attack: 252,
-          defense: 6,
+      const evDamageResult = await client.callTool({
+        name: "calculate_damage",
+        arguments: {
+          attackerName: "メタグロス",
+          defenderName: "ハピナス",
+          moveName: "コメットパンチ",
+          attackerLevel: 50,
+          defenderLevel: 50,
+          attackerNature: "いじっぱり",
+          defenderNature: "ずぶとい",
+          attackerEvs: {
+            hp: 252,
+            attack: 252,
+            defense: 6,
+          },
+          defenderEvs: {
+            hp: 252,
+            defense: 252,
+            specialDefense: 6,
+          },
+          attackerAbility: "クリアボディ",
+          defenderAbility: "しぜんかいふく",
+          calculateAllEvs: true,
         },
-        defenderEvs: {
-          hp: 252,
-          defense: 252,
-          specialDefense: 6,
-        },
-        attackerAbility: "クリアボディ",
-        defenderAbility: "しぜんかいふく",
-        calculateAllEvs: true,
       });
 
       results.push({
         name: "calculate_damage with calculateAllEvs",
         success: true,
-        response: evDamageResult.content[0],
+        response: evDamageResult.content,
       });
 
-      if (evDamageResult.content[0].type === "text") {
+      if (
+        Array.isArray(evDamageResult.content) &&
+        evDamageResult.content[0] &&
+        "type" in evDamageResult.content[0] &&
+        evDamageResult.content[0].type === "text" &&
+        "text" in evDamageResult.content[0]
+      ) {
         const text = evDamageResult.content[0].text;
         // 努力値別の結果の一部のみ表示
         const lines = text.split("\n");
@@ -183,10 +210,13 @@ const runIntegrationTests = async () => {
     // テスト4: エラーケース（存在しないポケモン）
     console.log("🚫 テスト4: エラーケース (存在しないポケモン)");
     try {
-      await client.callTool("calculate_status", {
-        pokemonName: "存在しないポケモン",
-        level: 50,
-        nature: "ようき",
+      await client.callTool({
+        name: "calculate_status",
+        arguments: {
+          pokemonName: "存在しないポケモン",
+          level: 50,
+          nature: "ようき",
+        },
       });
 
       results.push({
