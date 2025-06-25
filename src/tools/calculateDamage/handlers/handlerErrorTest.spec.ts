@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parseResponse } from "@/tools/test-helpers/parseResponse";
 import { calculateDamageHandler } from "./handler";
 
 describe("calculateDamageHandler エラーハンドリング", () => {
@@ -18,9 +19,8 @@ describe("calculateDamageHandler エラーハンドリング", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(
-      "error" in result.structuredContent && result.structuredContent.error,
-    ).toContain(
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output && output.error).toContain(
       '「move」は文字列（わざ名）または { type: "タイプ名", power: 威力 } の形式で指定してください',
     );
   });
@@ -28,11 +28,10 @@ describe("calculateDamageHandler エラーハンドリング", () => {
   it("不正なJSONフォーマットの場合でも適切に処理する", async () => {
     const input = undefined;
     const result = await calculateDamageHandler(input);
-    expect(
-      "error" in result.structuredContent && result.structuredContent.error,
-    ).toBeTruthy();
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain("入力エラー");
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output && output.error).toBeTruthy();
+    if ("error" in output) {
+      expect(output.error).toContain("入力エラー");
     }
   });
 
@@ -52,9 +51,10 @@ describe("calculateDamageHandler エラーハンドリング", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(
-      "error" in result.structuredContent && result.structuredContent.error,
-    ).toContain("ポケモン「存在しないポケモン」が見つかりません");
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output && output.error).toContain(
+      "ポケモン「存在しないポケモン」が見つかりません",
+    );
   });
 
   it("存在しないわざ名の場合、具体的なエラーメッセージを返す", async () => {
@@ -73,9 +73,10 @@ describe("calculateDamageHandler エラーハンドリング", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(
-      "error" in result.structuredContent && result.structuredContent.error,
-    ).toContain("わざ「存在しないわざ」が見つかりません");
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output && output.error).toContain(
+      "わざ「存在しないわざ」が見つかりません",
+    );
   });
 
   it("レベルが範囲外の場合、分かりやすいエラーメッセージを返す", async () => {
@@ -94,8 +95,9 @@ describe("calculateDamageHandler エラーハンドリング", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(
-      "error" in result.structuredContent && result.structuredContent.error,
-    ).toContain("「attacker.level」は1以上である必要があります");
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output && output.error).toContain(
+      "「attacker.level」は1以上である必要があります",
+    );
   });
 });

@@ -1,7 +1,6 @@
 import {
   createEvRangeDamageOutput,
   createNormalDamageOutput,
-  type StructuredOutput,
 } from "./formatters/structuredOutputFormatter";
 import {
   calculateAttackerEvDamages,
@@ -30,7 +29,7 @@ const handleAttackerEvCalculation = (
   attackStatArray: number[],
   fixedDefenseStat: number,
 ): {
-  structuredContent: StructuredOutput;
+  content: Array<{ type: "text"; text: string }>;
 } => {
   const context = prepareCalculationContext(input);
   const evResults = calculateAttackerEvDamages(
@@ -39,13 +38,20 @@ const handleAttackerEvCalculation = (
     fixedDefenseStat,
   );
 
+  const structuredOutput = createEvRangeDamageOutput({
+    ...context,
+    evResults,
+    fixedStat: fixedDefenseStat,
+    isAttackerEv: true,
+  });
+
   return {
-    structuredContent: createEvRangeDamageOutput({
-      ...context,
-      evResults,
-      fixedStat: fixedDefenseStat,
-      isAttackerEv: true,
-    }),
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(structuredOutput, null, 2),
+      },
+    ],
   };
 };
 
@@ -57,7 +63,7 @@ const handleDefenderEvCalculation = (
   fixedAttackStat: number,
   defenseStatArray: number[],
 ): {
-  structuredContent: StructuredOutput;
+  content: Array<{ type: "text"; text: string }>;
 } => {
   const context = prepareCalculationContext(input);
   const evResults = calculateDefenderEvDamages(
@@ -66,13 +72,20 @@ const handleDefenderEvCalculation = (
     defenseStatArray,
   );
 
+  const structuredOutput = createEvRangeDamageOutput({
+    ...context,
+    evResults,
+    fixedStat: fixedAttackStat,
+    isAttackerEv: false,
+  });
+
   return {
-    structuredContent: createEvRangeDamageOutput({
-      ...context,
-      evResults,
-      fixedStat: fixedAttackStat,
-      isAttackerEv: false,
-    }),
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(structuredOutput, null, 2),
+      },
+    ],
   };
 };
 
@@ -84,18 +97,25 @@ const handleNormalCalculation = (
   attackStat: number,
   defenseStat: number,
 ): {
-  structuredContent: StructuredOutput;
+  content: Array<{ type: "text"; text: string }>;
 } => {
   const context = prepareCalculationContext(input);
   const damages = calculateNormalDamage(input, attackStat, defenseStat);
 
+  const structuredOutput = createNormalDamageOutput({
+    ...context,
+    damages,
+    attackStat,
+    defenseStat,
+  });
+
   return {
-    structuredContent: createNormalDamageOutput({
-      ...context,
-      damages,
-      attackStat,
-      defenseStat,
-    }),
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(structuredOutput, null, 2),
+      },
+    ],
   };
 };
 
@@ -106,7 +126,7 @@ const handleEvCalculation = (
   input: CalculateDamageInput,
   stats: ReturnType<typeof getCalculatedStats>,
 ): {
-  structuredContent: StructuredOutput;
+  content: Array<{ type: "text"; text: string }>;
 } => {
   const { attackStat, defenseStat } = stats;
 
@@ -130,9 +150,15 @@ const handleEvCalculation = (
  */
 export const calculateDamageHandler = async (
   args: unknown,
-): Promise<{
-  structuredContent: StructuredOutput;
-}> => {
+): Promise<
+  | {
+      content: Array<{ type: "text"; text: string }>;
+    }
+  | {
+      isError: true;
+      content: Array<{ type: "text"; text: string }>;
+    }
+> => {
   try {
     const input = calculateDamageInputSchema.parse(args);
 

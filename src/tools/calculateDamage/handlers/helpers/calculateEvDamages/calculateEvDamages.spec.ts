@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isNormalDamageOutput } from "@/tools/calculateDamage/handlers/formatters/structuredOutputFormatter";
+import {
+  isNormalDamageOutput,
+  type StructuredOutput,
+} from "@/tools/calculateDamage/handlers/formatters/structuredOutputFormatter";
 import { calculateDamageHandler } from "@/tools/calculateDamage/handlers/handler";
+import { parseResponse } from "@/tools/test-helpers/parseResponse";
 
 describe("じばく・だいばくはつの防御半減", () => {
   it("じばくで防御が半減される", async () => {
@@ -23,8 +27,9 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const normalResult = await calculateDamageHandler(normalInput);
-    const normalMinDamage = isNormalDamageOutput(normalResult.structuredContent)
-      ? normalResult.structuredContent.damage.min
+    const normalOutput = parseResponse<StructuredOutput>(normalResult);
+    const normalMinDamage = isNormalDamageOutput(normalOutput)
+      ? normalOutput.damage.min
       : 0;
 
     // じばくでのダメージ計算（防御半減）
@@ -46,10 +51,10 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const selfDestructResult = await calculateDamageHandler(selfDestructInput);
-    const selfDestructMinDamage = isNormalDamageOutput(
-      selfDestructResult.structuredContent,
-    )
-      ? selfDestructResult.structuredContent.damage.min
+    const selfDestructOutput =
+      parseResponse<StructuredOutput>(selfDestructResult);
+    const selfDestructMinDamage = isNormalDamageOutput(selfDestructOutput)
+      ? selfDestructOutput.damage.min
       : 0;
 
     // じばくは威力200で防御半減なので、とっしん（威力90）の2倍以上のダメージになるはず
@@ -75,10 +80,9 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const explosionResult = await calculateDamageHandler(explosionInput);
-    const explosionMinDamage = isNormalDamageOutput(
-      explosionResult.structuredContent,
-    )
-      ? explosionResult.structuredContent.damage.min
+    const explosionOutput = parseResponse<StructuredOutput>(explosionResult);
+    const explosionMinDamage = isNormalDamageOutput(explosionOutput)
+      ? explosionOutput.damage.min
       : 0;
 
     // だいばくはつは威力250で防御半減なので大きなダメージになるはず
@@ -104,10 +108,9 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const hyperBeamResult = await calculateDamageHandler(hyperBeamInput);
-    const hyperBeamMaxDamage = isNormalDamageOutput(
-      hyperBeamResult.structuredContent,
-    )
-      ? hyperBeamResult.structuredContent.damage.max
+    const hyperBeamOutput = parseResponse<StructuredOutput>(hyperBeamResult);
+    const hyperBeamMaxDamage = isNormalDamageOutput(hyperBeamOutput)
+      ? hyperBeamOutput.damage.max
       : 0;
 
     // 防御が高いため、ダメージは少なめになるはず

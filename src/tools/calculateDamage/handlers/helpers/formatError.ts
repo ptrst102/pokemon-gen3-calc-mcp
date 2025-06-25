@@ -55,10 +55,8 @@ const formatZodError = (error: ZodError): string => {
 export const formatError = (
   error: unknown,
 ): {
-  structuredContent: {
-    error: string;
-    move: { type: string; power: number; category: string };
-  };
+  isError: true;
+  content: Array<{ type: "text"; text: string }>;
 } => {
   const message = (() => {
     if (error instanceof ZodError) {
@@ -70,15 +68,23 @@ export const formatError = (
     return "不明なエラーが発生しました";
   })();
 
-  return {
-    structuredContent: {
-      error: message,
-      // エラー時でも最小限のmove情報を含める（スキーマ準拠のため）
-      move: {
-        type: "unknown",
-        power: 0,
-        category: "unknown",
-      },
+  const errorOutput = {
+    error: message,
+    // エラー時でも最小限のmove情報を含める（スキーマ準拠のため）
+    move: {
+      type: "unknown",
+      power: 0,
+      category: "unknown",
     },
+  };
+
+  return {
+    isError: true,
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(errorOutput, null, 2),
+      },
+    ],
   };
 };
