@@ -27,7 +27,8 @@
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-mcp": "^0.0.14",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "zod-to-json-schema": "^3.24.6"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.13.1",
