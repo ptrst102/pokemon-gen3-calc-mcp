@@ -12,6 +12,11 @@ import {
   isAttackerEvArray,
   isDefenderEvArray,
 } from "./helpers/calculateStats";
+import {
+  createEvRangeDamageOutput,
+  createNormalDamageOutput,
+  type StructuredOutput,
+} from "./helpers/createStructuredOutput";
 import { formatError } from "./helpers/formatError";
 import { prepareCalculationContext } from "./helpers/prepareCalculationContext";
 import {
@@ -28,7 +33,10 @@ const createDamageResponse = <T extends object>(
   formatter: (
     result: ReturnType<typeof prepareCalculationContext> & T,
   ) => string,
-): { content: { type: "text"; text: string }[] } => {
+): {
+  content: { type: "text"; text: string }[];
+  structuredContent?: StructuredOutput;
+} => {
   const result = {
     ...context,
     ...additionalData,
@@ -53,7 +61,10 @@ const handleAttackerEvCalculation = (
   input: CalculateDamageInput,
   attackStatArray: number[],
   fixedDefenseStat: number,
-): { content: { type: "text"; text: string }[] } => {
+): {
+  content: { type: "text"; text: string }[];
+  structuredContent: StructuredOutput;
+} => {
   const context = prepareCalculationContext(input);
   const evResults = calculateAttackerEvDamages(
     input,
@@ -61,7 +72,7 @@ const handleAttackerEvCalculation = (
     fixedDefenseStat,
   );
 
-  return createDamageResponse(
+  const response = createDamageResponse(
     context,
     {
       evResults,
@@ -70,6 +81,16 @@ const handleAttackerEvCalculation = (
     },
     formatDamageWithEvRange,
   );
+
+  return {
+    ...response,
+    structuredContent: createEvRangeDamageOutput({
+      ...context,
+      evResults,
+      fixedStat: fixedDefenseStat,
+      isAttackerEv: true,
+    }),
+  };
 };
 
 /**
@@ -79,7 +100,10 @@ const handleDefenderEvCalculation = (
   input: CalculateDamageInput,
   fixedAttackStat: number,
   defenseStatArray: number[],
-): { content: { type: "text"; text: string }[] } => {
+): {
+  content: { type: "text"; text: string }[];
+  structuredContent: StructuredOutput;
+} => {
   const context = prepareCalculationContext(input);
   const evResults = calculateDefenderEvDamages(
     input,
@@ -87,7 +111,7 @@ const handleDefenderEvCalculation = (
     defenseStatArray,
   );
 
-  return createDamageResponse(
+  const response = createDamageResponse(
     context,
     {
       evResults,
@@ -96,6 +120,16 @@ const handleDefenderEvCalculation = (
     },
     formatDamageWithEvRange,
   );
+
+  return {
+    ...response,
+    structuredContent: createEvRangeDamageOutput({
+      ...context,
+      evResults,
+      fixedStat: fixedAttackStat,
+      isAttackerEv: false,
+    }),
+  };
 };
 
 /**
@@ -105,11 +139,14 @@ const handleNormalCalculation = (
   input: CalculateDamageInput,
   attackStat: number,
   defenseStat: number,
-): { content: { type: "text"; text: string }[] } => {
+): {
+  content: { type: "text"; text: string }[];
+  structuredContent: StructuredOutput;
+} => {
   const context = prepareCalculationContext(input);
   const damages = calculateNormalDamage(input, attackStat, defenseStat);
 
-  return createDamageResponse(
+  const response = createDamageResponse(
     context,
     {
       damages,
@@ -118,6 +155,16 @@ const handleNormalCalculation = (
     },
     formatDamageResult,
   );
+
+  return {
+    ...response,
+    structuredContent: createNormalDamageOutput({
+      ...context,
+      damages,
+      attackStat,
+      defenseStat,
+    }),
+  };
 };
 
 /**
@@ -126,7 +173,10 @@ const handleNormalCalculation = (
 const handleEvCalculation = (
   input: CalculateDamageInput,
   stats: ReturnType<typeof getCalculatedStats>,
-): { content: { type: "text"; text: string }[] } => {
+): {
+  content: { type: "text"; text: string }[];
+  structuredContent?: StructuredOutput;
+} => {
   const { attackStat, defenseStat } = stats;
 
   if (isAttackerEvArray(attackStat)) {
@@ -149,7 +199,10 @@ const handleEvCalculation = (
  */
 export const calculateDamageHandler = async (
   args: unknown,
-): Promise<{ content: { type: "text"; text: string }[] }> => {
+): Promise<{
+  content: { type: "text"; text: string }[];
+  structuredContent?: StructuredOutput;
+}> => {
   try {
     const input = calculateDamageInputSchema.parse(args);
 
