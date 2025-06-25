@@ -1,6 +1,11 @@
 import { formatDamageResult } from "./formatters/damageFormatter";
 import { formatDamageWithEvRange } from "./formatters/damageWithEvRangeFormatter";
 import {
+  createEvRangeDamageOutput,
+  createNormalDamageOutput,
+  type StructuredOutput,
+} from "./formatters/structuredOutputFormatter";
+import {
   calculateAttackerEvDamages,
   calculateDefenderEvDamages,
   calculateNormalDamage,
@@ -12,11 +17,6 @@ import {
   isAttackerEvArray,
   isDefenderEvArray,
 } from "./helpers/calculateStats";
-import {
-  createEvRangeDamageOutput,
-  createNormalDamageOutput,
-  type StructuredOutput,
-} from "./helpers/createStructuredOutput";
 import { formatError } from "./helpers/formatError";
 import { prepareCalculationContext } from "./helpers/prepareCalculationContext";
 import {
