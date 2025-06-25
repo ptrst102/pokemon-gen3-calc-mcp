@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseResponse } from "@/tools/test-helpers/parseResponse";
+import { parseResponse } from "@/tests/parseResponse";
 import {
   isErrorOutput,
   isEvRangeDamageOutput,

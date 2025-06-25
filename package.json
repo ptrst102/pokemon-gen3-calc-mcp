@@ -14,7 +14,8 @@
     "check": "run-p check:*",
     "check:type": "npm run typecheck",
     "check:lint": "npm run lint",
-    "check:test": "npm run test"
+    "check:test": "npm run test",
+    "schemagen": "tsx scripts/generateSchemas.ts"
   },
   "author": "ptrst102",
   "license": "MIT",
