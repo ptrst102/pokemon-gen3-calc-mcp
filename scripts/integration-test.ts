@@ -151,8 +151,59 @@ const runIntegrationTests = async () => {
     }
     console.log("");
 
-    // テスト3: calculate_damage with calculateAllEvs（努力値別ダメージ計算）
-    console.log("📈 テスト3: calculate_damage with calculateAllEvs");
+    // テスト3: calculate_damage 実数値直接指定
+    console.log("🏠 テスト3: calculate_damage (実数値直接指定)");
+    try {
+      const valueResult = await client.callTool({
+        name: "calculate_damage",
+        arguments: {
+          move: "れいとうビーム",
+          attacker: {
+            pokemonName: "ラプラス",
+            level: 50,
+            ability: "シェルアーマー",
+            stat: {
+              value: 182, // とくこう実数値を直接指定
+            },
+          },
+          defender: {
+            pokemonName: "サーナイト",
+            level: 50,
+            item: "オボンのみ",
+            stat: {
+              value: 121, // とくぼう実数値を直接指定
+            },
+          },
+        },
+      });
+
+      results.push({
+        name: "calculate_damage (実数値直接指定)",
+        success: true,
+        response: valueResult.content,
+      });
+
+      if (
+        Array.isArray(valueResult.content) &&
+        valueResult.content[0] &&
+        "type" in valueResult.content[0] &&
+        valueResult.content[0].type === "text" &&
+        "text" in valueResult.content[0]
+      ) {
+        console.log(valueResult.content[0].text);
+      }
+    } catch (error) {
+      results.push({
+        name: "calculate_damage (実数値直接指定)",
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      console.error(`❌ エラー: ${error}`);
+    }
+    console.log("");
+
+    // テスト4: calculate_damage with calculateAllEvs（努力値別ダメージ計算）
+    console.log("📈 テスト4: calculate_damage with calculateAllEvs");
     try {
       const evDamageResult = await client.callTool({
         name: "calculate_damage",
@@ -209,8 +260,8 @@ const runIntegrationTests = async () => {
     }
     console.log("");
 
-    // テスト4: エラーケース（存在しないポケモン）
-    console.log("🚫 テスト4: エラーケース (存在しないポケモン)");
+    // テスト5: エラーケース（存在しないポケモン）
+    console.log("🚫 テスト5: エラーケース (存在しないポケモン)");
     try {
       await client.callTool({
         name: "calculate_status",
