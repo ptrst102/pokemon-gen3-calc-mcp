@@ -4,7 +4,7 @@ import { calculateStatusDefinition } from "@/tools/calculateStatus";
 
 /**
  * 既存のスキーマと新しいzod-to-json-schemaで生成されたスキーマの比較テスト
- * 
+ *
  * 注意: このテストは一時的なもので、動作確認後に削除予定
  */
 describe("既存スキーマと自動生成スキーマの比較", () => {
@@ -329,35 +329,38 @@ describe("既存スキーマと自動生成スキーマの比較", () => {
 
   it("calculateDamageの新旧スキーマが構造的に同等", () => {
     const newSchema = calculateDamageDefinition.inputSchema;
-    
+
     // トップレベルの構造を確認
     expect(newSchema.type).toBe(oldDamageSchema.type);
     expect(newSchema.required).toEqual(oldDamageSchema.required);
-    
+
     // プロパティのキーが同じであることを確認
     const oldKeys = Object.keys(oldDamageSchema.properties).sort();
     const newKeys = Object.keys(newSchema.properties || {}).sort();
     expect(newKeys).toEqual(oldKeys);
-    
+
     // 各プロパティの基本的な型が同じであることを確認
     for (const key of oldKeys) {
-      const oldProp = oldDamageSchema.properties[key as keyof typeof oldDamageSchema.properties];
+      const oldProp =
+        oldDamageSchema.properties[
+          key as keyof typeof oldDamageSchema.properties
+        ];
       const newProp = (newSchema.properties as any)?.[key];
-      
+
       expect(newProp).toBeDefined();
-      
+
       // 型の確認（numberとintegerは同等として扱う）
-      if ('type' in oldProp) {
-        if (oldProp.type === 'number' && newProp.type === 'integer') {
+      if ("type" in oldProp) {
+        if (oldProp.type === "number" && newProp.type === "integer") {
           // zod-to-json-schemaはnumberをintegerに変換することがある
-          expect(['number', 'integer']).toContain(newProp.type);
+          expect(["number", "integer"]).toContain(newProp.type);
         } else {
           expect(newProp.type).toBe(oldProp.type);
         }
       }
-      
+
       // oneOf/anyOfがある場合は構造を確認（zod-to-json-schemaはanyOfを使用）
-      if ('oneOf' in oldProp && oldProp.oneOf) {
+      if ("oneOf" in oldProp && oldProp.oneOf) {
         expect(newProp.anyOf || newProp.oneOf).toBeDefined();
         const alternatives = newProp.anyOf || newProp.oneOf;
         expect(alternatives.length).toBe(oldProp.oneOf.length);
@@ -367,38 +370,41 @@ describe("既存スキーマと自動生成スキーマの比較", () => {
 
   it("calculateStatusの新旧スキーマが構造的に同等", () => {
     const newSchema = calculateStatusDefinition.inputSchema;
-    
+
     // トップレベルの構造を確認
     expect(newSchema.type).toBe(oldStatusSchema.type);
     // requiredフィールドの違いを許容（ivsが追加されている）
-    expect(newSchema.required).toContain('pokemonName');
-    expect(newSchema.required).toContain('level');
-    expect(newSchema.required).toContain('nature');
-    expect(newSchema.required).toContain('evs');
-    
+    expect(newSchema.required).toContain("pokemonName");
+    expect(newSchema.required).toContain("level");
+    expect(newSchema.required).toContain("nature");
+    expect(newSchema.required).toContain("evs");
+
     // プロパティのキーが同じであることを確認
     const oldKeys = Object.keys(oldStatusSchema.properties).sort();
     const newKeys = Object.keys(newSchema.properties || {}).sort();
     expect(newKeys).toEqual(oldKeys);
-    
+
     // 各プロパティの基本的な型が同じであることを確認
     for (const key of oldKeys) {
-      const oldProp = oldStatusSchema.properties[key as keyof typeof oldStatusSchema.properties];
+      const oldProp =
+        oldStatusSchema.properties[
+          key as keyof typeof oldStatusSchema.properties
+        ];
       const newProp = (newSchema.properties as any)?.[key];
-      
+
       expect(newProp).toBeDefined();
-      
+
       // 型の確認（numberとintegerは同等として扱う）
-      if ('type' in oldProp) {
-        if (oldProp.type === 'number' && newProp.type === 'integer') {
-          expect(['number', 'integer']).toContain(newProp.type);
+      if ("type" in oldProp) {
+        if (oldProp.type === "number" && newProp.type === "integer") {
+          expect(["number", "integer"]).toContain(newProp.type);
         } else {
           expect(newProp.type).toBe(oldProp.type);
         }
       }
-      
+
       // ネストされたオブジェクトの場合
-      if (oldProp.type === 'object' && 'properties' in oldProp) {
+      if (oldProp.type === "object" && "properties" in oldProp) {
         expect(newProp.properties).toBeDefined();
         const oldNestedKeys = Object.keys(oldProp.properties).sort();
         const newNestedKeys = Object.keys(newProp.properties || {}).sort();
@@ -409,17 +415,17 @@ describe("既存スキーマと自動生成スキーマの比較", () => {
 
   it("calculateDamageの詳細な構造が一致", () => {
     const newSchema = calculateDamageDefinition.inputSchema;
-    
+
     // move.anyOf の詳細な確認（zod-to-json-schemaはanyOfを使用）
     const newMove = (newSchema.properties as any)?.move;
-    
+
     expect(newMove.anyOf || newMove.oneOf).toBeDefined();
     const moveAlternatives = newMove.anyOf || newMove.oneOf;
     expect(moveAlternatives.length).toBe(2);
-    
+
     // 文字列型の確認
     expect(moveAlternatives[0].type).toBe("string");
-    
+
     // オブジェクト型の確認
     const moveObject = moveAlternatives[1];
     expect(moveObject.type).toBe("object");
@@ -427,20 +433,20 @@ describe("既存スキーマと自動生成スキーマの比較", () => {
     expect(moveObject.properties.type).toBeDefined();
     expect(moveObject.properties.power).toBeDefined();
     expect(moveObject.required).toEqual(["type", "power"]);
-    
+
     // attacker.stat.anyOf の確認
     const newAttacker = (newSchema.properties as any)?.attacker;
     const newAttackerStat = newAttacker?.properties?.stat;
-    
+
     expect(newAttackerStat.anyOf || newAttackerStat.oneOf).toBeDefined();
     const statAlternatives = newAttackerStat.anyOf || newAttackerStat.oneOf;
     expect(statAlternatives.length).toBe(3);
-    
+
     // defender の構造確認
     const newDefender = (newSchema.properties as any)?.defender;
     expect(newDefender.type).toBe("object");
     expect(newDefender.required).toEqual(["stat"]);
-    
+
     // options の構造確認
     const newOptions = (newSchema.properties as any)?.options;
     expect(newOptions.type).toBe("object");
@@ -449,19 +455,19 @@ describe("既存スキーマと自動生成スキーマの比較", () => {
 
   it("calculateStatusの詳細な構造が一致", () => {
     const newSchema = calculateStatusDefinition.inputSchema;
-    
+
     // ivs の詳細確認
     const newIvs = (newSchema.properties as any)?.ivs;
     expect(newIvs.type).toBe("object");
     expect(newIvs.properties).toBeDefined();
     expect(newIvs.required).toEqual(["hp", "atk", "def", "spa", "spd", "spe"]);
-    
+
     // evs の詳細確認
     const newEvs = (newSchema.properties as any)?.evs;
     expect(newEvs.type).toBe("object");
     expect(newEvs.properties).toBeDefined();
     expect(newEvs.required).toEqual(["hp", "atk", "def", "spa", "spd", "spe"]);
-    
+
     // 各ステータスプロパティの型確認（integerも許容）
     const statNames = ["hp", "atk", "def", "spa", "spd", "spe"];
     for (const stat of statNames) {
@@ -473,19 +479,22 @@ describe("既存スキーマと自動生成スキーマの比較", () => {
   // 完全な一致を確認する詳細テスト
   it("スキーマのバリデーション制約が同等", () => {
     const newDamageSchema = calculateDamageDefinition.inputSchema;
-    
+
     // attackerのlevelの制約確認
-    const attackerLevel = (newDamageSchema.properties as any)?.attacker?.properties?.level;
+    const attackerLevel = (newDamageSchema.properties as any)?.attacker
+      ?.properties?.level;
     expect(attackerLevel.minimum).toBe(1);
     expect(attackerLevel.maximum).toBe(100);
-    
+
     // statModifierの制約確認
-    const attackerStatModifier = (newDamageSchema.properties as any)?.attacker?.properties?.statModifier;
+    const attackerStatModifier = (newDamageSchema.properties as any)?.attacker
+      ?.properties?.statModifier;
     expect(attackerStatModifier.minimum).toBe(-6);
     expect(attackerStatModifier.maximum).toBe(6);
-    
+
     // weatherのenum確認
-    const weather = (newDamageSchema.properties as any)?.options?.properties?.weather;
+    const weather = (newDamageSchema.properties as any)?.options?.properties
+      ?.weather;
     expect(weather.enum).toEqual(["はれ", "あめ"]);
   });
 
@@ -493,25 +502,29 @@ describe("既存スキーマと自動生成スキーマの比較", () => {
   it("新旧スキーマは機能的に同等（anyOf/oneOfとnumber/integerの違いを除く）", () => {
     // anyOfとoneOfは機能的に同等（すべての選択肢を試す）
     // integerはnumberのサブセットなので互換性がある
-    
+
     const newDamageSchema = calculateDamageDefinition.inputSchema;
     const newStatusSchema = calculateStatusDefinition.inputSchema;
-    
+
     // 基本的な構造が維持されていることを確認
     expect(newDamageSchema.type).toBe("object");
     expect(newDamageSchema.required).toEqual(["move", "attacker", "defender"]);
-    
+
     expect(newStatusSchema.type).toBe("object");
     // ivsは新しいスキーマでrequiredに追加されているが、これは適切な改善
     expect(newStatusSchema.required).toContain("pokemonName");
     expect(newStatusSchema.required).toContain("level");
     expect(newStatusSchema.required).toContain("nature");
     expect(newStatusSchema.required).toContain("evs");
-    
+
     console.log("\n=== スキーマの主な変更点 ===");
-    console.log("1. oneOf → anyOf: 機能的に同等（ZodのunionはanyOfにマッピング）");
+    console.log(
+      "1. oneOf → anyOf: 機能的に同等（ZodのunionはanyOfにマッピング）",
+    );
     console.log("2. number → integer: 適切な型の厳密化（整数値のみ許可）");
     console.log("3. calculateStatusのivsがrequiredに追加: 適切な改善");
-    console.log("\nこれらの変更は互換性を保ちながら、より正確なスキーマ定義となっています。");
+    console.log(
+      "\nこれらの変更は互換性を保ちながら、より正確なスキーマ定義となっています。",
+    );
   });
 });

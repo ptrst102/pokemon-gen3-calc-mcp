@@ -71,9 +71,11 @@ const moveInputSchema = z.union([
 // 能力値の入力スキーマ（3パターン）
 const statInputSchema = z.union([
   // パターン1: 実数値を直接指定
-  z.object({
-    value: z.number().int().min(1),
-  }),
+  z
+    .object({
+      value: z.number().int().min(1).describe("こうげきまたはとくこうの実数値"),
+    })
+    .describe("能力値を実数値で直接指定"),
   // パターン2: 個体値＋努力値＋性格補正
   z.object({
     iv: z.number().int().min(0).max(31),
