@@ -26,16 +26,19 @@ cd pokemon-gen3-calc-mcp
 
 # 依存関係のインストール
 npm install
-
-# ビルド
-npm run build
 ```
 
 ## 使い方
 
 ### MCP クライアントとの連携
 
-MCP クライアント（Claude Desktop など）の設定ファイルに以下を追加：
+1. ビルドを実行してdistディレクトリにファイルを生成：
+
+```bash
+npm run build
+```
+
+2. MCP クライアント（Claude Desktop など）の設定ファイルに以下を追加：
 
 ```json
 {
