@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { parseResponse } from "@/tests/parseResponse";
 import {
   isNormalDamageOutput,
   type StructuredOutput,
 } from "@/tools/calculateDamage/handlers/formatters/structuredOutputFormatter";
 import { calculateDamageHandler } from "@/tools/calculateDamage/handlers/handler";
-import { parseResponse } from "@/tools/test-helpers/parseResponse";
 
 describe("じばく・だいばくはつの防御半減", () => {
   it("じばくで防御が半減される", async () => {

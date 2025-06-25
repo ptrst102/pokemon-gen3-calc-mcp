@@ -1,11 +1,10 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { generateInputSchema } from "@/tools/utils/generateInputSchema";
-import { calculateStatusInputSchema } from "./handlers/schemas/statusSchema";
+import { calculateStatusInputSchema } from "./generated/inputSchema";
 
 /**
- * ステータス計算ツールの定義（zod-to-json-schema版）
+ * ステータス計算ツールの定義
  *
- * inputSchemaはZodスキーマから自動生成される
+ * inputSchemaは事前生成されたスキーマファイルから読み込まれる
  */
 export const calculateStatusDefinition: Tool = {
   name: "calculate_status",
@@ -13,7 +12,7 @@ export const calculateStatusDefinition: Tool = {
   description:
     "ポケモンのステータス実数値を計算します。種族値、個体値、努力値、レベル、せいかくを考慮した正確な数値を算出します。",
   _meta: {},
-  inputSchema: generateInputSchema(calculateStatusInputSchema),
+  inputSchema: calculateStatusInputSchema,
   outputSchema: {
     type: "object",
     properties: {
