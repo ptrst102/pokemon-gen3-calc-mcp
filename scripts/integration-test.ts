@@ -13,7 +13,7 @@ interface TestResult {
 const runIntegrationTests = async () => {
   const results: TestResult[] = [];
 
-  console.log("🚀 MCP Server Integration Test\n");
+  console.log("MCP Server Integration Test\n");
 
   try {
     // MCPサーバーへの接続
@@ -33,18 +33,18 @@ const runIntegrationTests = async () => {
     );
 
     await client.connect(transport);
-    console.log("✅ サーバーへの接続成功\n");
+    console.log("サーバーへの接続成功\n");
 
     // 利用可能なツールの一覧取得
     const tools = await client.listTools();
-    console.log("📋 利用可能なツール:");
+    console.log("利用可能なツール:");
     tools.tools.forEach((tool) => {
       console.log(`  - ${tool.name}: ${tool.description}`);
     });
     console.log("");
 
     // テスト1: calculate_status（ピカチュウのステータス計算）
-    console.log("📊 テスト1: calculate_status (ピカチュウ)");
+    console.log("テスト1: calculate_status (ピカチュウ)");
     try {
       const statusResult = await client.callTool({
         name: "calculate_status",
@@ -92,12 +92,12 @@ const runIntegrationTests = async () => {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       });
-      console.error(`❌ エラー: ${error}`);
+      console.error(`エラー: ${error}`);
     }
     console.log("");
 
     // テスト2: calculate_damage（努力値・個体値指定）
-    console.log("🎯 テスト2: calculate_damage (努力値・個体値指定)");
+    console.log("テスト2: calculate_damage (努力値・個体値指定)");
     try {
       const damageResult = await client.callTool({
         name: "calculate_damage",
@@ -147,12 +147,12 @@ const runIntegrationTests = async () => {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       });
-      console.error(`❌ エラー: ${error}`);
+      console.error(`エラー: ${error}`);
     }
     console.log("");
 
     // テスト3: calculate_damage 実数値直接指定
-    console.log("🏠 テスト3: calculate_damage (実数値直接指定)");
+    console.log("テスト3: calculate_damage (実数値直接指定)");
     try {
       const valueResult = await client.callTool({
         name: "calculate_damage",
@@ -198,12 +198,12 @@ const runIntegrationTests = async () => {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       });
-      console.error(`❌ エラー: ${error}`);
+      console.error(`エラー: ${error}`);
     }
     console.log("");
 
     // テスト4: calculate_damage with calculateAllEvs（努力値別ダメージ計算）
-    console.log("📈 テスト4: calculate_damage with calculateAllEvs");
+    console.log("テスト4: calculate_damage with calculateAllEvs");
     try {
       const evDamageResult = await client.callTool({
         name: "calculate_damage",
@@ -256,12 +256,12 @@ const runIntegrationTests = async () => {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       });
-      console.error(`❌ エラー: ${error}`);
+      console.error(`エラー: ${error}`);
     }
     console.log("");
 
     // テスト5: エラーケース（存在しないポケモン）
-    console.log("🚫 テスト5: エラーケース (存在しないポケモン)");
+    console.log("テスト5: エラーケース (存在しないポケモン)");
     try {
       await client.callTool({
         name: "calculate_status",
@@ -283,7 +283,7 @@ const runIntegrationTests = async () => {
         success: true,
         response: `正常にエラーをキャッチ: ${error}`,
       });
-      console.log(`✅ 正常にエラーをキャッチ: ${error}`);
+      console.log(`正常にエラーをキャッチ: ${error}`);
     }
     console.log("");
 
@@ -291,7 +291,7 @@ const runIntegrationTests = async () => {
     await client.close();
 
     // テスト結果のサマリー
-    console.log("\n📝 テスト結果サマリー\n");
+    console.log("\nテスト結果サマリー\n");
     const successCount = results.filter((r) => r.success).length;
     console.log(`全体: ${successCount}/${results.length} 成功`);
     console.log("");
@@ -306,13 +306,13 @@ const runIntegrationTests = async () => {
 
     process.exit(successCount === results.length ? 0 : 1);
   } catch (error) {
-    console.error("💥 テスト実行中に予期しないエラーが発生しました:", error);
+    console.error("テスト実行中に予期しないエラーが発生しました:", error);
     process.exit(1);
   }
 };
 
 // テスト実行
 runIntegrationTests().catch((error) => {
-  console.error("💥 テスト実行エラー:", error);
+  console.error("テスト実行エラー:", error);
   process.exit(1);
 });
