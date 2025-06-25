@@ -96,8 +96,8 @@ const runIntegrationTests = async () => {
     }
     console.log("");
 
-    // テスト2: calculate_damage（ラティオスのサイコキネシス）
-    console.log("🎯 テスト2: calculate_damage (ラティオスのサイコキネシス)");
+    // テスト2: calculate_damage（努力値・個体値指定）
+    console.log("🎯 テスト2: calculate_damage (努力値・個体値指定)");
     try {
       const damageResult = await client.callTool({
         name: "calculate_damage",
@@ -127,7 +127,7 @@ const runIntegrationTests = async () => {
       });
 
       results.push({
-        name: "calculate_damage (ラティオス vs キノガッサ)",
+        name: "calculate_damage (努力値・個体値指定)",
         success: true,
         response: damageResult.content,
       });
@@ -143,7 +143,7 @@ const runIntegrationTests = async () => {
       }
     } catch (error) {
       results.push({
-        name: "calculate_damage (ラティオス vs キノガッサ)",
+        name: "calculate_damage (努力値・個体値指定)",
         success: false,
         error: error instanceof Error ? error.message : String(error),
       });
