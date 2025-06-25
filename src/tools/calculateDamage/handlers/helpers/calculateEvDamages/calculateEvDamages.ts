@@ -5,12 +5,12 @@ import type {
   EvDamageEntry,
   InternalDamageParams,
 } from "@/tools/calculateDamage/types/damageCalculation";
-import { applyAbilityEffects } from "./abilityEffects";
-import { calculateBaseDamage } from "./calculateBaseDamage";
-import { getDamageRanges } from "./damageRanges";
-import { calculateItemEffects } from "./itemEffects";
-import { getStatModifierRatio } from "./statModifier";
-import { getTypeEffectiveness } from "./typeEffectiveness";
+import { applyAbilityEffects } from "../abilityEffects";
+import { calculateBaseDamage } from "../calculateBaseDamage";
+import { getDamageRanges } from "../damageRanges";
+import { calculateItemEffects } from "../itemEffects";
+import { getStatModifierRatio } from "../statModifier";
+import { getTypeEffectiveness } from "../typeEffectiveness";
 
 /**
  * ダメージ計算の主処理
