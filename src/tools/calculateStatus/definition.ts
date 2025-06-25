@@ -1,55 +1,19 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
+import { generateInputSchema } from "@/tools/utils/generateInputSchema";
+import { calculateStatusInputSchema } from "./handlers/schemas/statusSchema";
 
+/**
+ * ステータス計算ツールの定義（zod-to-json-schema版）
+ *
+ * inputSchemaはZodスキーマから自動生成される
+ */
 export const calculateStatusDefinition: Tool = {
   name: "calculate_status",
   title: "ポケモンステータス計算",
   description:
-    "ポケモンのステータス実数値を計算します。種族値、個体値、努力値、レベル、せいかくを考慮して正確な実数値を算出します。",
+    "ポケモンのステータス実数値を計算します。種族値、個体値、努力値、レベル、せいかくを考慮した正確な数値を算出します。",
   _meta: {},
-  inputSchema: {
-    type: "object",
-    properties: {
-      pokemonName: {
-        type: "string",
-        description: "ポケモン名",
-      },
-      level: {
-        type: "number",
-        description: "レベル（1-100）",
-      },
-      nature: {
-        type: "string",
-        description: "せいかく",
-      },
-      ivs: {
-        type: "object",
-        description: "個体値（0-31）",
-        properties: {
-          hp: { type: "number" },
-          atk: { type: "number" },
-          def: { type: "number" },
-          spa: { type: "number" },
-          spd: { type: "number" },
-          spe: { type: "number" },
-        },
-        required: ["hp", "atk", "def", "spa", "spd", "spe"],
-      },
-      evs: {
-        type: "object",
-        description: "努力値（0-252、合計510まで）",
-        properties: {
-          hp: { type: "number" },
-          atk: { type: "number" },
-          def: { type: "number" },
-          spa: { type: "number" },
-          spd: { type: "number" },
-          spe: { type: "number" },
-        },
-        required: ["hp", "atk", "def", "spa", "spd", "spe"],
-      },
-    },
-    required: ["pokemonName", "level", "nature", "evs"],
-  },
+  inputSchema: generateInputSchema(calculateStatusInputSchema),
   outputSchema: {
     type: "object",
     properties: {
