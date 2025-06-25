@@ -107,6 +107,9 @@ npm run check
 
 # 結合テスト（MCPサーバーへの実際のリクエストをテスト）
 npm run test:integration
+
+# スキーマ生成（ZodスキーマからMCP用JSONスキーマを生成）
+npm run schemagen
 ```
 
 ### 技術スタック

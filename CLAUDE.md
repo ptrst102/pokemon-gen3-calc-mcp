@@ -52,6 +52,9 @@ npm run dev
 
 # ビルド
 npm run build
+
+# スキーマ生成（ZodスキーマからMCP用JSONスキーマを生成）
+npm run schemagen
 ```
 
 ## コーディング規約
@@ -187,10 +190,14 @@ src/
 ├── tools/                   # MCPツール定義とハンドラ
 │   ├── calculateStatus/
 │   │   ├── definition.ts   # ツール定義
+│   │   ├── generated/      # 自動生成されたスキーマ
+│   │   │   └── inputSchema.ts
 │   │   ├── handlers/       # ハンドラとロジック
 │   │   └── index.ts        # エクスポート
 │   └── calculateDamage/
 │       ├── definition.ts   # ツール定義
+│       ├── generated/      # 自動生成されたスキーマ
+│       │   └── inputSchema.ts
 │       ├── handlers/       # リクエストハンドラ
 │       │   ├── handler.ts
 │       │   ├── schemas/    # Zodスキーマ
@@ -202,6 +209,8 @@ src/
 │       │   └── formatters/ # レスポンス整形
 │       ├── types/          # 型定義
 │       └── index.ts
+├── tests/                   # テストヘルパー
+│   └── parseResponse.ts    # MCPレスポンスパーサー
 ├── types/                   # 共通型定義
 └── utils/                   # 共通ユーティリティ
     ├── calculateHp/        # HP計算
@@ -223,6 +232,7 @@ src/
 
    - Zod による API 入出力の厳密な型定義
    - ランタイムバリデーション
+   - `npm run schemagen`でZodスキーマからMCP用JSONスキーマを自動生成
 
 3. **テストファースト**:
 
@@ -246,12 +256,17 @@ src/
    - `npm run check`でエラーがないことを確認
    - 特に型エラーとリントエラーに注意
 
-3. **コミット前**:
+3. **スキーマ変更時**:
+
+   - Zodスキーマ（`schemas/`内）を変更した場合は必ず`npm run schemagen`を実行
+   - 自動生成されたファイル（`generated/`内）は直接編集しない
+
+4. **コミット前**:
 
    - `npm run format`でコード整形
    - `npm run check`で全チェック実行
 
-4. **CI/CD**:
+5. **CI/CD**:
    - GitHub Actions で PR 時と main ブランチへの push 時に自動テスト実行
    - CI は`npm run check`（型チェック、リント、テスト）を実行
 
