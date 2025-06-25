@@ -14,26 +14,8 @@ const formatZodError = (error: ZodError): string => {
         }
         return `「${path}」は${issue.expected}型である必要があります（現在: ${issue.received}型）`;
 
-      case "invalid_union": {
-        // Unionタイプの検証失敗時は、最初の失敗理由から必須フィールドエラーを判定
-        const unionErrors = error.errors.filter(
-          (e) => e.path.join(".") === path,
-        );
-        if (
-          unionErrors.some(
-            (e) => e.code === "invalid_type" && e.received === "undefined",
-          )
-        ) {
-          return `「${path}」フィールドが必須です`;
-        }
-
-        // moveフィールドの場合は特別なメッセージを返す
-        if (path === "move") {
-          return '「move」は文字列（わざ名）または { type: "タイプ名", power: 威力 } の形式で指定してください';
-        }
-
+      case "invalid_union":
         return `「${path}」の形式が正しくありません`;
-      }
 
       case "too_small":
         return `「${path}」は${issue.minimum}以上である必要があります`;
@@ -57,7 +39,15 @@ export const formatError = (
 ): {
   structuredContent: {
     error: string;
-    move: { type: string; power: number; category: string };
+    pokemonName: string;
+    stats: {
+      hp: number;
+      atk: number;
+      def: number;
+      spa: number;
+      spd: number;
+      spe: number;
+    };
   };
 } => {
   let message: string;
@@ -73,11 +63,15 @@ export const formatError = (
   return {
     structuredContent: {
       error: message,
-      // エラー時でも最小限のmove情報を含める（スキーマ準拠のため）
-      move: {
-        type: "unknown",
-        power: 0,
-        category: "unknown",
+      // エラー時でも最小限の情報を含める（スキーマ準拠のため）
+      pokemonName: "unknown",
+      stats: {
+        hp: 0,
+        atk: 0,
+        def: 0,
+        spa: 0,
+        spd: 0,
+        spe: 0,
       },
     },
   };

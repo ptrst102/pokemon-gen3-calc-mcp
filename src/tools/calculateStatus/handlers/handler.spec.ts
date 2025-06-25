@@ -29,9 +29,13 @@ describe("calculate-status tool", () => {
       evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
     };
 
-    await expect(calculateStatusHandler(input)).rejects.toThrow(
-      "ポケモン「ミュウツーX」が見つかりません",
-    );
+    const result = await calculateStatusHandler(input);
+    expect("error" in result.structuredContent).toBe(true);
+    if ("error" in result.structuredContent) {
+      expect(result.structuredContent.error).toContain(
+        "ポケモン「ミュウツーX」が見つかりません",
+      );
+    }
   });
 
   it("存在しない性格でエラーになること", async () => {
@@ -43,9 +47,13 @@ describe("calculate-status tool", () => {
       evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
     };
 
-    await expect(calculateStatusHandler(input)).rejects.toThrow(
-      "せいかく「つよき」が見つかりません",
-    );
+    const result = await calculateStatusHandler(input);
+    expect("error" in result.structuredContent).toBe(true);
+    if ("error" in result.structuredContent) {
+      expect(result.structuredContent.error).toContain(
+        "せいかく「つよき」が見つかりません",
+      );
+    }
   });
 
   it("努力値の合計が510を超える場合エラーになること", async () => {
@@ -57,9 +65,13 @@ describe("calculate-status tool", () => {
       evs: { hp: 252, atk: 252, def: 252, spa: 0, spd: 0, spe: 0 },
     };
 
-    await expect(calculateStatusHandler(input)).rejects.toThrow(
-      "努力値の合計は510以下でなければなりません",
-    );
+    const result = await calculateStatusHandler(input);
+    expect("error" in result.structuredContent).toBe(true);
+    if ("error" in result.structuredContent) {
+      expect(result.structuredContent.error).toContain(
+        "努力値の合計は510以下でなければなりません",
+      );
+    }
   });
 
   it("ヌケニンのHPは個体値・努力値に関わらず1になること", async () => {
