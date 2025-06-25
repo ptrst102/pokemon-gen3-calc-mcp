@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 重要な参照ドキュメント
 
-MCPプロトコルの詳細については、`docs/what-is-MCP.md`を参照してください。このファイルにはMCPの包括的なドキュメントが含まれており、MCPサーバーやクライアントの実装時に必要な情報が記載されています。
+MCP プロトコルの詳細については、`docs/what-is-MCP.md`を参照してください。このファイルには MCP の包括的なドキュメントが含まれており、MCP サーバーやクライアントの実装時に必要な情報が記載されています。
 
 ## プロジェクト概要
 
@@ -206,19 +206,20 @@ src/
    - 特に型エラーとリントエラーに注意
 
 3. **コミット前**:
+
    - `npm run format`でコード整形
    - `npm run check`で全チェック実行
 
 4. **CI/CD**:
-   - GitHub ActionsでPR時とmainブランチへのpush時に自動テスト実行
-   - CIは`npm run check`（型チェック、リント、テスト）を実行
+   - GitHub Actions で PR 時と main ブランチへの push 時に自動テスト実行
+   - CI は`npm run check`（型チェック、リント、テスト）を実行
 
 ## 開発時のルール
 
 - **ブランチ管理**:
-  - 適宜ブランチを切り、ghコマンドを用いてプルリクを出すこと
-  - mainブランチは保護されている: 直接プッシュ不可、PR必須、CI通過必須
-  - ブランチは原則としてorigin/mainから生やす: `git checkout -b feature-branch origin/main`を使用してコンフリクトを防ぐ
+  - 適宜ブランチを切り、gh コマンドを用いてプルリクを出すこと
+  - main ブランチは保護されている: 直接プッシュ不可、PR 必須、CI 通過必須
+  - ブランチは原則として origin/main から生やす: `git checkout -b feature-branch origin/main`を使用してコンフリクトを防ぐ
 
 ## 技術スタック
 
@@ -230,6 +231,29 @@ src/
 - **ビルド**: esbuild (via tsx)
 - **パッケージマネージャー**: npm
 - **Node.js バージョン管理**: Volta 推奨
+
+## TypeScript MCP（.mcp.json）
+
+TypeScript 言語サーバー機能が利用可能：
+
+```json
+{
+  "mcpServers": {
+    "typescript": {
+      "command": "npx",
+      "args": ["typescript-mcp"]
+    }
+  }
+}
+```
+
+これにより、Claude Code は以下の高度な TypeScript 操作が可能：
+
+- シンボルのリネーム
+- 定義へのジャンプ
+- 参照の検索
+- 型情報の取得
+- ファイル/ディレクトリの移動（インポートの自動更新付き）
 
 ## 新しいルールの追加プロセス
 
