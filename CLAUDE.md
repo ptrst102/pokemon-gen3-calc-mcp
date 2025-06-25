@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 重要な参照ドキュメント
+
+MCPプロトコルの詳細については、`docs/what-is-MCP.md`を参照してください。このファイルにはMCPの包括的なドキュメントが含まれており、MCPサーバーやクライアントの実装時に必要な情報が記載されています。
+
 ## プロジェクト概要
 
 このプロジェクトは、ポケモン第三世代（ルビー・サファイア・エメラルド・ファイアレッド・リーフグリーン）のステータスとダメージ計算を行う MCP（Model Context Protocol）サーバーです。LLM がポケモンの計算を正確に行うための外部ツールとして機能します。
@@ -32,7 +36,9 @@ npm install
 npm run typecheck
 
 # テスト実行
-npm run test
+npm run test        # 全テスト実行
+npm run test -- src/tools/calculateDamage  # 特定ディレクトリのテスト
+npm run test -- --watch  # ウォッチモード
 
 # リント・フォーマット
 npm run lint        # リントのみ
@@ -202,6 +208,10 @@ src/
 3. **コミット前**:
    - `npm run format`でコード整形
    - `npm run check`で全チェック実行
+
+4. **CI/CD**:
+   - GitHub ActionsでPR時とmainブランチへのpush時に自動テスト実行
+   - CIは`npm run check`（型チェック、リント、テスト）を実行
 
 ## 開発時のルール
 
