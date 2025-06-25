@@ -34,48 +34,44 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
   );
 
   const attackRatio = getStatModifierRatio(attacker.attackModifier);
-  let attackStat = Math.floor(
+  const baseAttackStat = Math.floor(
     (attacker.attack * attackRatio.numerator) / attackRatio.denominator,
   );
 
-  if (move.isPhysical) {
-    attackStat = Math.floor(
-      (attackStat * attackerItemEffects.attackMultiplier.numerator) /
-        attackerItemEffects.attackMultiplier.denominator,
-    );
-  } else {
-    attackStat = Math.floor(
-      (attackStat * attackerItemEffects.specialAttackMultiplier.numerator) /
-        attackerItemEffects.specialAttackMultiplier.denominator,
-    );
-  }
+  const attackStat = move.isPhysical
+    ? Math.floor(
+        (baseAttackStat * attackerItemEffects.attackMultiplier.numerator) /
+          attackerItemEffects.attackMultiplier.denominator,
+      )
+    : Math.floor(
+        (baseAttackStat *
+          attackerItemEffects.specialAttackMultiplier.numerator) /
+          attackerItemEffects.specialAttackMultiplier.denominator,
+      );
 
   const defenseRatio = getStatModifierRatio(defender.defenseModifier);
-  let defenseStat = Math.floor(
+  const baseDefenseStat = Math.floor(
     (defender.defense * defenseRatio.numerator) / defenseRatio.denominator,
   );
 
-  if (move.isPhysical) {
-    defenseStat = Math.floor(
-      (defenseStat * defenderItemEffects.defenseMultiplier.numerator) /
-        defenderItemEffects.defenseMultiplier.denominator,
-    );
-  } else {
-    defenseStat = Math.floor(
-      (defenseStat * defenderItemEffects.specialDefenseMultiplier.numerator) /
-        defenderItemEffects.specialDefenseMultiplier.denominator,
-    );
-  }
+  const itemAdjustedDefenseStat = move.isPhysical
+    ? Math.floor(
+        (baseDefenseStat * defenderItemEffects.defenseMultiplier.numerator) /
+          defenderItemEffects.defenseMultiplier.denominator,
+      )
+    : Math.floor(
+        (baseDefenseStat *
+          defenderItemEffects.specialDefenseMultiplier.numerator) /
+          defenderItemEffects.specialDefenseMultiplier.denominator,
+      );
 
   // じばく・だいばくはつの処理: 防御を半分にする
-  if (
-    "name" in move &&
-    (move.name === "じばく" || move.name === "だいばくはつ")
-  ) {
-    defenseStat = Math.floor(defenseStat / 2);
-  }
+  const defenseStat =
+    "name" in move && (move.name === "じばく" || move.name === "だいばくはつ")
+      ? Math.floor(itemAdjustedDefenseStat / 2)
+      : itemAdjustedDefenseStat;
 
-  let damage = calculateBaseDamage({
+  const baseDamage = calculateBaseDamage({
     level: attacker.level,
     power: move.power,
     attack: attackStat,
@@ -83,46 +79,67 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
     isPhysical: move.isPhysical,
   });
 
-  if (attacker.types?.some((type) => type === move.type)) {
-    damage = Math.floor(damage * 1.5);
-  }
+  // タイプ一致ボーナス
+  const stabDamage = attacker.types?.some((type) => type === move.type)
+    ? Math.floor(baseDamage * 1.5)
+    : baseDamage;
 
+  // タイプ相性
   const typeEffectiveness = getTypeEffectiveness(move.type, defender.types);
-  damage = Math.floor(damage * typeEffectiveness);
+  const typeAdjustedDamage = Math.floor(stabDamage * typeEffectiveness);
 
-  if (options.weather === "はれ") {
-    if (move.type === "ほのお") {
-      damage = Math.floor(damage * 1.5);
-    } else if (move.type === "みず") {
-      damage = Math.floor(damage * 0.5);
+  // 天候効果
+  const weatherAdjustedDamage = (() => {
+    if (options.weather === "はれ") {
+      if (move.type === "ほのお") {
+        return Math.floor(typeAdjustedDamage * 1.5);
+      }
+      if (move.type === "みず") {
+        return Math.floor(typeAdjustedDamage * 0.5);
+      }
     }
-  } else if (options.weather === "あめ") {
-    if (move.type === "みず") {
-      damage = Math.floor(damage * 1.5);
-    } else if (move.type === "ほのお") {
-      damage = Math.floor(damage * 0.5);
+    if (options.weather === "あめ") {
+      if (move.type === "みず") {
+        return Math.floor(typeAdjustedDamage * 1.5);
+      }
+      if (move.type === "ほのお") {
+        return Math.floor(typeAdjustedDamage * 0.5);
+      }
     }
-  }
+    return typeAdjustedDamage;
+  })();
 
-  if (options.charge && move.type === "でんき") {
-    damage = Math.floor(damage * 2);
-  }
+  // チャージ効果
+  const chargeAdjustedDamage =
+    options.charge && move.type === "でんき"
+      ? Math.floor(weatherAdjustedDamage * 2)
+      : weatherAdjustedDamage;
 
-  if (move.isPhysical && options.reflect) {
-    damage = Math.floor(damage * 0.5);
-  } else if (!move.isPhysical && options.lightScreen) {
-    damage = Math.floor(damage * 0.5);
-  }
+  // 壁効果
+  const screenAdjustedDamage = (() => {
+    if (move.isPhysical && options.reflect) {
+      return Math.floor(chargeAdjustedDamage * 0.5);
+    }
+    if (!move.isPhysical && options.lightScreen) {
+      return Math.floor(chargeAdjustedDamage * 0.5);
+    }
+    return chargeAdjustedDamage;
+  })();
 
-  if (options.mudSport && move.type === "でんき") {
-    damage = Math.floor(damage * 0.5);
-  }
-  if (options.waterSport && move.type === "ほのお") {
-    damage = Math.floor(damage * 0.5);
-  }
+  // スポーツ効果
+  const sportAdjustedDamage = (() => {
+    if (options.mudSport && move.type === "でんき") {
+      return Math.floor(screenAdjustedDamage * 0.5);
+    }
+    if (options.waterSport && move.type === "ほのお") {
+      return Math.floor(screenAdjustedDamage * 0.5);
+    }
+    return screenAdjustedDamage;
+  })();
 
-  damage = applyAbilityEffects({
-    damage,
+  // とくせい効果
+  const abilityAdjustedDamage = applyAbilityEffects({
+    damage: sportAdjustedDamage,
     moveType: move.type,
     attackerAbility: attacker.ability as AbilityName | undefined,
     defenderAbility: defender.ability as AbilityName | undefined,
@@ -132,11 +149,13 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
     isPhysical: move.isPhysical,
   });
 
-  if (damage > 0) {
-    damage = Math.max(1, damage);
-  }
+  // 最小ダメージ保証
+  const finalDamage =
+    abilityAdjustedDamage > 0
+      ? Math.max(1, abilityAdjustedDamage)
+      : abilityAdjustedDamage;
 
-  return getDamageRanges(damage);
+  return getDamageRanges(finalDamage);
 };
 
 /**

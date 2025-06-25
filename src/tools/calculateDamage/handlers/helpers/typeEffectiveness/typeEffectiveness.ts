@@ -67,19 +67,19 @@ export const getTypeEffectiveness = (
   attackType: TypeName,
   defenderTypes: TypeName[],
 ): number => {
-  let effectiveness = 1;
-
-  for (const defenderType of defenderTypes) {
-    if (NO_EFFECT[attackType].includes(defenderType)) {
-      return 0;
-    }
-
-    if (SUPER_EFFECTIVE[attackType].includes(defenderType)) {
-      effectiveness *= 2;
-    } else if (NOT_VERY_EFFECTIVE[attackType].includes(defenderType)) {
-      effectiveness *= 0.5;
-    }
+  // 無効タイプがあれば即座に0を返す
+  if (defenderTypes.some((type) => NO_EFFECT[attackType].includes(type))) {
+    return 0;
   }
 
-  return effectiveness;
+  // 各タイプに対する効果を計算して積算
+  return defenderTypes.reduce((effectiveness, defenderType) => {
+    if (SUPER_EFFECTIVE[attackType].includes(defenderType)) {
+      return effectiveness * 2;
+    }
+    if (NOT_VERY_EFFECTIVE[attackType].includes(defenderType)) {
+      return effectiveness * 0.5;
+    }
+    return effectiveness;
+  }, 1);
 };

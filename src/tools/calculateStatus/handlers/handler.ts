@@ -12,17 +12,15 @@ export const calculateStatusHandler = async (args: unknown) => {
     const { pokemon, nature, level, ivs, evs } = parsedData;
 
     // ステータス実数値の計算
-    let hp = calculateHp({
-      baseStat: pokemon.baseStats.hp,
-      iv: ivs.hp,
-      ev: evs.hp,
-      level,
-    });
-
-    // ヌケニンのHPは常に1
-    if (pokemon.name === "ヌケニン") {
-      hp = 1;
-    }
+    const hp =
+      pokemon.name === "ヌケニン"
+        ? 1 // ヌケニンのHPは常に1
+        : calculateHp({
+            baseStat: pokemon.baseStats.hp,
+            iv: ivs.hp,
+            ev: evs.hp,
+            level,
+          });
 
     const atk = calculateStat({
       baseStat: pokemon.baseStats.atk,

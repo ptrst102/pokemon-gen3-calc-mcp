@@ -26,75 +26,83 @@ export const applyAbilityEffects = (
     isPhysical,
   } = params;
 
-  let modifiedDamage = damage;
-
-  if (attackerAbility) {
-    // 常時発動とくせい
-    if (
-      (attackerAbility === "ちからもち" || attackerAbility === "ヨガパワー") &&
-      isPhysical
-    ) {
-      modifiedDamage = Math.floor(modifiedDamage * 2);
-    }
-
-    if (attackerAbility === "はりきり" && isPhysical) {
-      modifiedDamage = Math.floor(modifiedDamage * 1.5);
-    }
-
-    // 条件付きとくせい（発動時のみ）
-    if (attackerAbilityActive) {
-      // HP1/3以下で発動するタイプ強化とくせい
-      if (attackerAbility === "もうか" && moveType === "ほのお") {
-        modifiedDamage = Math.floor(modifiedDamage * 1.5);
-      }
-      if (attackerAbility === "げきりゅう" && moveType === "みず") {
-        modifiedDamage = Math.floor(modifiedDamage * 1.5);
-      }
-      if (attackerAbility === "しんりょく" && moveType === "くさ") {
-        modifiedDamage = Math.floor(modifiedDamage * 1.5);
-      }
-      if (attackerAbility === "むしのしらせ" && moveType === "むし") {
-        modifiedDamage = Math.floor(modifiedDamage * 1.5);
-      }
-
-      // こんじょう（状態異常時、物理攻撃1.5倍）
-      if (attackerAbility === "こんじょう" && isPhysical) {
-        modifiedDamage = Math.floor(modifiedDamage * 1.5);
-      }
-
-      // プラス/マイナス（ダブルバトルで相手がプラス/マイナス持ちの時、特殊攻撃1.5倍）
-      if (
-        (attackerAbility === "プラス" || attackerAbility === "マイナス") &&
-        !isPhysical
-      ) {
-        modifiedDamage = Math.floor(modifiedDamage * 1.5);
-      }
-    }
-  }
-
+  // 防御側とくせいによる無効化チェック（早期return）
   if (defenderAbility) {
-    // 常時発動とくせい
     if (defenderAbility === "ふゆう" && moveType === "じめん") {
       return 0;
     }
 
     if (
       defenderAbility === "ふしぎなまもり" &&
-      typeEffectiveness !== undefined
+      typeEffectiveness !== undefined &&
+      typeEffectiveness <= 1
     ) {
-      if (typeEffectiveness <= 1) {
-        return 0;
-      }
-    }
-
-    // 条件付きとくせい（発動時のみ）
-    if (defenderAbilityActive) {
-      // ふしぎなうろこ（状態異常時、防御1.5倍 = 物理ダメージを2/3に軽減）
-      if (defenderAbility === "ふしぎなうろこ" && isPhysical) {
-        modifiedDamage = Math.floor((modifiedDamage * 2) / 3);
-      }
+      return 0;
     }
   }
 
-  return modifiedDamage;
+  // 攻撃側とくせいによるダメージ補正を計算
+  const attackerModifiedDamage = (() => {
+    if (!attackerAbility) {
+      return damage;
+    }
+
+    // 常時発動とくせい
+    const constantAbilityDamage = (() => {
+      if (
+        (attackerAbility === "ちからもち" ||
+          attackerAbility === "ヨガパワー") &&
+        isPhysical
+      ) {
+        return Math.floor(damage * 2);
+      }
+
+      if (attackerAbility === "はりきり" && isPhysical) {
+        return Math.floor(damage * 1.5);
+      }
+
+      return damage;
+    })();
+
+    // 条件付きとくせい（発動時のみ）
+    if (!attackerAbilityActive) {
+      return constantAbilityDamage;
+    }
+
+    // HP1/3以下で発動するタイプ強化とくせい
+    if (
+      (attackerAbility === "もうか" && moveType === "ほのお") ||
+      (attackerAbility === "げきりゅう" && moveType === "みず") ||
+      (attackerAbility === "しんりょく" && moveType === "くさ") ||
+      (attackerAbility === "むしのしらせ" && moveType === "むし")
+    ) {
+      return Math.floor(constantAbilityDamage * 1.5);
+    }
+
+    // こんじょう（状態異常時、物理攻撃1.5倍）
+    if (attackerAbility === "こんじょう" && isPhysical) {
+      return Math.floor(constantAbilityDamage * 1.5);
+    }
+
+    // プラス/マイナス（ダブルバトルで相手がプラス/マイナス持ちの時、特殊攻撃1.5倍）
+    if (
+      (attackerAbility === "プラス" || attackerAbility === "マイナス") &&
+      !isPhysical
+    ) {
+      return Math.floor(constantAbilityDamage * 1.5);
+    }
+
+    return constantAbilityDamage;
+  })();
+
+  // 防御側とくせいによるダメージ軽減
+  if (
+    defenderAbility === "ふしぎなうろこ" &&
+    defenderAbilityActive &&
+    isPhysical
+  ) {
+    return Math.floor((attackerModifiedDamage * 2) / 3);
+  }
+
+  return attackerModifiedDamage;
 };
