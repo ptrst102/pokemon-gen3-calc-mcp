@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { parseResponse } from "@/tools/test-helpers/parseResponse";
 import {
   isErrorOutput,
   isEvRangeDamageOutput,
   isNormalDamageOutput,
+  type StructuredOutput,
 } from "./formatters/structuredOutputFormatter";
 import { calculateDamageHandler } from "./handler";
 
@@ -34,9 +36,10 @@ describe("calculateDamageHandler", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(result.structuredContent).toBeDefined();
-    if (isNormalDamageOutput(result.structuredContent)) {
-      expect(result.structuredContent.damage).toBeDefined();
+    expect(result.content).toBeDefined();
+    const output = parseResponse<StructuredOutput>(result);
+    if (isNormalDamageOutput(output)) {
+      expect(output.damage).toBeDefined();
     }
   });
 
@@ -59,10 +62,11 @@ describe("calculateDamageHandler", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(result.structuredContent).toBeDefined();
-    if (isNormalDamageOutput(result.structuredContent)) {
-      expect(result.structuredContent.damage).toBeDefined();
-      expect(result.structuredContent.modifiers.typeEffectiveness).toBe(4);
+    expect(result.content).toBeDefined();
+    const output = parseResponse<StructuredOutput>(result);
+    if (isNormalDamageOutput(output)) {
+      expect(output.damage).toBeDefined();
+      expect(output.modifiers.typeEffectiveness).toBe(4);
     }
   });
 
@@ -85,9 +89,10 @@ describe("calculateDamageHandler", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(result.structuredContent).toBeDefined();
-    if (isNormalDamageOutput(result.structuredContent)) {
-      expect(result.structuredContent.modifiers.typeEffectiveness).toBe(4);
+    expect(result.content).toBeDefined();
+    const output = parseResponse<StructuredOutput>(result);
+    if (isNormalDamageOutput(output)) {
+      expect(output.modifiers.typeEffectiveness).toBe(4);
     }
   });
 
@@ -105,11 +110,10 @@ describe("calculateDamageHandler", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    expect(result.structuredContent).toBeDefined();
-    if (isErrorOutput(result.structuredContent)) {
-      expect(result.structuredContent.error).toContain(
-        "わざ「存在しないわざ」が見つかりません",
-      );
+    expect(result.content).toBeDefined();
+    const output = parseResponse<StructuredOutput>(result);
+    if (isErrorOutput(output)) {
+      expect(output.error).toContain("わざ「存在しないわざ」が見つかりません");
     }
   });
 
@@ -141,11 +145,13 @@ describe("calculateDamageHandler", () => {
     });
 
     // 晴れ補正で1.5倍のダメージになることを確認
-    const normalDamage = isNormalDamageOutput(normalResult.structuredContent)
-      ? normalResult.structuredContent.damage.min
+    const normalOutput = parseResponse<StructuredOutput>(normalResult);
+    const sunOutput = parseResponse<StructuredOutput>(sunResult);
+    const normalDamage = isNormalDamageOutput(normalOutput)
+      ? normalOutput.damage.min
       : 0;
-    const sunDamage = isNormalDamageOutput(sunResult.structuredContent)
-      ? sunResult.structuredContent.damage.min
+    const sunDamage = isNormalDamageOutput(sunOutput)
+      ? sunOutput.damage.min
       : 0;
 
     // はれ補正は1.5倍だが、小数点以下切り捨てがあるので単純に比較
@@ -171,8 +177,9 @@ describe("calculateDamageHandler", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    if (isNormalDamageOutput(result.structuredContent)) {
-      expect(result.structuredContent.damage.min).toBe(0);
+    const output = parseResponse<StructuredOutput>(result);
+    if (isNormalDamageOutput(output)) {
+      expect(output.damage.min).toBe(0);
     }
   });
 
@@ -195,8 +202,9 @@ describe("calculateDamageHandler", () => {
     };
 
     const result = await calculateDamageHandler(input);
-    if (isNormalDamageOutput(result.structuredContent)) {
-      expect(result.structuredContent.damage.min).toBe(0);
+    const output = parseResponse<StructuredOutput>(result);
+    if (isNormalDamageOutput(output)) {
+      expect(output.damage.min).toBe(0);
     }
   });
 
@@ -228,11 +236,13 @@ describe("calculateDamageHandler", () => {
     const normalResult = await calculateDamageHandler(normalInput);
     const powerResult = await calculateDamageHandler(powerInput);
 
-    const normalDamage = isNormalDamageOutput(normalResult.structuredContent)
-      ? normalResult.structuredContent.damage.min
+    const normalOutput = parseResponse<StructuredOutput>(normalResult);
+    const powerOutput = parseResponse<StructuredOutput>(powerResult);
+    const normalDamage = isNormalDamageOutput(normalOutput)
+      ? normalOutput.damage.min
       : 0;
-    const powerDamage = isNormalDamageOutput(powerResult.structuredContent)
-      ? powerResult.structuredContent.damage.min
+    const powerDamage = isNormalDamageOutput(powerOutput)
+      ? powerOutput.damage.min
       : 0;
 
     // ちからもちで2倍のダメージ
@@ -266,15 +276,12 @@ describe("calculateDamageHandler", () => {
       };
 
       const result = await calculateDamageHandler(input);
-      if (isEvRangeDamageOutput(result.structuredContent)) {
-        expect(result.structuredContent.evRanges).toBeDefined();
-        expect(result.structuredContent.evRanges.length).toBeGreaterThan(0);
-        expect(result.structuredContent.evRanges[0].ev).toBe(0);
-        expect(
-          result.structuredContent.evRanges[
-            result.structuredContent.evRanges.length - 1
-          ].ev,
-        ).toBe(252);
+      const output = parseResponse<StructuredOutput>(result);
+      if (isEvRangeDamageOutput(output)) {
+        expect(output.evRanges).toBeDefined();
+        expect(output.evRanges.length).toBeGreaterThan(0);
+        expect(output.evRanges[0].ev).toBe(0);
+        expect(output.evRanges[output.evRanges.length - 1].ev).toBe(252);
       }
     });
 
@@ -304,15 +311,12 @@ describe("calculateDamageHandler", () => {
       };
 
       const result = await calculateDamageHandler(input);
-      if (isEvRangeDamageOutput(result.structuredContent)) {
-        expect(result.structuredContent.evRanges).toBeDefined();
-        expect(result.structuredContent.evRanges.length).toBeGreaterThan(0);
-        expect(result.structuredContent.evRanges[0].ev).toBe(0);
-        expect(
-          result.structuredContent.evRanges[
-            result.structuredContent.evRanges.length - 1
-          ].ev,
-        ).toBe(252);
+      const output = parseResponse<StructuredOutput>(result);
+      if (isEvRangeDamageOutput(output)) {
+        expect(output.evRanges).toBeDefined();
+        expect(output.evRanges.length).toBeGreaterThan(0);
+        expect(output.evRanges[0].ev).toBe(0);
+        expect(output.evRanges[output.evRanges.length - 1].ev).toBe(252);
       }
     });
 
@@ -341,9 +345,10 @@ describe("calculateDamageHandler", () => {
       };
 
       const result = await calculateDamageHandler(input);
-      if (isErrorOutput(result.structuredContent)) {
-        expect(result.structuredContent.error).toBeDefined();
-        expect(result.structuredContent.error).toContain(
+      const output = parseResponse<StructuredOutput>(result);
+      if (isErrorOutput(output)) {
+        expect(output.error).toBeDefined();
+        expect(output.error).toContain(
           "攻撃側と防御側の両方でcalculateAllEvsを使うことはできません",
         );
       }
@@ -375,17 +380,16 @@ describe("calculateDamageHandler", () => {
       };
 
       const result = await calculateDamageHandler(input);
-      if (isEvRangeDamageOutput(result.structuredContent)) {
-        expect(result.structuredContent.evRanges).toBeDefined();
+      const output = parseResponse<StructuredOutput>(result);
+      if (isEvRangeDamageOutput(output)) {
+        expect(output.evRanges).toBeDefined();
 
         // 中間のEV値（124）も含まれることを確認
-        const ev124Entry = result.structuredContent.evRanges.find(
-          (e) => e.ev === 124,
-        );
+        const ev124Entry = output.evRanges.find((e) => e.ev === 124);
         expect(ev124Entry).toBeDefined();
 
         // タイプ相性が正しく設定されることを確認
-        expect(result.structuredContent.modifiers.typeEffectiveness).toBe(2);
+        expect(output.modifiers.typeEffectiveness).toBe(2);
       }
     });
 
@@ -416,10 +420,11 @@ describe("calculateDamageHandler", () => {
 
       const result = await calculateDamageHandler(input);
 
-      // C145（性格補正なし）の場合、タイプ一致で72〜85付近のダメージ
-      if (isNormalDamageOutput(result.structuredContent)) {
-        expect(result.structuredContent.damage.min).toBeGreaterThanOrEqual(72);
-        expect(result.structuredContent.damage.max).toBeLessThanOrEqual(85);
+      // C145（性格裍正なし）の場合、タイプ一致で72〜85付近のダメージ
+      const output = parseResponse<StructuredOutput>(result);
+      if (isNormalDamageOutput(output)) {
+        expect(output.damage.min).toBeGreaterThanOrEqual(72);
+        expect(output.damage.max).toBeLessThanOrEqual(85);
       }
     });
   });
@@ -455,15 +460,13 @@ describe("calculateDamageHandler", () => {
         options: {},
       });
 
-      const normalMinDamage = isNormalDamageOutput(
-        normalResult.structuredContent,
-      )
-        ? normalResult.structuredContent.damage.min
+      const normalOutput = parseResponse<StructuredOutput>(normalResult);
+      const activeOutput = parseResponse<StructuredOutput>(activeResult);
+      const normalMinDamage = isNormalDamageOutput(normalOutput)
+        ? normalOutput.damage.min
         : 0;
-      const activeMinDamage = isNormalDamageOutput(
-        activeResult.structuredContent,
-      )
-        ? activeResult.structuredContent.damage.min
+      const activeMinDamage = isNormalDamageOutput(activeOutput)
+        ? activeOutput.damage.min
         : 0;
 
       // もうか発動時は1.5倍のダメージ
@@ -500,15 +503,13 @@ describe("calculateDamageHandler", () => {
         options: {},
       });
 
-      const normalMinDamage = isNormalDamageOutput(
-        normalResult.structuredContent,
-      )
-        ? normalResult.structuredContent.damage.min
+      const normalOutput = parseResponse<StructuredOutput>(normalResult);
+      const activeOutput = parseResponse<StructuredOutput>(activeResult);
+      const normalMinDamage = isNormalDamageOutput(normalOutput)
+        ? normalOutput.damage.min
         : 0;
-      const activeMinDamage = isNormalDamageOutput(
-        activeResult.structuredContent,
-      )
-        ? activeResult.structuredContent.damage.min
+      const activeMinDamage = isNormalDamageOutput(activeOutput)
+        ? activeOutput.damage.min
         : 0;
 
       // ふしぎなうろこ発動時は2/3のダメージ

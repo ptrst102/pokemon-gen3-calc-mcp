@@ -1,4 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { parseResponse } from "@/tools/test-helpers/parseResponse";
+import type {
+  CalculateStatusErrorOutput,
+  CalculateStatusOutput,
+} from "../types";
 import { calculateStatusHandler } from "./handler";
 
 describe("calculate-status tool", () => {
@@ -14,10 +19,11 @@ describe("calculate-status tool", () => {
     const result = await calculateStatusHandler(input);
 
     expect(result).toBeDefined();
-    expect(result.structuredContent).toBeDefined();
-    expect(result.structuredContent?.pokemonName).toBe("フシギダネ");
-    expect(result.structuredContent?.stats?.hp).toBe(112);
-    expect(result.structuredContent?.stats?.atk).toBe(61);
+    expect(result.content).toBeDefined();
+    const output = parseResponse<CalculateStatusOutput>(result);
+    expect(output.pokemonName).toBe("フシギダネ");
+    expect(output.stats.hp).toBe(112);
+    expect(output.stats.atk).toBe(61);
   });
 
   it("存在しないポケモン名でエラーになること", async () => {
@@ -30,11 +36,10 @@ describe("calculate-status tool", () => {
     };
 
     const result = await calculateStatusHandler(input);
-    expect("error" in result.structuredContent).toBe(true);
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain(
-        "ポケモン「ミュウツーX」が見つかりません",
-      );
+    const output = parseResponse<CalculateStatusErrorOutput>(result);
+    expect("error" in output).toBe(true);
+    if ("error" in output) {
+      expect(output.error).toContain("ポケモン「ミュウツーX」が見つかりません");
     }
   });
 
@@ -48,11 +53,10 @@ describe("calculate-status tool", () => {
     };
 
     const result = await calculateStatusHandler(input);
-    expect("error" in result.structuredContent).toBe(true);
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain(
-        "せいかく「つよき」が見つかりません",
-      );
+    const output = parseResponse<CalculateStatusErrorOutput>(result);
+    expect("error" in output).toBe(true);
+    if ("error" in output) {
+      expect(output.error).toContain("せいかく「つよき」が見つかりません");
     }
   });
 
@@ -66,9 +70,10 @@ describe("calculate-status tool", () => {
     };
 
     const result = await calculateStatusHandler(input);
-    expect("error" in result.structuredContent).toBe(true);
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain(
+    const output = parseResponse<CalculateStatusErrorOutput>(result);
+    expect("error" in output).toBe(true);
+    if ("error" in output) {
+      expect(output.error).toContain(
         "努力値の合計は510以下でなければなりません",
       );
     }
@@ -85,7 +90,8 @@ describe("calculate-status tool", () => {
 
     const result = await calculateStatusHandler(input);
 
-    expect(result.structuredContent?.pokemonName).toBe("ヌケニン");
-    expect(result.structuredContent?.stats?.hp).toBe(1);
+    const output = parseResponse<CalculateStatusOutput>(result);
+    expect(output.pokemonName).toBe("ヌケニン");
+    expect(output.stats.hp).toBe(1);
   });
 });

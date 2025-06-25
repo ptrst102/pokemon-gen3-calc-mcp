@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parseResponse } from "@/tools/test-helpers/parseResponse";
 import { calculateStatusHandler } from "./handler";
 
 describe("calculateStatusHandler エラーハンドリング", () => {
@@ -12,11 +13,10 @@ describe("calculateStatusHandler エラーハンドリング", () => {
     };
 
     const result = await calculateStatusHandler(input);
-    expect("error" in result.structuredContent).toBe(true);
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain(
-        "「pokemonName」フィールドが必須です",
-      );
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output).toBe(true);
+    if ("error" in output) {
+      expect(output.error).toContain("「pokemonName」フィールドが必須です");
     }
   });
 
@@ -30,9 +30,10 @@ describe("calculateStatusHandler エラーハンドリング", () => {
     };
 
     const result = await calculateStatusHandler(input);
-    expect("error" in result.structuredContent).toBe(true);
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain(
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output).toBe(true);
+    if ("error" in output) {
+      expect(output.error).toContain(
         "ポケモン「存在しないポケモン」が見つかりません",
       );
     }
@@ -48,9 +49,10 @@ describe("calculateStatusHandler エラーハンドリング", () => {
     };
 
     const result = await calculateStatusHandler(input);
-    expect("error" in result.structuredContent).toBe(true);
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain(
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output).toBe(true);
+    if ("error" in output) {
+      expect(output.error).toContain(
         "せいかく「無効なせいかく」が見つかりません",
       );
     }
@@ -66,9 +68,10 @@ describe("calculateStatusHandler エラーハンドリング", () => {
     };
 
     const result = await calculateStatusHandler(input);
-    expect("error" in result.structuredContent).toBe(true);
-    if ("error" in result.structuredContent) {
-      expect(result.structuredContent.error).toContain(
+    const output = parseResponse<{ error: string }>(result);
+    expect("error" in output).toBe(true);
+    if ("error" in output) {
+      expect(output.error).toContain(
         "「evs.spa」は252以下である必要があります",
       );
     }

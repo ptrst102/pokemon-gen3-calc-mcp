@@ -37,18 +37,8 @@ const formatZodError = (error: ZodError): string => {
 export const formatError = (
   error: unknown,
 ): {
-  structuredContent: {
-    error: string;
-    pokemonName: string;
-    stats: {
-      hp: number;
-      atk: number;
-      def: number;
-      spa: number;
-      spd: number;
-      spe: number;
-    };
-  };
+  isError: true;
+  content: Array<{ type: "text"; text: string }>;
 } => {
   const message = (() => {
     if (error instanceof ZodError) {
@@ -60,19 +50,27 @@ export const formatError = (
     return "不明なエラーが発生しました";
   })();
 
-  return {
-    structuredContent: {
-      error: message,
-      // エラー時でも最小限の情報を含める（スキーマ準拠のため）
-      pokemonName: "unknown",
-      stats: {
-        hp: 0,
-        atk: 0,
-        def: 0,
-        spa: 0,
-        spd: 0,
-        spe: 0,
-      },
+  const errorOutput = {
+    error: message,
+    // エラー時でも最小限の情報を含める（スキーマ準拠のため）
+    pokemonName: "unknown",
+    stats: {
+      hp: 0,
+      atk: 0,
+      def: 0,
+      spa: 0,
+      spd: 0,
+      spe: 0,
     },
+  };
+
+  return {
+    isError: true,
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(errorOutput, null, 2),
+      },
+    ],
   };
 };

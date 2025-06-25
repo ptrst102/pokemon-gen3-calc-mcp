@@ -7,8 +7,12 @@ describe("formatError", () => {
     const error = new Error("テストエラー");
     const result = formatError(error);
 
-    expect(result.structuredContent.error).toBe("テストエラー");
-    expect(result.structuredContent.move).toEqual({
+    expect(result.isError).toBe(true);
+    expect(result.content).toBeDefined();
+    expect(result.content[0].type).toBe("text");
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.error).toBe("テストエラー");
+    expect(parsed.move).toEqual({
       type: "unknown",
       power: 0,
       category: "unknown",
@@ -19,7 +23,9 @@ describe("formatError", () => {
     const error = "文字列エラー";
     const result = formatError(error);
 
-    expect(result.structuredContent.error).toBe("不明なエラーが発生しました");
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.error).toBe("不明なエラーが発生しました");
   });
 
   it("ZodErrorの場合は分かりやすいメッセージに変換する", () => {
@@ -34,9 +40,9 @@ describe("formatError", () => {
     ]);
 
     const result = formatError(zodError);
-    expect(result.structuredContent.error).toBe(
-      "入力エラー:\n「move」フィールドが必須です",
-    );
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.error).toBe("入力エラー:\n「move」フィールドが必須です");
   });
 
   it("複数のZodErrorを適切にフォーマットする", () => {
@@ -58,7 +64,9 @@ describe("formatError", () => {
     ]);
 
     const result = formatError(zodError);
-    expect(result.structuredContent.error).toBe(
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.error).toBe(
       "入力エラー:\n「attacker」フィールドが必須です\n「defender.level」はnumber型である必要があります（現在: string型）",
     );
   });
@@ -77,7 +85,9 @@ describe("formatError", () => {
     ]);
 
     const result = formatError(zodError);
-    expect(result.structuredContent.error).toBe(
+    expect(result.isError).toBe(true);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.error).toBe(
       "入力エラー:\n「attacker.level」は1以上である必要があります",
     );
   });

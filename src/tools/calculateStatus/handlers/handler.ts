@@ -5,7 +5,17 @@ import { natureModifier } from "@/utils/natureModifier";
 import { formatError } from "./helpers";
 import { calculateStatusInputSchema } from "./schemas/statusSchema";
 
-export const calculateStatusHandler = async (args: unknown) => {
+export const calculateStatusHandler = async (
+  args: unknown,
+): Promise<
+  | {
+      content: Array<{ type: "text"; text: string }>;
+    }
+  | {
+      isError: true;
+      content: Array<{ type: "text"; text: string }>;
+    }
+> => {
   try {
     const parsedData = calculateStatusInputSchema.parse(args);
 
@@ -64,11 +74,18 @@ export const calculateStatusHandler = async (args: unknown) => {
 
     const stats: StatsObj = { hp, atk, def, spa, spd, spe };
 
+    const structuredOutput = {
+      pokemonName: pokemon.name,
+      stats,
+    };
+
     return {
-      structuredContent: {
-        pokemonName: pokemon.name,
-        stats,
-      },
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(structuredOutput, null, 2),
+        },
+      ],
     };
   } catch (error) {
     return formatError(error);
