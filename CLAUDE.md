@@ -217,6 +217,8 @@ src/
 
 - **ブランチ管理**:
   - 適宜ブランチを切り、ghコマンドを用いてプルリクを出すこと
+  - mainブランチは保護されている: 直接プッシュ不可、PR必須、CI通過必須
+  - ブランチは原則としてorigin/mainから生やす: `git checkout -b feature-branch origin/main`を使用してコンフリクトを防ぐ
 
 ## 技術スタック
 
