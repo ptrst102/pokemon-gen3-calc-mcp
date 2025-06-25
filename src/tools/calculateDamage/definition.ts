@@ -355,6 +355,6 @@ export const calculateDamageDefinition: Tool = {
         },
       },
     },
-    required: ["move", "damage"],
+    required: ["move"],
   },
 };
