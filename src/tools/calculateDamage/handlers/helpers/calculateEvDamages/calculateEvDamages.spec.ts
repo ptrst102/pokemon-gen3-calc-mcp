@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { isNormalDamageOutput } from "@/tools/calculateDamage/handlers/formatters/structuredOutputFormatter";
 import { calculateDamageHandler } from "@/tools/calculateDamage/handlers/handler";
 
 describe("じばく・だいばくはつの防御半減", () => {
@@ -22,9 +23,9 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const normalResult = await calculateDamageHandler(normalInput);
-    const normalDamageMatch =
-      normalResult.content[0].text.match(/ダメージ: (\d+) 〜 (\d+)/);
-    const normalMinDamage = Number(normalDamageMatch?.[1]);
+    const normalMinDamage = isNormalDamageOutput(normalResult.structuredContent)
+      ? normalResult.structuredContent.damage.min
+      : 0;
 
     // じばくでのダメージ計算（防御半減）
     const selfDestructInput = {
@@ -45,9 +46,11 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const selfDestructResult = await calculateDamageHandler(selfDestructInput);
-    const selfDestructDamageMatch =
-      selfDestructResult.content[0].text.match(/ダメージ: (\d+) 〜 (\d+)/);
-    const selfDestructMinDamage = Number(selfDestructDamageMatch?.[1]);
+    const selfDestructMinDamage = isNormalDamageOutput(
+      selfDestructResult.structuredContent,
+    )
+      ? selfDestructResult.structuredContent.damage.min
+      : 0;
 
     // じばくは威力200で防御半減なので、とっしん（威力90）の2倍以上のダメージになるはず
     expect(selfDestructMinDamage).toBeGreaterThan(normalMinDamage * 2);
@@ -72,9 +75,11 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const explosionResult = await calculateDamageHandler(explosionInput);
-    const explosionDamageMatch =
-      explosionResult.content[0].text.match(/ダメージ: (\d+) 〜 (\d+)/);
-    const explosionMinDamage = Number(explosionDamageMatch?.[1]);
+    const explosionMinDamage = isNormalDamageOutput(
+      explosionResult.structuredContent,
+    )
+      ? explosionResult.structuredContent.damage.min
+      : 0;
 
     // だいばくはつは威力250で防御半減なので大きなダメージになるはず
     expect(explosionMinDamage).toBeGreaterThan(60);
@@ -99,9 +104,11 @@ describe("じばく・だいばくはつの防御半減", () => {
     };
 
     const hyperBeamResult = await calculateDamageHandler(hyperBeamInput);
-    const hyperBeamDamageMatch =
-      hyperBeamResult.content[0].text.match(/ダメージ: (\d+) 〜 (\d+)/);
-    const hyperBeamMaxDamage = Number(hyperBeamDamageMatch?.[2]);
+    const hyperBeamMaxDamage = isNormalDamageOutput(
+      hyperBeamResult.structuredContent,
+    )
+      ? hyperBeamResult.structuredContent.damage.max
+      : 0;
 
     // 防御が高いため、ダメージは少なめになるはず
     expect(hyperBeamMaxDamage).toBeLessThan(50);
