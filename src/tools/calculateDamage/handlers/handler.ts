@@ -1,7 +1,3 @@
-import type {
-  EvRangeDamageResult,
-  NormalDamageResult,
-} from "../types/damageCalculation";
 import { formatDamageResult } from "./formatters/damageFormatter";
 import { formatDamageWithEvRange } from "./formatters/damageWithEvRangeFormatter";
 import {
@@ -24,6 +20,33 @@ import {
 } from "./schemas/damageSchema";
 
 /**
+ * ダメージ計算の共通処理を行う汎用関数
+ */
+const createDamageResponse = <T extends object>(
+  context: ReturnType<typeof prepareCalculationContext>,
+  additionalData: T,
+  formatter: (
+    result: ReturnType<typeof prepareCalculationContext> & T,
+  ) => string,
+): { content: { type: "text"; text: string }[] } => {
+  const result = {
+    ...context,
+    ...additionalData,
+  };
+
+  const formattedResult = formatter(result);
+
+  return {
+    content: [
+      {
+        type: "text",
+        text: formattedResult,
+      },
+    ],
+  };
+};
+
+/**
  * 防御側のステータスを固定し、攻撃側のEV別ダメージを計算
  */
 const handleAttackerEvCalculation = (
@@ -38,23 +61,15 @@ const handleAttackerEvCalculation = (
     fixedDefenseStat,
   );
 
-  const result: EvRangeDamageResult = {
-    ...context,
-    evResults,
-    fixedStat: fixedDefenseStat,
-    isAttackerEv: true,
-  };
-
-  const formattedResult = formatDamageWithEvRange(result);
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: formattedResult,
-      },
-    ],
-  };
+  return createDamageResponse(
+    context,
+    {
+      evResults,
+      fixedStat: fixedDefenseStat,
+      isAttackerEv: true,
+    },
+    formatDamageWithEvRange,
+  );
 };
 
 /**
@@ -72,23 +87,15 @@ const handleDefenderEvCalculation = (
     defenseStatArray,
   );
 
-  const result: EvRangeDamageResult = {
-    ...context,
-    evResults,
-    fixedStat: fixedAttackStat,
-    isAttackerEv: false,
-  };
-
-  const formattedResult = formatDamageWithEvRange(result);
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: formattedResult,
-      },
-    ],
-  };
+  return createDamageResponse(
+    context,
+    {
+      evResults,
+      fixedStat: fixedAttackStat,
+      isAttackerEv: false,
+    },
+    formatDamageWithEvRange,
+  );
 };
 
 /**
@@ -102,23 +109,15 @@ const handleNormalCalculation = (
   const context = prepareCalculationContext(input);
   const damages = calculateNormalDamage(input, attackStat, defenseStat);
 
-  const result: NormalDamageResult = {
-    ...context,
-    damages,
-    attackStat,
-    defenseStat,
-  };
-
-  const formattedResult = formatDamageResult(result);
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: formattedResult,
-      },
-    ],
-  };
+  return createDamageResponse(
+    context,
+    {
+      damages,
+      attackStat,
+      defenseStat,
+    },
+    formatDamageResult,
+  );
 };
 
 /**
