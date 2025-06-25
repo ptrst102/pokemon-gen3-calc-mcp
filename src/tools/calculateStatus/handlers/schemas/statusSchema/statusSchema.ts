@@ -3,25 +3,28 @@ import { NATURES } from "@/data/natures";
 import { POKEMONS } from "@/data/pokemon";
 
 // 個体値のスキーマ
-const ivsSchema = z.object({
-  hp: z.number().int().min(0).max(31),
-  atk: z.number().int().min(0).max(31),
-  def: z.number().int().min(0).max(31),
-  spa: z.number().int().min(0).max(31),
-  spd: z.number().int().min(0).max(31),
-  spe: z.number().int().min(0).max(31),
-});
+const ivsSchema = z
+  .object({
+    hp: z.number().int().min(0).max(31).describe("HP個体値（0-31）"),
+    atk: z.number().int().min(0).max(31).describe("こうげき個体値（0-31）"),
+    def: z.number().int().min(0).max(31).describe("ぼうぎょ個体値（0-31）"),
+    spa: z.number().int().min(0).max(31).describe("とくこう個体値（0-31）"),
+    spd: z.number().int().min(0).max(31).describe("とくぼう個体値（0-31）"),
+    spe: z.number().int().min(0).max(31).describe("すばやさ個体値（0-31）"),
+  })
+  .describe("個体値（0-31）");
 
 // 努力値のスキーマ
 const evsSchema = z
   .object({
-    hp: z.number().int().min(0).max(252),
-    atk: z.number().int().min(0).max(252),
-    def: z.number().int().min(0).max(252),
-    spa: z.number().int().min(0).max(252),
-    spd: z.number().int().min(0).max(252),
-    spe: z.number().int().min(0).max(252),
+    hp: z.number().int().min(0).max(252).describe("HP努力値（0-252）"),
+    atk: z.number().int().min(0).max(252).describe("こうげき努力値（0-252）"),
+    def: z.number().int().min(0).max(252).describe("ぼうぎょ努力値（0-252）"),
+    spa: z.number().int().min(0).max(252).describe("とくこう努力値（0-252）"),
+    spd: z.number().int().min(0).max(252).describe("とくぼう努力値（0-252）"),
+    spe: z.number().int().min(0).max(252).describe("すばやさ努力値（0-252）"),
   })
+  .describe("努力値（0-252、合計510まで）")
   .refine(
     (evs) => {
       const total = Object.values(evs).reduce((sum, ev) => sum + ev, 0);
@@ -35,9 +38,11 @@ const evsSchema = z
 // 入力スキーマ
 export const calculateStatusInputSchema = z
   .object({
-    pokemonName: z.string(),
-    level: z.number().int().min(1).max(100),
-    nature: z.string(),
+    pokemonName: z
+      .string()
+      .describe('ポケモン名（例: "フシギダネ"、"メタグロス"）'),
+    level: z.number().int().min(1).max(100).describe("レベル（1-100）"),
+    nature: z.string().describe('せいかく（例: "いじっぱり"、"ひかえめ"）'),
     ivs: ivsSchema,
     evs: evsSchema,
   })
