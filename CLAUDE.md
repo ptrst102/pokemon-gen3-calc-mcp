@@ -61,6 +61,8 @@ npm run build
 - **MUST**: `any`型の使用禁止
 - **MUST**: `as`による型アサーション禁止。`as`を使いたくなったら切腹する
 - **MUST**: if 文は必ず中括弧を使用する（一行でも省略しない）
+- **MUST**: `let`の使用を避け、`const`を優先する。変数の再代入が必要な場合は即時実行関数などを使用する
+- **MUST**: 早期returnを活用し、不要な`else`を避ける
 
 ```typescript
 // ❌ 悪い例
@@ -70,12 +72,51 @@ if (condition) return value;
 if (condition) {
   return value;
 }
+
+// ❌ 悪い例（let使用）
+let message: string;
+if (error instanceof ZodError) {
+  message = formatZodError(error);
+} else if (error instanceof Error) {
+  message = error.message;
+} else {
+  message = "不明なエラー";
+}
+
+// ⭕ 良い例（即時実行関数）
+const message = (() => {
+  if (error instanceof ZodError) {
+    return formatZodError(error);
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "不明なエラー";
+})();
+
+// ❌ 悪い例（不要なelse）
+if (value === 0) {
+  return "ゼロ";
+} else if (value > 0) {
+  return "正の数";
+} else {
+  return "負の数";
+}
+
+// ⭕ 良い例（早期return）
+if (value === 0) {
+  return "ゼロ";
+}
+if (value > 0) {
+  return "正の数";
+}
+return "負の数";
 ```
 
 ### コーディングスタイル
 
 - 関数定義: `const fn = () => {}`形式を使用
-- 変数定義: `const`を優先使用（再代入が必要な場合のみ`let`）
+- 変数定義: `const`を使用（`let`は原則禁止、ループ変数を除く）
 - インポート: `@/`エイリアスを使用（tsconfig.json で設定済み）
 - エクスポート: index.ts での再エクスポートパターンを使用
 

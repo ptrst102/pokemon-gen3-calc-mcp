@@ -60,15 +60,15 @@ export const formatError = (
     move: { type: string; power: number; category: string };
   };
 } => {
-  let message: string;
-
-  if (error instanceof ZodError) {
-    message = formatZodError(error);
-  } else if (error instanceof Error) {
-    message = error.message;
-  } else {
-    message = "不明なエラーが発生しました";
-  }
+  const message = (() => {
+    if (error instanceof ZodError) {
+      return formatZodError(error);
+    }
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return "不明なエラーが発生しました";
+  })();
 
   return {
     structuredContent: {
