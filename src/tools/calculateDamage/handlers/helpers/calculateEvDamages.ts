@@ -67,6 +67,14 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
     );
   }
 
+  // じばく・だいばくはつの処理: 防御を半分にする
+  if (
+    "name" in move &&
+    (move.name === "じばく" || move.name === "だいばくはつ")
+  ) {
+    defenseStat = Math.floor(defenseStat / 2);
+  }
+
   let damage = calculateBaseDamage({
     level: attacker.level,
     power: move.power,
@@ -148,6 +156,7 @@ export const calculateAttackerEvDamages = (
 
     const damages = calculateDamageInternal({
       move: {
+        name: input.move.name,
         type: input.move.type,
         power: input.move.power,
         isPhysical: input.move.isPhysical,
@@ -197,6 +206,7 @@ export const calculateDefenderEvDamages = (
 
     const damages = calculateDamageInternal({
       move: {
+        name: input.move.name,
         type: input.move.type,
         power: input.move.power,
         isPhysical: input.move.isPhysical,
@@ -241,6 +251,7 @@ export const calculateNormalDamage = (
 
   return calculateDamageInternal({
     move: {
+      name: input.move.name,
       type: input.move.type,
       power: input.move.power,
       isPhysical: input.move.isPhysical,

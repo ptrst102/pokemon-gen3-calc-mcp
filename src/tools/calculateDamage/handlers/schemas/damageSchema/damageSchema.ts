@@ -40,6 +40,7 @@ const moveInputSchema = z.union([
   // タイプと威力を直接指定
   z
     .object({
+      name: z.string().optional(),
       type: z.enum([
         "ノーマル",
         "ほのお",
