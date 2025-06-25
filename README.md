@@ -32,7 +32,7 @@ npm install
 
 ### MCP クライアントとの連携
 
-1. ビルドを実行してdistディレクトリにファイルを生成：
+1. ビルドを実行して dist ディレクトリにファイルを生成：
 
 ```bash
 npm run build
@@ -53,6 +53,18 @@ npm run build
 
 ## 開発者向け
 
+### スキーマの生成
+
+```bash
+npm run schemagen
+```
+
+このプロジェクトでは、Zod スキーマから MCP（Model Context Protocol）用の JSON スキーマを自動生成する仕組みを採用しています。
+
+`src/tools/*/handlers/schemas/` 内の Zod スキーマを変更したのち、
+`npm run schemagen` を実行すると
+`src/tools/*/generated/inputSchema.ts` が自動生成されます。
+
 ### 開発サーバーの起動
 
 ```bash
@@ -69,6 +81,7 @@ npm run test:integration
 ```
 
 結合テストでは以下を検証します：
+
 - サーバーへの接続
 - `calculate_status` ツールによるステータス計算
 - `calculate_damage` ツールによるダメージ計算
