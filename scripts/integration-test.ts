@@ -54,19 +54,19 @@ const runIntegrationTests = async () => {
           nature: "ようき",
           evs: {
             hp: 6,
-            attack: 252,
-            defense: 0,
-            specialAttack: 0,
-            specialDefense: 0,
-            speed: 252,
+            atk: 252,
+            def: 0,
+            spa: 0,
+            spd: 0,
+            spe: 252,
           },
           ivs: {
             hp: 31,
-            attack: 31,
-            defense: 31,
-            specialAttack: 31,
-            specialDefense: 31,
-            speed: 31,
+            atk: 31,
+            def: 31,
+            spa: 31,
+            spd: 31,
+            spe: 31,
           },
         },
       });
@@ -102,25 +102,27 @@ const runIntegrationTests = async () => {
       const damageResult = await client.callTool({
         name: "calculate_damage",
         arguments: {
-          attackerName: "ラティオス",
-          defenderName: "キノガッサ",
-          moveName: "サイコキネシス",
-          attackerLevel: 50,
-          defenderLevel: 50,
-          attackerNature: "ひかえめ",
-          defenderNature: "ようき",
-          attackerEvs: {
-            hp: 6,
-            specialAttack: 252,
-            speed: 252,
+          move: "サイコキネシス",
+          attacker: {
+            pokemonName: "ラティオス",
+            level: 50,
+            item: "こだわりメガネ",
+            stat: {
+              iv: 31,
+              ev: 252,
+              natureModifier: "up", // ひかえめはとくこう上昇
+            },
           },
-          defenderEvs: {
-            hp: 6,
-            attack: 252,
-            speed: 252,
+          defender: {
+            pokemonName: "キノガッサ",
+            level: 50,
+            ability: "ポイズンヒール",
+            stat: {
+              iv: 31,
+              ev: 6,
+              natureModifier: "neutral", // ようきはとくぼうに影響なし
+            },
           },
-          attackerItem: "こだわりメガネ",
-          defenderAbility: "ポイズンヒール",
         },
       });
 
@@ -155,26 +157,26 @@ const runIntegrationTests = async () => {
       const evDamageResult = await client.callTool({
         name: "calculate_damage",
         arguments: {
-          attackerName: "メタグロス",
-          defenderName: "ハピナス",
-          moveName: "コメットパンチ",
-          attackerLevel: 50,
-          defenderLevel: 50,
-          attackerNature: "いじっぱり",
-          defenderNature: "ずぶとい",
-          attackerEvs: {
-            hp: 252,
-            attack: 252,
-            defense: 6,
+          move: "コメットパンチ",
+          attacker: {
+            pokemonName: "メタグロス",
+            level: 50,
+            ability: "クリアボディ",
+            stat: {
+              iv: 31,
+              ev: 252,
+              natureModifier: "up", // いじっぱりはこうげき上昇
+            },
           },
-          defenderEvs: {
-            hp: 252,
-            defense: 252,
-            specialDefense: 6,
+          defender: {
+            pokemonName: "ハピナス",
+            level: 50,
+            ability: "しぜんかいふく",
+            stat: {
+              iv: 31,
+              calculateAllEvs: true,
+            },
           },
-          attackerAbility: "クリアボディ",
-          defenderAbility: "しぜんかいふく",
-          calculateAllEvs: true,
         },
       });
 
