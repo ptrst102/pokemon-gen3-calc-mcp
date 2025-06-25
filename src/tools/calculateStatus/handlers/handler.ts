@@ -89,5 +89,9 @@ export const calculateStatusHandler = async (args: unknown) => {
         text: response,
       },
     ],
+    structuredContent: {
+      pokemonName: pokemon.name,
+      stats,
+    },
   };
 };
