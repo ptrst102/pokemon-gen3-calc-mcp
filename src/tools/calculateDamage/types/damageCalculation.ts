@@ -96,6 +96,7 @@ export interface EvRangeDamageResult extends DamageCalculationContext {
  */
 export interface InternalDamageParams {
   move: {
+    name?: string;
     type: TypeName;
     power: number;
     isPhysical: boolean;
