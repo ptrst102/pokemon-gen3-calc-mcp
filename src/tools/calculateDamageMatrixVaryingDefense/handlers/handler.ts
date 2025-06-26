@@ -1,4 +1,6 @@
 import { ZodError } from "zod";
+import type { AbilityName } from "@/data/abilities";
+import type { ItemName } from "@/data/items";
 import { applyAbilityEffects } from "@/tools/calculateDamage/handlers/helpers/abilityEffects";
 import { calculateBaseDamage } from "@/tools/calculateDamage/handlers/helpers/calculateBaseDamage";
 import { getDamageRanges } from "@/tools/calculateDamage/handlers/helpers/damageRanges";
@@ -33,18 +35,18 @@ interface DamageCalculationParams {
   attacker: {
     level: number;
     statModifier: number;
-    pokemon?: { types?: string[] };
-    ability?: { name?: string };
+    pokemon?: { types?: TypeName[] };
+    ability?: { name?: AbilityName };
     abilityActive?: boolean;
-    item?: { name?: string };
+    item?: { name?: ItemName };
     pokemonName?: string;
   };
   defender: {
     statModifier: number;
-    pokemon?: { types?: string[] };
-    ability?: { name?: string };
+    pokemon?: { types?: TypeName[] };
+    ability?: { name?: AbilityName };
     abilityActive?: boolean;
-    item?: { name?: string };
+    item?: { name?: ItemName };
     pokemonName?: string;
   };
   options: {
@@ -211,14 +213,14 @@ const calculateDamageWithContext = (
 
   // もちもの効果を計算
   const attackerItemEffects = calculateItemEffects(
-    attacker.item?.name,
+    attacker.item?.name as ItemName | undefined,
     attacker.pokemonName || undefined,
     move.type as TypeName,
     move.isPhysical,
   );
 
   const defenderItemEffects = calculateItemEffects(
-    defender.item?.name,
+    defender.item?.name as ItemName | undefined,
     defender.pokemonName || undefined,
     move.type as TypeName,
     move.isPhysical,
@@ -282,16 +284,16 @@ const calculateDamageWithContext = (
     damage: baseDamage,
     moveType: move.type as TypeName,
     isPhysical: move.isPhysical,
-    attackerAbility: attacker.ability?.name,
+    attackerAbility: attacker.ability?.name as AbilityName | undefined,
     attackerAbilityActive: attacker.abilityActive,
-    defenderAbility: defender.ability?.name,
+    defenderAbility: defender.ability?.name as AbilityName | undefined,
     defenderAbilityActive: defender.abilityActive,
   });
 
   // タイプ相性を計算
   const effectiveness = getTypeEffectiveness(
     move.type as TypeName,
-    defender.pokemon?.types || [],
+    (defender.pokemon?.types || []) as TypeName[],
   );
 
   // タイプ一致ボーナス
