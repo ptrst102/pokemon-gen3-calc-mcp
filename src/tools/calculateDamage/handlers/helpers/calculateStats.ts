@@ -1,8 +1,5 @@
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
-import type {
-  CalculatedStats,
-  StatValue,
-} from "@/tools/calculateDamage/types";
+import type { CalculatedStats, StatValue } from "@/tools/calculateDamage/types";
 import { getStatValue } from "./getStatValue";
 
 export const getCalculatedStats = (
