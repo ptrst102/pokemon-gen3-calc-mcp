@@ -40,72 +40,77 @@ const createCalculationResponse = (
 };
 
 /**
- * 防御側のステータスを固定し、攻撃側のEV別ダメージを計算
+ * 計算処理の共通インターフェース
  */
-const handleAttackerEvCalculation = (
-  input: CalculateDamageInput,
-  attackStatArray: number[],
-  fixedDefenseStat: number,
-) => {
-  const context = prepareCalculationContext(input);
-  const evResults = calculateAttackerEvDamages(
-    input,
-    attackStatArray,
-    fixedDefenseStat,
-  );
-
-  const structuredOutput = createEvRangeDamageOutput({
-    ...context,
-    evResults,
-    fixedStat: fixedDefenseStat,
-    isAttackerEv: true,
-  });
-
-  return createCalculationResponse(structuredOutput);
-};
+type CalculationParams =
+  | {
+      type: "attackerEv";
+      attackStatArray: number[];
+      fixedDefenseStat: number;
+    }
+  | {
+      type: "defenderEv";
+      fixedAttackStat: number;
+      defenseStatArray: number[];
+    }
+  | {
+      type: "normal";
+      attackStat: number;
+      defenseStat: number;
+    };
 
 /**
- * 攻撃側のステータスを固定し、防御側のEV別ダメージを計算
+ * 計算処理を統一的に扱う
  */
-const handleDefenderEvCalculation = (
+const performCalculation = (
   input: CalculateDamageInput,
-  fixedAttackStat: number,
-  defenseStatArray: number[],
+  params: CalculationParams,
 ) => {
   const context = prepareCalculationContext(input);
-  const evResults = calculateDefenderEvDamages(
-    input,
-    fixedAttackStat,
-    defenseStatArray,
-  );
 
-  const structuredOutput = createEvRangeDamageOutput({
-    ...context,
-    evResults,
-    fixedStat: fixedAttackStat,
-    isAttackerEv: false,
-  });
-
-  return createCalculationResponse(structuredOutput);
-};
-
-/**
- * 通常のダメージ計算を処理する
- */
-const handleNormalCalculation = (
-  input: CalculateDamageInput,
-  attackStat: number,
-  defenseStat: number,
-) => {
-  const context = prepareCalculationContext(input);
-  const damages = calculateNormalDamage(input, attackStat, defenseStat);
-
-  const structuredOutput = createNormalDamageOutput({
-    ...context,
-    damages,
-    attackStat,
-    defenseStat,
-  });
+  const structuredOutput = (() => {
+    switch (params.type) {
+      case "attackerEv": {
+        const evResults = calculateAttackerEvDamages(
+          input,
+          params.attackStatArray,
+          params.fixedDefenseStat,
+        );
+        return createEvRangeDamageOutput({
+          ...context,
+          evResults,
+          fixedStat: params.fixedDefenseStat,
+          isAttackerEv: true,
+        });
+      }
+      case "defenderEv": {
+        const evResults = calculateDefenderEvDamages(
+          input,
+          params.fixedAttackStat,
+          params.defenseStatArray,
+        );
+        return createEvRangeDamageOutput({
+          ...context,
+          evResults,
+          fixedStat: params.fixedAttackStat,
+          isAttackerEv: false,
+        });
+      }
+      case "normal": {
+        const damages = calculateNormalDamage(
+          input,
+          params.attackStat,
+          params.defenseStat,
+        );
+        return createNormalDamageOutput({
+          ...context,
+          damages,
+          attackStat: params.attackStat,
+          defenseStat: params.defenseStat,
+        });
+      }
+    }
+  })();
 
   return createCalculationResponse(structuredOutput);
 };
@@ -121,13 +126,21 @@ const handleEvCalculation = (
 
   if (isAttackerEvArray(attackStat)) {
     if (!isDefenderEvArray(defenseStat)) {
-      return handleAttackerEvCalculation(input, attackStat, defenseStat);
+      return performCalculation(input, {
+        type: "attackerEv",
+        attackStatArray: attackStat,
+        fixedDefenseStat: defenseStat,
+      });
     }
   }
 
   if (isDefenderEvArray(defenseStat)) {
     if (!isAttackerEvArray(attackStat)) {
-      return handleDefenderEvCalculation(input, attackStat, defenseStat);
+      return performCalculation(input, {
+        type: "defenderEv",
+        fixedAttackStat: attackStat,
+        defenseStatArray: defenseStat,
+      });
     }
   }
 
@@ -167,11 +180,11 @@ export const calculateDamageHandler = async (
       !isAttackerEvArray(stats.attackStat) &&
       !isDefenderEvArray(stats.defenseStat)
     ) {
-      return handleNormalCalculation(
-        input,
-        stats.attackStat,
-        stats.defenseStat,
-      );
+      return performCalculation(input, {
+        type: "normal",
+        attackStat: stats.attackStat,
+        defenseStat: stats.defenseStat,
+      });
     }
 
     throw new Error("内部エラー: 予期しない状態です");
