@@ -1,5 +1,5 @@
-import type { AbilityName } from "@/data/abilities";
-import type { ItemName } from "@/data/items";
+import type { Ability, AbilityName } from "@/data/abilities";
+import type { Item, ItemName } from "@/data/items";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { DamageOptions } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
@@ -35,18 +35,18 @@ interface InternalDamageParams {
     attackModifier: number;
     types?: TypeName[];
     pokemonName?: string;
-    ability?: string;
+    ability?: Ability;
     abilityActive?: boolean;
-    item?: string;
+    item?: Item;
   };
   defender: {
     defense: number;
     defenseModifier: number;
     types: TypeName[];
     pokemonName?: string;
-    ability?: string;
+    ability?: Ability;
     abilityActive?: boolean;
-    item?: string;
+    item?: Item;
   };
   options: DamageOptions;
 }
@@ -59,14 +59,14 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
   const { move, attacker, defender, options } = params;
 
   const attackerItemEffects = calculateItemEffects(
-    attacker.item as ItemName | undefined,
+    attacker.item?.name as ItemName | undefined,
     attacker.pokemonName,
     move.type,
     move.isPhysical,
   );
 
   const defenderItemEffects = calculateItemEffects(
-    defender.item as ItemName | undefined,
+    defender.item?.name as ItemName | undefined,
     defender.pokemonName,
     move.type,
     move.isPhysical,
@@ -180,8 +180,8 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
   const abilityAdjustedDamage = applyAbilityEffects({
     damage: sportAdjustedDamage,
     moveType: move.type,
-    attackerAbility: attacker.ability as AbilityName | undefined,
-    defenderAbility: defender.ability as AbilityName | undefined,
+    attackerAbility: attacker.ability?.name as AbilityName | undefined,
+    defenderAbility: defender.ability?.name as AbilityName | undefined,
     attackerAbilityActive: attacker.abilityActive,
     defenderAbilityActive: defender.abilityActive,
     typeEffectiveness,
@@ -225,18 +225,18 @@ export const calculateAttackerEvDamages = (
         attackModifier: input.attacker.statModifier,
         types: input.attacker.pokemon?.types,
         pokemonName: input.attacker.pokemon?.name,
-        ability: input.attacker.ability?.name,
+        ability: input.attacker.ability,
         abilityActive: input.attacker.abilityActive,
-        item: input.attacker.item?.name,
+        item: input.attacker.item,
       },
       defender: {
         defense: fixedDefenseStat,
         defenseModifier: input.defender.statModifier,
         types: defenderTypes,
         pokemonName: input.defender.pokemon?.name,
-        ability: input.defender.ability?.name,
+        ability: input.defender.ability,
         abilityActive: input.defender.abilityActive,
-        item: input.defender.item?.name,
+        item: input.defender.item,
       },
       options: input.options || {},
     });
@@ -275,18 +275,18 @@ export const calculateDefenderEvDamages = (
         attackModifier: input.attacker.statModifier,
         types: input.attacker.pokemon?.types,
         pokemonName: input.attacker.pokemon?.name,
-        ability: input.attacker.ability?.name,
+        ability: input.attacker.ability,
         abilityActive: input.attacker.abilityActive,
-        item: input.attacker.item?.name,
+        item: input.attacker.item,
       },
       defender: {
         defense: stat,
         defenseModifier: input.defender.statModifier,
         types: defenderTypes,
         pokemonName: input.defender.pokemon?.name,
-        ability: input.defender.ability?.name,
+        ability: input.defender.ability,
         abilityActive: input.defender.abilityActive,
-        item: input.defender.item?.name,
+        item: input.defender.item,
       },
       options: input.options || {},
     });
@@ -320,18 +320,18 @@ export const calculateNormalDamage = (
       attackModifier: input.attacker.statModifier,
       types: input.attacker.pokemon?.types,
       pokemonName: input.attacker.pokemon?.name,
-      ability: input.attacker.ability?.name,
+      ability: input.attacker.ability,
       abilityActive: input.attacker.abilityActive,
-      item: input.attacker.item?.name,
+      item: input.attacker.item,
     },
     defender: {
       defense: defenseStat,
       defenseModifier: input.defender.statModifier,
       types: defenderTypes,
       pokemonName: input.defender.pokemon?.name,
-      ability: input.defender.ability?.name,
+      ability: input.defender.ability,
       abilityActive: input.defender.abilityActive,
-      item: input.defender.item?.name,
+      item: input.defender.item,
     },
     options: input.options || {},
   });
