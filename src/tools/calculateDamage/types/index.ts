@@ -32,7 +32,7 @@ export interface DamageOptions {
 /**
  * わざの情報
  */
-export interface MoveInfo {
+interface MoveInfo {
   name?: string;
   type: TypeName;
   power: number;
@@ -42,7 +42,7 @@ export interface MoveInfo {
 /**
  * ポケモンの情報（攻撃側/防御側共通）
  */
-export interface PokemonInfo {
+interface PokemonInfo {
   level: number;
   pokemon?: Pokemon;
   item?: Item;
@@ -74,58 +74,14 @@ export interface NormalDamageResult extends DamageCalculationContext {
 }
 
 /**
- * EV別のダメージ情報
- */
-export interface EvDamageEntry {
-  ev: number;
-  stat: number;
-  damages: number[];
-}
-
-/**
  * EV別ダメージ計算結果
  */
 export interface EvRangeDamageResult extends DamageCalculationContext {
-  evResults: EvDamageEntry[];
+  evResults: Array<{
+    ev: number;
+    stat: number;
+    damages: number[];
+  }>;
   fixedStat: number;
   isAttackerEv: boolean;
 }
-
-/**
- * 内部的なダメージ計算パラメータ
- */
-export interface InternalDamageParams {
-  move: {
-    name?: string;
-    type: TypeName;
-    power: number;
-    isPhysical: boolean;
-  };
-  attacker: {
-    level: number;
-    attack: number;
-    attackModifier: number;
-    types?: TypeName[];
-    pokemonName?: string;
-    ability?: string;
-    abilityActive?: boolean;
-    item?: string;
-  };
-  defender: {
-    defense: number;
-    defenseModifier: number;
-    types: TypeName[];
-    pokemonName?: string;
-    ability?: string;
-    abilityActive?: boolean;
-    item?: string;
-  };
-  options: DamageOptions;
-}
-
-/**
- * ステータス値がEV計算配列かどうかを判定
- */
-export const isEvArray = (stat: StatValue): stat is number[] => {
-  return Array.isArray(stat);
-};

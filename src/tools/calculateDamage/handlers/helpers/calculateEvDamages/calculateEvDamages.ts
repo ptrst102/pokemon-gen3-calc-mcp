@@ -1,16 +1,55 @@
 import type { AbilityName } from "@/data/abilities";
 import type { ItemName } from "@/data/items";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
-import type {
-  EvDamageEntry,
-  InternalDamageParams,
-} from "@/tools/calculateDamage/types/damageCalculation";
+import type { DamageOptions } from "@/tools/calculateDamage/types";
+import type { TypeName } from "@/types";
 import { applyAbilityEffects } from "../abilityEffects";
 import { calculateBaseDamage } from "../calculateBaseDamage";
 import { getDamageRanges } from "../damageRanges";
 import { calculateItemEffects } from "../itemEffects";
 import { getStatModifierRatio } from "../statModifier";
 import { getTypeEffectiveness } from "../typeEffectiveness";
+
+/**
+ * EV別のダメージ情報
+ */
+export interface EvDamageEntry {
+  ev: number;
+  stat: number;
+  damages: number[];
+}
+
+/**
+ * 内部的なダメージ計算パラメータ
+ */
+interface InternalDamageParams {
+  move: {
+    name?: string;
+    type: TypeName;
+    power: number;
+    isPhysical: boolean;
+  };
+  attacker: {
+    level: number;
+    attack: number;
+    attackModifier: number;
+    types?: TypeName[];
+    pokemonName?: string;
+    ability?: string;
+    abilityActive?: boolean;
+    item?: string;
+  };
+  defender: {
+    defense: number;
+    defenseModifier: number;
+    types: TypeName[];
+    pokemonName?: string;
+    ability?: string;
+    abilityActive?: boolean;
+    item?: string;
+  };
+  options: DamageOptions;
+}
 
 /**
  * ダメージ計算の主処理

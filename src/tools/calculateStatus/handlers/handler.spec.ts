@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { parseResponse } from "@/utils/parseResponse";
-import type {
-  CalculateStatusErrorOutput,
-  CalculateStatusOutput,
-} from "../types";
+import type { StatsObj } from "@/types";
 import { calculateStatusHandler } from "./handler";
+
+interface CalculateStatusOutput {
+  pokemonName: string;
+  stats: StatsObj;
+}
+
+interface CalculateStatusErrorOutput {
+  error: string;
+  pokemonName: string;
+  stats: StatsObj;
+}
 
 describe("calculate-status tool", () => {
   it("正常な入力でステータスを計算できること", async () => {

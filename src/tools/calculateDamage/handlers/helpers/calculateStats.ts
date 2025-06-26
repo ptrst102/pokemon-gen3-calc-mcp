@@ -2,7 +2,7 @@ import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/sche
 import type {
   CalculatedStats,
   StatValue,
-} from "@/tools/calculateDamage/types/damageCalculation";
+} from "@/tools/calculateDamage/types";
 import { getStatValue } from "./getStatValue";
 
 export const getCalculatedStats = (
