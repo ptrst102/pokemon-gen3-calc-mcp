@@ -1,5 +1,5 @@
 import { ZodError } from "zod";
-import { calculateDamageWithContext } from "@/tools/calculateDamage/handlers/helpers/calculateDamageWithContext/calculateDamageWithContext";
+import { calculateDamageWithContext } from "@/utils/calculateDamageWithContext";
 import { calculateHp } from "@/utils/calculateHp";
 import { calculateStat } from "@/utils/calculateStat";
 import { NATURE_MODIFIER_MAP } from "@/utils/natureModifier";
