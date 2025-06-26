@@ -1,10 +1,10 @@
+import { applyAbilityEffects } from "@/tools/calculateDamage/handlers/helpers/abilityEffects";
+import { calculateBaseDamage } from "@/tools/calculateDamage/handlers/helpers/calculateBaseDamage";
+import { getDamageRanges } from "@/tools/calculateDamage/handlers/helpers/damageRanges";
+import { calculateItemEffects } from "@/tools/calculateDamage/handlers/helpers/itemEffects";
+import { getStatModifierRatio } from "@/tools/calculateDamage/handlers/helpers/statModifier";
+import { getTypeEffectiveness } from "@/tools/calculateDamage/handlers/helpers/typeEffectiveness";
 import type { TypeName } from "@/types";
-import { applyAbilityEffects } from "../abilityEffects";
-import { calculateBaseDamage } from "../calculateBaseDamage";
-import { getDamageRanges } from "../damageRanges";
-import { calculateItemEffects } from "../itemEffects";
-import { getStatModifierRatio } from "../statModifier";
-import { getTypeEffectiveness } from "../typeEffectiveness";
 
 export interface DamageCalculationParams {
   move: {
