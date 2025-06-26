@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseResponse } from "@/tests/parseResponse";
+import { parseResponse } from "@/utils/parseResponse";
 import { calculateDamageHandler } from "./handler";
 
 describe("calculateDamageHandler エラーハンドリング", () => {
