@@ -22,15 +22,31 @@ import {
 } from "./schemas/damageSchema";
 
 /**
+ * 計算結果をMCPレスポンス形式に変換する共通関数
+ */
+const createCalculationResponse = (
+  structuredOutput: unknown,
+): {
+  content: Array<{ type: "text"; text: string }>;
+} => {
+  return {
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(structuredOutput, null, 2),
+      },
+    ],
+  };
+};
+
+/**
  * 防御側のステータスを固定し、攻撃側のEV別ダメージを計算
  */
 const handleAttackerEvCalculation = (
   input: CalculateDamageInput,
   attackStatArray: number[],
   fixedDefenseStat: number,
-): {
-  content: Array<{ type: "text"; text: string }>;
-} => {
+) => {
   const context = prepareCalculationContext(input);
   const evResults = calculateAttackerEvDamages(
     input,
@@ -45,14 +61,7 @@ const handleAttackerEvCalculation = (
     isAttackerEv: true,
   });
 
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(structuredOutput, null, 2),
-      },
-    ],
-  };
+  return createCalculationResponse(structuredOutput);
 };
 
 /**
@@ -62,9 +71,7 @@ const handleDefenderEvCalculation = (
   input: CalculateDamageInput,
   fixedAttackStat: number,
   defenseStatArray: number[],
-): {
-  content: Array<{ type: "text"; text: string }>;
-} => {
+) => {
   const context = prepareCalculationContext(input);
   const evResults = calculateDefenderEvDamages(
     input,
@@ -79,14 +86,7 @@ const handleDefenderEvCalculation = (
     isAttackerEv: false,
   });
 
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(structuredOutput, null, 2),
-      },
-    ],
-  };
+  return createCalculationResponse(structuredOutput);
 };
 
 /**
@@ -96,9 +96,7 @@ const handleNormalCalculation = (
   input: CalculateDamageInput,
   attackStat: number,
   defenseStat: number,
-): {
-  content: Array<{ type: "text"; text: string }>;
-} => {
+) => {
   const context = prepareCalculationContext(input);
   const damages = calculateNormalDamage(input, attackStat, defenseStat);
 
@@ -109,14 +107,7 @@ const handleNormalCalculation = (
     defenseStat,
   });
 
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(structuredOutput, null, 2),
-      },
-    ],
-  };
+  return createCalculationResponse(structuredOutput);
 };
 
 /**
@@ -125,9 +116,7 @@ const handleNormalCalculation = (
 const handleEvCalculation = (
   input: CalculateDamageInput,
   stats: ReturnType<typeof getCalculatedStats>,
-): {
-  content: Array<{ type: "text"; text: string }>;
-} => {
+) => {
   const { attackStat, defenseStat } = stats;
 
   if (isAttackerEvArray(attackStat)) {
