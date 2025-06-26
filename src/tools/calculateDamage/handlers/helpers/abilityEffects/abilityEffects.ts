@@ -1,11 +1,10 @@
-import type { AbilityName } from "@/data/abilities";
 import type { TypeName } from "@/types";
 
 interface ApplyAbilityEffectsParams {
   damage: number;
   moveType: TypeName;
-  attackerAbility?: AbilityName;
-  defenderAbility?: AbilityName;
+  attackerAbility?: string;
+  defenderAbility?: string;
   attackerAbilityActive?: boolean;
   defenderAbilityActive?: boolean;
   typeEffectiveness?: number;

@@ -1,13 +1,5 @@
 import { ZodError } from "zod";
-import type { AbilityName } from "@/data/abilities";
-import type { ItemName } from "@/data/items";
-import { applyAbilityEffects } from "@/tools/calculateDamage/handlers/helpers/abilityEffects";
-import { calculateBaseDamage } from "@/tools/calculateDamage/handlers/helpers/calculateBaseDamage";
-import { getDamageRanges } from "@/tools/calculateDamage/handlers/helpers/damageRanges";
-import { calculateItemEffects } from "@/tools/calculateDamage/handlers/helpers/itemEffects";
-import { getStatModifierRatio } from "@/tools/calculateDamage/handlers/helpers/statModifier";
-import { getTypeEffectiveness } from "@/tools/calculateDamage/handlers/helpers/typeEffectiveness";
-import type { TypeName } from "@/types";
+import { calculateDamageWithContext } from "@/tools/calculateDamage/handlers/helpers/calculateDamageWithContext";
 import { calculateHp } from "@/utils/calculateHp";
 import { calculateStat } from "@/utils/calculateStat";
 import { NATURE_MODIFIER_MAP } from "@/utils/natureModifier";
@@ -21,42 +13,6 @@ interface DamageMatrixEntry {
   defenseStat: number;
   hpStat: number;
   damages: number[];
-}
-
-interface DamageCalculationParams {
-  move: {
-    name?: string;
-    type: string;
-    power: number;
-    isPhysical: boolean;
-  };
-  attackStat: number;
-  defenseStat: number;
-  attacker: {
-    level: number;
-    statModifier: number;
-    pokemon?: { types?: TypeName[] };
-    ability?: { name?: AbilityName };
-    abilityActive?: boolean;
-    item?: { name?: ItemName };
-    pokemonName?: string;
-  };
-  defender: {
-    statModifier: number;
-    pokemon?: { types?: TypeName[] };
-    ability?: { name?: AbilityName };
-    abilityActive?: boolean;
-    item?: { name?: ItemName };
-    pokemonName?: string;
-  };
-  options: {
-    weather?: "はれ" | "あめ";
-    charge?: boolean;
-    reflect?: boolean;
-    lightScreen?: boolean;
-    mudSport?: boolean;
-    waterSport?: boolean;
-  };
 }
 
 /**
@@ -184,11 +140,31 @@ const calculateDamageMatrix = (
 
     // ダメージ計算
     const damages = calculateDamageWithContext({
-      move,
+      move: {
+        name: move.name,
+        type: move.type,
+        power: move.power,
+        isPhysical: move.isPhysical,
+      },
       attackStat,
       defenseStat,
-      attacker,
-      defender,
+      attacker: {
+        level: attacker.level,
+        statModifier: attacker.statModifier,
+        pokemon: attacker.pokemon,
+        ability: attacker.ability ? { name: attacker.ability.name } : undefined,
+        abilityActive: attacker.abilityActive,
+        item: attacker.item ? { name: attacker.item.name } : undefined,
+        pokemonName: attacker.pokemonName,
+      },
+      defender: {
+        statModifier: defender.statModifier,
+        pokemon: defender.pokemon,
+        ability: defender.ability ? { name: defender.ability.name } : undefined,
+        abilityActive: defender.abilityActive,
+        item: defender.item ? { name: defender.item.name } : undefined,
+        pokemonName: defender.pokemonName,
+      },
       options,
     });
 
@@ -201,111 +177,4 @@ const calculateDamageMatrix = (
   });
 
   return { damageMatrix };
-};
-
-/**
- * コンテキストを含むダメージ計算
- */
-const calculateDamageWithContext = (
-  params: DamageCalculationParams,
-): number[] => {
-  const { move, attackStat, defenseStat, attacker, defender, options } = params;
-
-  // もちもの効果を計算
-  const attackerItemEffects = calculateItemEffects(
-    attacker.item?.name as ItemName | undefined,
-    attacker.pokemonName || undefined,
-    move.type as TypeName,
-    move.isPhysical,
-  );
-
-  const defenderItemEffects = calculateItemEffects(
-    defender.item?.name as ItemName | undefined,
-    defender.pokemonName || undefined,
-    move.type as TypeName,
-    move.isPhysical,
-  );
-
-  // ランク補正を適用
-  const attackRatio = getStatModifierRatio(attacker.statModifier);
-  const baseAttackStat = Math.floor(
-    (attackStat * attackRatio.numerator) / attackRatio.denominator,
-  );
-
-  const finalAttackStat = move.isPhysical
-    ? Math.floor(
-        (baseAttackStat * attackerItemEffects.attackMultiplier.numerator) /
-          attackerItemEffects.attackMultiplier.denominator,
-      )
-    : Math.floor(
-        (baseAttackStat *
-          attackerItemEffects.specialAttackMultiplier.numerator) /
-          attackerItemEffects.specialAttackMultiplier.denominator,
-      );
-
-  const defenseRatio = getStatModifierRatio(defender.statModifier);
-  const baseDefenseStat = Math.floor(
-    (defenseStat * defenseRatio.numerator) / defenseRatio.denominator,
-  );
-
-  const itemAdjustedDefenseStat = move.isPhysical
-    ? Math.floor(
-        (baseDefenseStat * defenderItemEffects.defenseMultiplier.numerator) /
-          defenderItemEffects.defenseMultiplier.denominator,
-      )
-    : Math.floor(
-        (baseDefenseStat *
-          defenderItemEffects.specialDefenseMultiplier.numerator) /
-          defenderItemEffects.specialDefenseMultiplier.denominator,
-      );
-
-  // 場の状態による防御補正
-  const finalDefenseStat = (() => {
-    if (move.isPhysical && options.reflect) {
-      return itemAdjustedDefenseStat * 2;
-    }
-    if (!move.isPhysical && options.lightScreen) {
-      return itemAdjustedDefenseStat * 2;
-    }
-    return itemAdjustedDefenseStat;
-  })();
-
-  // 基本ダメージを計算
-  const baseDamage = calculateBaseDamage({
-    level: attacker.level,
-    power: move.power,
-    attack: finalAttackStat,
-    defense: finalDefenseStat,
-    isPhysical: move.isPhysical,
-  });
-
-  // とくせい効果を適用
-  const abilityAdjustedDamage = applyAbilityEffects({
-    damage: baseDamage,
-    moveType: move.type as TypeName,
-    isPhysical: move.isPhysical,
-    attackerAbility: attacker.ability?.name as AbilityName | undefined,
-    attackerAbilityActive: attacker.abilityActive,
-    defenderAbility: defender.ability?.name as AbilityName | undefined,
-    defenderAbilityActive: defender.abilityActive,
-  });
-
-  // タイプ相性を計算
-  const effectiveness = getTypeEffectiveness(
-    move.type as TypeName,
-    (defender.pokemon?.types || []) as TypeName[],
-  );
-
-  // タイプ一致ボーナス
-  const hasStab =
-    attacker.pokemon?.types?.includes(move.type as TypeName) ?? false;
-  const stabMultiplier = hasStab ? 1.5 : 1;
-
-  // 最終的なダメージを計算
-  const finalDamage = Math.floor(
-    abilityAdjustedDamage * effectiveness * stabMultiplier,
-  );
-
-  // ダメージ乱数（16通り）を計算
-  return getDamageRanges(finalDamage);
 };
