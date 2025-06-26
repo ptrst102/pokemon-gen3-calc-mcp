@@ -1,4 +1,3 @@
-import type { ItemName } from "@/data/items";
 import type { TypeName } from "@/types";
 
 export interface ItemEffectResult {
@@ -11,7 +10,7 @@ export interface ItemEffectResult {
 }
 
 export const calculateItemEffects = (
-  item: ItemName | undefined,
+  item: string | undefined,
   pokemonName: string | undefined,
   moveType: TypeName,
   isPhysical: boolean,
@@ -29,7 +28,7 @@ export const calculateItemEffects = (
     return defaultResult;
   }
 
-  const typeEnhancingItems: Partial<Record<ItemName, TypeName>> = {
+  const typeEnhancingItems: Record<string, TypeName> = {
     もくたん: "ほのお",
     しんぴのしずく: "みず",
     きせきのタネ: "くさ",
