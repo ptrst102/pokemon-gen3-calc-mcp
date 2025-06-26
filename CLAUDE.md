@@ -13,7 +13,6 @@ MCP プロトコルの詳細については、`docs/what-is-MCP.md`を参照し�
 ### 主要な機能
 
 1. **ステータス計算** (`calculate_status`)
-
    - 種族値、個体値、努力値、レベル、せいかくを考慮した実数値計算
    - HP、こうげき、ぼうぎょ、とくこう、とくぼう、すばやさの 6 つのステータスに対応
 
@@ -25,6 +24,14 @@ MCP プロトコルの詳細については、`docs/what-is-MCP.md`を参照し�
    - 場の状態（リフレクター、ひかりのかべ、どろあそび、みずあそび）
    - 能力ランク補正（-6〜+6）
    - **努力値別ダメージ計算**（`calculateAllEvs`オプション）
+
+3. **攻撃側努力値総当たり計算** (`calculate_damage_matrix_varying_attack`)
+   - 防御側の努力値を固定し、攻撃側の努力値を総当たりしてダメージ行列を計算
+   - 相手を確実に倒すための最小限の攻撃努力値を見つける際に使用
+
+4. **防御側努力値総当たり計算** (`calculate_damage_matrix_varying_defense`)
+   - 攻撃側の努力値を固定し、防御側の努力値を総当たりしてダメージ行列を計算
+   - 特定の攻撃を耐えるために必要な防御努力値配分を検討する際に使用
 
 ## 開発コマンド
 
@@ -39,6 +46,7 @@ npm run typecheck
 npm run test        # 全テスト実行
 npm run test -- src/tools/calculateDamage  # 特定ディレクトリのテスト
 npm run test -- --watch  # ウォッチモード
+npm run test:integration  # 結合テスト（MCPサーバーへの実際のリクエストをテスト）
 
 # リント・フォーマット
 npm run lint        # リントのみ
@@ -171,10 +179,12 @@ return "負の数";
 
 ### MCP サーバー構造
 
-このプロジェクトは Model Context Protocol (MCP) サーバーとして実装されており、以下の 2 つの主要ツールを提供：
+このプロジェクトは Model Context Protocol (MCP) サーバーとして実装されており、以下の 4 つの主要ツールを提供：
 
 - `calculate_status`: ポケモンのステータス計算
 - `calculate_damage`: ダメージ計算
+- `calculate_damage_matrix_varying_attack`: 攻撃側努力値総当たりダメージ計算
+- `calculate_damage_matrix_varying_defense`: 防御側努力値総当たりダメージ計算
 
 ### ディレクトリ構成
 
@@ -194,27 +204,45 @@ src/
 │   │   │   └── inputSchema.ts
 │   │   ├── handlers/       # ハンドラとロジック
 │   │   └── index.ts        # エクスポート
-│   └── calculateDamage/
+│   ├── calculateDamage/
+│   │   ├── definition.ts   # ツール定義
+│   │   ├── generated/      # 自動生成されたスキーマ
+│   │   │   └── inputSchema.ts
+│   │   ├── handlers/       # リクエストハンドラ
+│   │   │   ├── handler.ts
+│   │   │   ├── schemas/    # Zodスキーマ
+│   │   │   ├── helpers/    # 計算ロジック
+│   │   │   │   ├── calculateEvDamages.ts  # 努力値別計算
+│   │   │   │   ├── abilityEffects/        # とくせい効果
+│   │   │   │   ├── itemEffects/           # もちもの効果
+│   │   │   │   └── typeEffectiveness/     # タイプ相性
+│   │   │   └── formatters/ # レスポンス整形
+│   │   ├── types/          # 型定義
+│   │   └── index.ts
+│   ├── calculateDamageMatrixVaryingAttack/
+│   │   ├── definition.ts   # ツール定義
+│   │   ├── generated/      # 自動生成されたスキーマ
+│   │   │   └── inputSchema.ts
+│   │   ├── handlers/       # ハンドラとロジック
+│   │   └── index.ts        # エクスポート
+│   └── calculateDamageMatrixVaryingDefense/
 │       ├── definition.ts   # ツール定義
 │       ├── generated/      # 自動生成されたスキーマ
 │       │   └── inputSchema.ts
-│       ├── handlers/       # リクエストハンドラ
-│       │   ├── handler.ts
-│       │   ├── schemas/    # Zodスキーマ
-│       │   ├── helpers/    # 計算ロジック
-│       │   │   ├── calculateEvDamages.ts  # 努力値別計算
-│       │   │   ├── abilityEffects/        # とくせい効果
-│       │   │   ├── itemEffects/           # もちもの効果
-│       │   │   └── typeEffectiveness/     # タイプ相性
-│       │   └── formatters/ # レスポンス整形
-│       ├── types/          # 型定義
-│       └── index.ts
+│       ├── handlers/       # ハンドラとロジック
+│       └── index.ts        # エクスポート
 ├── tests/                   # テストヘルパー
 │   └── parseResponse.ts    # MCPレスポンスパーサー
 ├── types/                   # 共通型定義
 └── utils/                   # 共通ユーティリティ
+    ├── calculateDamageWithContext/  # ダメージ計算コンテキスト（移動済み）
     ├── calculateHp/        # HP計算
     ├── calculateStat/      # ステータス計算
+    ├── error/              # エラーハンドリング（共通化）
+    │   ├── formatError.ts
+    │   ├── formatZodError.ts
+    │   └── index.ts
+    ├── getTypeEffectivenessText/  # タイプ相性テキスト
     └── natureModifier/     # せいかく補正
 ```
 
@@ -242,6 +270,11 @@ src/
 4. **モジュール設計**:
    - 単一責任の原則に従った小さなモジュール
    - index.ts による明確なパブリック API
+
+5. **エラーハンドリング**:
+   - 共通のエラーハンドリングユーティリティ（`utils/error/`）
+   - ZodエラーとMCPエラーの統一的な整形
+   - 各ツールでの一貫したエラーレスポンス
 
 ## 開発フロー
 
