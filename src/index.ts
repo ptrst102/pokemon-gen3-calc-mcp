@@ -11,6 +11,14 @@ import {
   calculateDamageHandler,
 } from "./tools/calculateDamage";
 import {
+  calculateDamageMatrixVaryingAttackDefinition,
+  calculateDamageMatrixVaryingAttackHandler,
+} from "./tools/calculateDamageMatrixVaryingAttack";
+import {
+  calculateDamageMatrixVaryingDefenseDefinition,
+  calculateDamageMatrixVaryingDefenseHandler,
+} from "./tools/calculateDamageMatrixVaryingDefense";
+import {
   calculateStatusDefinition,
   calculateStatusHandler,
 } from "./tools/calculateStatus";
@@ -29,7 +37,12 @@ const server = new Server(
 
 // ツールの登録
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: [calculateStatusDefinition, calculateDamageDefinition],
+  tools: [
+    calculateStatusDefinition,
+    calculateDamageDefinition,
+    calculateDamageMatrixVaryingDefenseDefinition,
+    calculateDamageMatrixVaryingAttackDefinition,
+  ],
 }));
 
 // ツールハンドラの登録
@@ -39,6 +52,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return await calculateStatusHandler(request.params.arguments);
     case "calculate_damage":
       return await calculateDamageHandler(request.params.arguments);
+    case "calculate_damage_matrix_varying_defense":
+      return await calculateDamageMatrixVaryingDefenseHandler(
+        request.params.arguments,
+      );
+    case "calculate_damage_matrix_varying_attack":
+      return await calculateDamageMatrixVaryingAttackHandler(
+        request.params.arguments,
+      );
     default:
       throw new McpError(
         ErrorCode.MethodNotFound,
