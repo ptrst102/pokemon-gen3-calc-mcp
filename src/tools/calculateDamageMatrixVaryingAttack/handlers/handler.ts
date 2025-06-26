@@ -6,7 +6,6 @@ import { calculateItemEffects } from "@/tools/calculateDamage/handlers/helpers/i
 import { getStatModifierRatio } from "@/tools/calculateDamage/handlers/helpers/statModifier";
 import { getTypeEffectiveness } from "@/tools/calculateDamage/handlers/helpers/typeEffectiveness";
 import type { TypeName } from "@/types";
-import { calculateHp } from "@/utils/calculateHp";
 import { calculateStat } from "@/utils/calculateStat";
 import { NATURE_MODIFIER_MAP } from "@/utils/natureModifier";
 import {
