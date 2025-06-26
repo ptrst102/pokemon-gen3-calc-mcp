@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parseResponse } from "@/utils/parseResponse";
 import type { StatsObj } from "@/types";
+import { parseResponse } from "@/utils/parseResponse";
 import { calculateStatusHandler } from "./handler";
 
 interface CalculateStatusOutput {
