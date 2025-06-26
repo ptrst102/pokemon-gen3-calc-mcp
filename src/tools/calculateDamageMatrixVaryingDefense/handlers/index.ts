@@ -1,0 +1,1 @@
+export { calculateDamageMatrixVaryingDefenseHandler } from "./handler";

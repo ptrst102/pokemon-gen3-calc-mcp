@@ -3,6 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { calculateDamageInputSchema } from "../src/tools/calculateDamage/handlers/schemas/damageSchema";
+import { calculateDamageMatrixVaryingAttackInputSchema } from "../src/tools/calculateDamageMatrixVaryingAttack/handlers/schemas/damageMatrixVaryingAttackSchema";
+import { calculateDamageMatrixVaryingDefenseInputSchema } from "../src/tools/calculateDamageMatrixVaryingDefense/handlers/schemas/damageMatrixVaryingDefenseSchema";
 import { calculateStatusInputSchema } from "../src/tools/calculateStatus/handlers/schemas/statusSchema";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -80,6 +82,32 @@ const main = () => {
     ),
     "calculateStatusInputSchema",
     statusSchema,
+  );
+
+  // calculateDamageMatrixVaryingDefenseのスキーマ生成
+  const damageMatrixVaryingDefenseSchema = generateSchema(
+    calculateDamageMatrixVaryingDefenseInputSchema,
+  );
+  writeSchemaFile(
+    path.join(
+      __dirname,
+      "../src/tools/calculateDamageMatrixVaryingDefense/generated/inputSchema.ts",
+    ),
+    "calculateDamageMatrixVaryingDefenseInputSchema",
+    damageMatrixVaryingDefenseSchema,
+  );
+
+  // calculateDamageMatrixVaryingAttackのスキーマ生成
+  const damageMatrixVaryingAttackSchema = generateSchema(
+    calculateDamageMatrixVaryingAttackInputSchema,
+  );
+  writeSchemaFile(
+    path.join(
+      __dirname,
+      "../src/tools/calculateDamageMatrixVaryingAttack/generated/inputSchema.ts",
+    ),
+    "calculateDamageMatrixVaryingAttackInputSchema",
+    damageMatrixVaryingAttackSchema,
   );
 
   console.log("✨ スキーマ生成が完了しました！");
