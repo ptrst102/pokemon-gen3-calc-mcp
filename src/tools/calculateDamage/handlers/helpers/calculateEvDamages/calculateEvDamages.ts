@@ -198,19 +198,30 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
 };
 
 /**
- * 防御側のステータスを固定し、攻撃側のEV別ダメージを計算
+ * EV別ダメージ計算のパラメータ
  */
-export const calculateAttackerEvDamages = (
-  input: CalculateDamageInput,
-  attackStatArray: number[],
-  fixedDefenseStat: number,
-): EvDamageEntry[] => {
+type EvDamageCalculationParams = {
+  input: CalculateDamageInput;
+  statArray: number[];
+  fixedStat: number;
+  isAttackerEv: boolean;
+};
+
+/**
+ * EV別ダメージを計算する共通関数
+ */
+const calculateEvDamagesCommon = ({
+  input,
+  statArray,
+  fixedStat,
+  isAttackerEv,
+}: EvDamageCalculationParams): EvDamageEntry[] => {
   const defenderTypes = input.defender.pokemon?.types || [];
   const results: EvDamageEntry[] = [];
 
-  for (let i = 0; i < attackStatArray.length; i++) {
+  for (let i = 0; i < statArray.length; i++) {
     const ev = i * 4;
-    const stat = attackStatArray[i];
+    const stat = statArray[i];
 
     const damages = calculateDamageInternal({
       move: {
@@ -221,7 +232,7 @@ export const calculateAttackerEvDamages = (
       },
       attacker: {
         level: input.attacker.level,
-        attack: stat,
+        attack: isAttackerEv ? stat : fixedStat,
         attackModifier: input.attacker.statModifier,
         types: input.attacker.pokemon?.types,
         pokemonName: input.attacker.pokemon?.name,
@@ -230,7 +241,7 @@ export const calculateAttackerEvDamages = (
         item: input.attacker.item,
       },
       defender: {
-        defense: fixedDefenseStat,
+        defense: isAttackerEv ? fixedStat : stat,
         defenseModifier: input.defender.statModifier,
         types: defenderTypes,
         pokemonName: input.defender.pokemon?.name,
@@ -248,6 +259,22 @@ export const calculateAttackerEvDamages = (
 };
 
 /**
+ * 防御側のステータスを固定し、攻撃側のEV別ダメージを計算
+ */
+export const calculateAttackerEvDamages = (
+  input: CalculateDamageInput,
+  attackStatArray: number[],
+  fixedDefenseStat: number,
+): EvDamageEntry[] => {
+  return calculateEvDamagesCommon({
+    input,
+    statArray: attackStatArray,
+    fixedStat: fixedDefenseStat,
+    isAttackerEv: true,
+  });
+};
+
+/**
  * 攻撃側のステータスを固定し、防御側のEV別ダメージを計算
  */
 export const calculateDefenderEvDamages = (
@@ -255,46 +282,12 @@ export const calculateDefenderEvDamages = (
   fixedAttackStat: number,
   defenseStatArray: number[],
 ): EvDamageEntry[] => {
-  const defenderTypes = input.defender.pokemon?.types || [];
-  const results: EvDamageEntry[] = [];
-
-  for (let i = 0; i < defenseStatArray.length; i++) {
-    const ev = i * 4;
-    const stat = defenseStatArray[i];
-
-    const damages = calculateDamageInternal({
-      move: {
-        name: input.move.name,
-        type: input.move.type,
-        power: input.move.power,
-        isPhysical: input.move.isPhysical,
-      },
-      attacker: {
-        level: input.attacker.level,
-        attack: fixedAttackStat,
-        attackModifier: input.attacker.statModifier,
-        types: input.attacker.pokemon?.types,
-        pokemonName: input.attacker.pokemon?.name,
-        ability: input.attacker.ability,
-        abilityActive: input.attacker.abilityActive,
-        item: input.attacker.item,
-      },
-      defender: {
-        defense: stat,
-        defenseModifier: input.defender.statModifier,
-        types: defenderTypes,
-        pokemonName: input.defender.pokemon?.name,
-        ability: input.defender.ability,
-        abilityActive: input.defender.abilityActive,
-        item: input.defender.item,
-      },
-      options: input.options || {},
-    });
-
-    results.push({ ev, stat, damages });
-  }
-
-  return results;
+  return calculateEvDamagesCommon({
+    input,
+    statArray: defenseStatArray,
+    fixedStat: fixedAttackStat,
+    isAttackerEv: false,
+  });
 };
 
 /**
