@@ -109,10 +109,32 @@ export const calculateDamageWithContext = (
     return itemAdjustedDefenseStat;
   })();
 
+  // 技の威力を計算（じゅうでん、どろあそび、みずあそびを考慮）
+  const finalPower = (() => {
+    let power = move.power;
+
+    // じゅうでん
+    if (options.charge && move.type === "でんき") {
+      power = Math.floor(power * 2);
+    }
+
+    // どろあそび
+    if (options.mudSport && move.type === "でんき") {
+      power = Math.floor(power * 0.5);
+    }
+
+    // みずあそび
+    if (options.waterSport && move.type === "ほのお") {
+      power = Math.floor(power * 0.5);
+    }
+
+    return power;
+  })();
+
   // 基本ダメージを計算
   const baseDamage = calculateBaseDamage({
     level: attacker.level,
-    power: move.power,
+    power: finalPower,
     attack: finalAttackStat,
     defense: finalDefenseStat,
     isPhysical: move.isPhysical,
@@ -139,9 +161,22 @@ export const calculateDamageWithContext = (
   const hasStab = attacker.pokemon?.types?.includes(move.type) ?? false;
   const stabMultiplier = hasStab ? 1.5 : 1;
 
+  // 天候効果
+  const weatherMultiplier = (() => {
+    if (options.weather === "はれ") {
+      if (move.type === "ほのお") return 1.5;
+      if (move.type === "みず") return 0.5;
+    }
+    if (options.weather === "あめ") {
+      if (move.type === "みず") return 1.5;
+      if (move.type === "ほのお") return 0.5;
+    }
+    return 1;
+  })();
+
   // 最終的なダメージを計算
   const finalDamage = Math.floor(
-    abilityAdjustedDamage * effectiveness * stabMultiplier,
+    abilityAdjustedDamage * effectiveness * stabMultiplier * weatherMultiplier,
   );
 
   // ダメージ乱数（16通り）を計算

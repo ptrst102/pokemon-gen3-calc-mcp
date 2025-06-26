@@ -260,8 +260,135 @@ const runIntegrationTests = async () => {
     }
     console.log("");
 
-    // テスト5: エラーケース（存在しないポケモン）
-    console.log("テスト5: エラーケース (存在しないポケモン)");
+    // テスト5: calculate_damage_matrix_varying_defense
+    console.log("テスト5: calculate_damage_matrix_varying_defense");
+    try {
+      const matrixDefenseResult = await client.callTool({
+        name: "calculate_damage_matrix_varying_defense",
+        arguments: {
+          move: "サイコキネシス",
+          attacker: {
+            pokemonName: "ラティオス",
+            level: 50,
+            item: "こだわりメガネ",
+            stat: {
+              iv: 31,
+              ev: 252,
+              natureModifier: "up",
+            },
+          },
+          defender: {
+            pokemonName: "キノガッサ",
+            level: 50,
+            isPhysicalDefense: false,
+            stat: {
+              iv: 31,
+              natureModifier: "neutral",
+            },
+          },
+        },
+      });
+
+      results.push({
+        name: "calculate_damage_matrix_varying_defense",
+        success: true,
+        response: matrixDefenseResult.content,
+      });
+
+      if (
+        Array.isArray(matrixDefenseResult.content) &&
+        matrixDefenseResult.content[0] &&
+        "type" in matrixDefenseResult.content[0] &&
+        matrixDefenseResult.content[0].type === "text" &&
+        "text" in matrixDefenseResult.content[0]
+      ) {
+        const text = matrixDefenseResult.content[0].text;
+        const parsed = JSON.parse(text);
+        console.log(
+          `計算された努力値パターン数: ${parsed.damageMatrix.length}`,
+        );
+        console.log(
+          `努力値0のダメージ: ${parsed.damageMatrix[0].damages[0]}-${parsed.damageMatrix[0].damages[15]}`,
+        );
+        console.log(
+          `努力値252のダメージ: ${parsed.damageMatrix[32].damages[0]}-${parsed.damageMatrix[32].damages[15]}`,
+        );
+      }
+    } catch (error) {
+      results.push({
+        name: "calculate_damage_matrix_varying_defense",
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      console.error(`エラー: ${error}`);
+    }
+    console.log("");
+
+    // テスト6: calculate_damage_matrix_varying_attack
+    console.log("テスト6: calculate_damage_matrix_varying_attack");
+    try {
+      const matrixAttackResult = await client.callTool({
+        name: "calculate_damage_matrix_varying_attack",
+        arguments: {
+          move: "コメットパンチ",
+          attacker: {
+            pokemonName: "メタグロス",
+            level: 50,
+            isPhysicalAttack: true,
+            stat: {
+              iv: 31,
+              natureModifier: "up",
+            },
+          },
+          defender: {
+            pokemonName: "ハピナス",
+            level: 50,
+            stat: {
+              iv: 31,
+              ev: 252,
+              natureModifier: "up",
+            },
+          },
+        },
+      });
+
+      results.push({
+        name: "calculate_damage_matrix_varying_attack",
+        success: true,
+        response: matrixAttackResult.content,
+      });
+
+      if (
+        Array.isArray(matrixAttackResult.content) &&
+        matrixAttackResult.content[0] &&
+        "type" in matrixAttackResult.content[0] &&
+        matrixAttackResult.content[0].type === "text" &&
+        "text" in matrixAttackResult.content[0]
+      ) {
+        const text = matrixAttackResult.content[0].text;
+        const parsed = JSON.parse(text);
+        console.log(
+          `計算された努力値パターン数: ${parsed.damageMatrix.length}`,
+        );
+        console.log(
+          `努力値0のダメージ: ${parsed.damageMatrix[0].damages[0]}-${parsed.damageMatrix[0].damages[15]}`,
+        );
+        console.log(
+          `努力値252のダメージ: ${parsed.damageMatrix[32].damages[0]}-${parsed.damageMatrix[32].damages[15]}`,
+        );
+      }
+    } catch (error) {
+      results.push({
+        name: "calculate_damage_matrix_varying_attack",
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      console.error(`エラー: ${error}`);
+    }
+    console.log("");
+
+    // テスト7: エラーケース（存在しないポケモン）
+    console.log("テスト7: エラーケース (存在しないポケモン)");
     try {
       await client.callTool({
         name: "calculate_status",
