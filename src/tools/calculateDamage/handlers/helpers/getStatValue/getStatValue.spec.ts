@@ -47,6 +47,7 @@ describe("getStatValue", () => {
       stat: {
         iv: 31,
         calculateAllEvs: true,
+        calculateAllNatures: false,
       },
       level: 50,
       statName: "atk",
@@ -64,5 +65,35 @@ describe("getStatValue", () => {
     // 最初と最後の値を確認（ピカチュウの攻撃種族値55、IV31、レベル50、性格補正なし）
     expect(resultArray[0]).toBe(75); // EV0の場合: ((55*2+31+0)*50/100)+5 = 75
     expect(resultArray[63]).toBe(107); // EV252の場合: ((55*2+31+63)*50/100)+5 = 107
+  });
+
+  it("calculateAllEvsとcalculateAllNaturesが指定された場合、性格補正も含めた配列を返す", () => {
+    const result = getStatValue({
+      stat: {
+        iv: 31,
+        calculateAllEvs: true,
+        calculateAllNatures: true,
+      },
+      level: 50,
+      statName: "atk",
+      pokemonName: "ピカチュウ",
+    });
+    expect(Array.isArray(result)).toBe(true);
+
+    const resultArray = result as number[];
+    expect(resultArray.length).toBeGreaterThan(0);
+
+    // 結果が昇順で並んでいることを確認
+    for (let i = 1; i < resultArray.length; i++) {
+      expect(resultArray[i]).toBeGreaterThan(resultArray[i - 1]);
+    }
+
+    // 最小値（EV0、マイナス補正）
+    // ((55*2+31+0)*50/100)+5 = 75, 75 * 0.9 = 67.5 → 67
+    expect(resultArray[0]).toBe(67);
+
+    // 最大値（EV252、プラス補正）
+    // ((55*2+31+63)*50/100)+5 = 107, 107 * 1.1 = 117.7 → 117
+    expect(resultArray[resultArray.length - 1]).toBe(117);
   });
 });

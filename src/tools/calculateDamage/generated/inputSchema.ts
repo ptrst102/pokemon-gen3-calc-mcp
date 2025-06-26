@@ -123,6 +123,11 @@ export const calculateDamageInputSchema = {
                   type: "boolean",
                   const: true,
                 },
+                calculateAllNatures: {
+                  type: "boolean",
+                  default: false,
+                  description: "性格補正も総当たりで計算するかどうか",
+                },
               },
               required: ["iv", "calculateAllEvs"],
               additionalProperties: false,
@@ -211,6 +216,11 @@ export const calculateDamageInputSchema = {
                 calculateAllEvs: {
                   type: "boolean",
                   const: true,
+                },
+                calculateAllNatures: {
+                  type: "boolean",
+                  default: false,
+                  description: "性格補正も総当たりで計算するかどうか",
                 },
               },
               required: ["iv", "calculateAllEvs"],

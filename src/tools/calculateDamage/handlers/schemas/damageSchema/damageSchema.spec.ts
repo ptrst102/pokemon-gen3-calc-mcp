@@ -168,6 +168,7 @@ describe("calculateDamageInputSchema", () => {
       expect(result.attacker.stat).toEqual({
         iv: 31,
         calculateAllEvs: true,
+        calculateAllNatures: false,
       });
     });
 

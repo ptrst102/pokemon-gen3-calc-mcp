@@ -12,7 +12,11 @@ interface GetStatValueParams {
   pokemonName?: string;
 }
 
-const EV_VALUES = Array.from({ length: 64 }, (_, i) => i * 4);
+// 性格補正の値も総当たりで計算する場合の補正値
+const NATURE_MODIFIERS = [0.9, 1.0, 1.1]; // マイナス補正、補正なし、プラス補正
+
+// 0から252まで4刻みの努力値配列を明示的に生成
+const EV_VALUES = Array.from({ length: 64 }, (_, i) => i * 4); // [0, 4, 8, ..., 252]
 
 export const getStatValue = (params: GetStatValueParams): number | number[] => {
   const { stat, level, statName, pokemonName } = params;
@@ -35,15 +39,49 @@ export const getStatValue = (params: GetStatValueParams): number | number[] => {
     const baseStat = pokemon.baseStats[statName];
 
     if ("calculateAllEvs" in stat && stat.calculateAllEvs) {
-      return EV_VALUES.map((ev) =>
-        calculateStat({
-          baseStat,
-          iv: stat.iv,
-          ev,
-          level,
-          natureModifier: 1.0,
-        }),
-      );
+      // 性格補正の総当たりも行うかどうか
+      const calculateAllNatures =
+        "calculateAllNatures" in stat && stat.calculateAllNatures;
+
+      if (calculateAllNatures) {
+        // 性格補正も含めた総当たり
+        const allStats: number[] = [];
+        const seenStats = new Set<number>();
+
+        for (const natureModifier of NATURE_MODIFIERS) {
+          for (const ev of EV_VALUES) {
+            const statValue = calculateStat({
+              baseStat,
+              iv: stat.iv,
+              ev,
+              level,
+              natureModifier,
+            });
+
+            // 重複するステータス値を除去
+            if (!seenStats.has(statValue)) {
+              seenStats.add(statValue);
+              allStats.push(statValue);
+            }
+          }
+        }
+
+        // ステータス値でソート
+        return allStats.sort((a, b) => a - b);
+      } else {
+        // 努力値のみの全パターンを計算（重複を除去しない）
+        const stats = EV_VALUES.map((ev) =>
+          calculateStat({
+            baseStat,
+            iv: stat.iv,
+            ev,
+            level,
+            natureModifier: 1.0,
+          }),
+        );
+
+        return stats;
+      }
     }
 
     if ("ev" in stat) {

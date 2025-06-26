@@ -88,6 +88,11 @@ const statInputSchema = z.union([
   z.object({
     iv: z.number().int().min(0).max(31),
     calculateAllEvs: z.literal(true),
+    calculateAllNatures: z
+      .boolean()
+      .optional()
+      .default(false)
+      .describe("性格補正も総当たりで計算するかどうか"),
   }),
 ]);
 
