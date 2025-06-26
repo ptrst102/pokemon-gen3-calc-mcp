@@ -2,7 +2,7 @@ import type {
   DamageCalculationContext,
   EvRangeDamageResult,
   NormalDamageResult,
-} from "@/tools/calculateDamage/types/damageCalculation";
+} from "@/tools/calculateDamage/types";
 
 interface BaseStructuredOutput {
   move: {

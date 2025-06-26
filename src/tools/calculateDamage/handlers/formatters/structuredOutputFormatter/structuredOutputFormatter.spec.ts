@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type {
   EvRangeDamageResult,
   NormalDamageResult,
-} from "@/tools/calculateDamage/types/damageCalculation";
+} from "@/tools/calculateDamage/types";
 import {
   createEvRangeDamageOutput,
   createNormalDamageOutput,

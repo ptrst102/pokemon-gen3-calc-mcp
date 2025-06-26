@@ -1,10 +1,32 @@
+import type { Ability } from "@/data/abilities";
+import type { Item } from "@/data/items";
+import type { Pokemon } from "@/data/pokemon";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
-import type {
-  DamageCalculationContext,
-  MoveInfo,
-  PokemonInfo,
-} from "@/tools/calculateDamage/types/damageCalculation";
+import type { DamageCalculationContext } from "@/tools/calculateDamage/types";
+import type { TypeName } from "@/types";
 import { getTypeEffectiveness } from "./typeEffectiveness";
+
+/**
+ * わざの情報
+ */
+interface MoveInfo {
+  name?: string;
+  type: TypeName;
+  power: number;
+  isPhysical: boolean;
+}
+
+/**
+ * ポケモンの情報（攻撃側/防御側共通）
+ */
+interface PokemonInfo {
+  level: number;
+  pokemon?: Pokemon;
+  item?: Item;
+  ability?: Ability;
+  abilityActive?: boolean;
+  statModifier: number;
+}
 
 const prepareMoveInfo = (input: CalculateDamageInput): MoveInfo => {
   if ("name" in input.move) {
