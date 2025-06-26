@@ -29,12 +29,11 @@ const moveInputSchema = z.union([
       if (!move) {
         throw new Error(`わざ「${moveName}」が見つかりません`);
       }
-      const moveType = move.type as TypeName;
       return {
         name: moveName,
-        type: moveType,
+        type: move.type,
         power: move.power,
-        isPhysical: isPhysicalType(moveType),
+        isPhysical: isPhysicalType(move.type),
       };
     }),
   // タイプと威力を直接指定
