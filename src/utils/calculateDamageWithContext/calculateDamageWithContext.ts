@@ -5,6 +5,7 @@ import { calculateItemEffects } from "@/tools/calculateDamage/handlers/helpers/i
 import { getStatModifierRatio } from "@/tools/calculateDamage/handlers/helpers/statModifier";
 import { getTypeEffectiveness } from "@/tools/calculateDamage/handlers/helpers/typeEffectiveness";
 import type { TypeName } from "@/types";
+import { adjustSpecialMoves } from "@/utils/adjustSpecialMoves";
 
 export interface DamageCalculationParams {
   move: {
@@ -26,7 +27,7 @@ export interface DamageCalculationParams {
   };
   defender: {
     statModifier: number;
-    pokemon?: { types?: TypeName[] };
+    pokemon?: { types?: TypeName[]; weightkg?: number };
     ability?: { name?: string };
     abilityActive?: boolean;
     item?: { name?: string };
@@ -48,7 +49,14 @@ export interface DamageCalculationParams {
 export const calculateDamageWithContext = (
   params: DamageCalculationParams,
 ): number[] => {
-  const { move, attackStat, defenseStat, attacker, defender, options } = params;
+  const { attackStat, defenseStat, attacker, defender, options } = params;
+
+  // 特殊な技の処理
+  const move = adjustSpecialMoves({
+    move: params.move,
+    weather: options?.weather,
+    defenderWeight: defender.pokemon?.weightkg,
+  });
 
   // もちもの効果を計算
   const attackerItemEffects = calculateItemEffects(
@@ -98,15 +106,21 @@ export const calculateDamageWithContext = (
           defenderItemEffects.specialDefenseMultiplier.denominator,
       );
 
+  // じばく・だいばくはつの処理: 防御を半分にする
+  const explosionAdjustedDefenseStat =
+    move.name === "じばく" || move.name === "だいばくはつ"
+      ? Math.floor(itemAdjustedDefenseStat / 2)
+      : itemAdjustedDefenseStat;
+
   // 場の状態による防御補正
   const finalDefenseStat = (() => {
     if (move.isPhysical && options.reflect) {
-      return itemAdjustedDefenseStat * 2;
+      return explosionAdjustedDefenseStat * 2;
     }
     if (!move.isPhysical && options.lightScreen) {
-      return itemAdjustedDefenseStat * 2;
+      return explosionAdjustedDefenseStat * 2;
     }
-    return itemAdjustedDefenseStat;
+    return explosionAdjustedDefenseStat;
   })();
 
   // 技の威力を計算（じゅうでん、どろあそび、みずあそびを考慮）
