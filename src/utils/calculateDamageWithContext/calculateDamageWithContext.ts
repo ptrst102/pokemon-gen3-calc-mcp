@@ -107,91 +107,98 @@ export const calculateDamageWithContext = (
       );
 
   // じばく・だいばくはつの処理: 防御を半分にする
-  const explosionAdjustedDefenseStat =
+  const finalDefenseStat =
     move.name === "じばく" || move.name === "だいばくはつ"
       ? Math.floor(itemAdjustedDefenseStat / 2)
       : itemAdjustedDefenseStat;
 
-  // 場の状態による防御補正
-  const finalDefenseStat = (() => {
-    if (move.isPhysical && options.reflect) {
-      return explosionAdjustedDefenseStat * 2;
-    }
-    if (!move.isPhysical && options.lightScreen) {
-      return explosionAdjustedDefenseStat * 2;
-    }
-    return explosionAdjustedDefenseStat;
-  })();
-
-  // 技の威力を計算（じゅうでん、どろあそび、みずあそびを考慮）
-  const finalPower = (() => {
-    let power = move.power;
-
-    // じゅうでん
-    if (options.charge && move.type === "でんき") {
-      power = Math.floor(power * 2);
-    }
-
-    // どろあそび
-    if (options.mudSport && move.type === "でんき") {
-      power = Math.floor(power * 0.5);
-    }
-
-    // みずあそび
-    if (options.waterSport && move.type === "ほのお") {
-      power = Math.floor(power * 0.5);
-    }
-
-    return power;
-  })();
-
   // 基本ダメージを計算
   const baseDamage = calculateBaseDamage({
     level: attacker.level,
-    power: finalPower,
+    power: move.power,
     attack: finalAttackStat,
     defense: finalDefenseStat,
     isPhysical: move.isPhysical,
   });
 
-  // とくせい効果を適用
+  // タイプ一致ボーナス
+  const stabDamage = attacker.pokemon?.types?.includes(move.type)
+    ? Math.floor(baseDamage * 1.5)
+    : baseDamage;
+
+  // タイプ相性
+  const typeEffectiveness = getTypeEffectiveness(
+    move.type,
+    defender.pokemon?.types || [],
+  );
+  const typeAdjustedDamage = Math.floor(stabDamage * typeEffectiveness);
+
+  // 天候効果
+  const weatherAdjustedDamage = (() => {
+    if (options.weather === "はれ") {
+      if (move.type === "ほのお") {
+        return Math.floor(typeAdjustedDamage * 1.5);
+      }
+      if (move.type === "みず") {
+        return Math.floor(typeAdjustedDamage * 0.5);
+      }
+    }
+    if (options.weather === "あめ") {
+      if (move.type === "みず") {
+        return Math.floor(typeAdjustedDamage * 1.5);
+      }
+      if (move.type === "ほのお") {
+        return Math.floor(typeAdjustedDamage * 0.5);
+      }
+    }
+    return typeAdjustedDamage;
+  })();
+
+  // チャージ効果
+  const chargeAdjustedDamage =
+    options.charge && move.type === "でんき"
+      ? Math.floor(weatherAdjustedDamage * 2)
+      : weatherAdjustedDamage;
+
+  // 壁効果
+  const screenAdjustedDamage = (() => {
+    if (move.isPhysical && options.reflect) {
+      return Math.floor(chargeAdjustedDamage * 0.5);
+    }
+    if (!move.isPhysical && options.lightScreen) {
+      return Math.floor(chargeAdjustedDamage * 0.5);
+    }
+    return chargeAdjustedDamage;
+  })();
+
+  // スポーツ効果
+  const sportAdjustedDamage = (() => {
+    if (options.mudSport && move.type === "でんき") {
+      return Math.floor(screenAdjustedDamage * 0.5);
+    }
+    if (options.waterSport && move.type === "ほのお") {
+      return Math.floor(screenAdjustedDamage * 0.5);
+    }
+    return screenAdjustedDamage;
+  })();
+
+  // とくせい効果
   const abilityAdjustedDamage = applyAbilityEffects({
-    damage: baseDamage,
+    damage: sportAdjustedDamage,
     moveType: move.type,
     isPhysical: move.isPhysical,
     attackerAbility: attacker.ability?.name,
     attackerAbilityActive: attacker.abilityActive,
     defenderAbility: defender.ability?.name,
     defenderAbilityActive: defender.abilityActive,
+    typeEffectiveness,
   });
 
-  // タイプ相性を計算
-  const effectiveness = getTypeEffectiveness(
-    move.type,
-    defender.pokemon?.types || [],
-  );
-
-  // タイプ一致ボーナス
-  const hasStab = attacker.pokemon?.types?.includes(move.type) ?? false;
-  const stabMultiplier = hasStab ? 1.5 : 1;
-
-  // 天候効果
-  const weatherMultiplier = (() => {
-    if (options.weather === "はれ") {
-      if (move.type === "ほのお") return 1.5;
-      if (move.type === "みず") return 0.5;
-    }
-    if (options.weather === "あめ") {
-      if (move.type === "みず") return 1.5;
-      if (move.type === "ほのお") return 0.5;
-    }
-    return 1;
-  })();
-
-  // 最終的なダメージを計算
-  const finalDamage = Math.floor(
-    abilityAdjustedDamage * effectiveness * stabMultiplier * weatherMultiplier,
-  );
+  // 最小ダメージ保証
+  const finalDamage =
+    abilityAdjustedDamage > 0
+      ? Math.max(1, abilityAdjustedDamage)
+      : abilityAdjustedDamage;
 
   // ダメージ乱数（16通り）を計算
   return getDamageRanges(finalDamage);
