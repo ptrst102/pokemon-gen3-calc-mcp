@@ -43,6 +43,50 @@ export const calculateDamageMatrixVaryingAttackInputSchema = {
             "power": {
               "type": "integer",
               "minimum": 0
+            },
+            "hiddenPowerIVs": {
+              "type": "object",
+              "properties": {
+                "hp": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                },
+                "attack": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                },
+                "defense": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                },
+                "specialAttack": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                },
+                "specialDefense": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                },
+                "speed": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                }
+              },
+              "required": [
+                "hp",
+                "attack",
+                "defense",
+                "specialAttack",
+                "specialDefense",
+                "speed"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [

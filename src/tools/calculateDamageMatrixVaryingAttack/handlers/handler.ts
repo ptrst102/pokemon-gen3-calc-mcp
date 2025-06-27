@@ -2,6 +2,8 @@ import { ZodError } from "zod";
 import { calculateDamageWithContext } from "@/utils/calculateDamageWithContext";
 import { calculateStat } from "@/utils/calculateStat";
 import { NATURE_MODIFIER_MAP } from "@/utils/natureModifier";
+import { getHiddenPowerType, getHiddenPowerPower } from "@/utils/hiddenPower";
+import type { TypeName } from "@/types";
 import {
   type CalculateDamageMatrixVaryingAttackInput,
   calculateDamageMatrixVaryingAttackInputSchema,
@@ -83,13 +85,41 @@ const calculateDamageMatrix = (
 ): { damageMatrix: DamageMatrixEntry[] } => {
   const { move, attacker, defender, options } = input;
 
+  // めざめるパワーの特別処理
+  const finalMove = (() => {
+    if ("hiddenPowerIVs" in move && move.hiddenPowerIVs) {
+      const type = getHiddenPowerType(move.hiddenPowerIVs) as TypeName;
+      const power = getHiddenPowerPower(move.hiddenPowerIVs);
+      // わざのタイプから物理技か特殊技かを判定する
+      const isPhysical = [
+        "ノーマル",
+        "かくとう",
+        "どく",
+        "じめん",
+        "ひこう",
+        "むし",
+        "いわ",
+        "ゴースト",
+        "はがね",
+      ].includes(type);
+      
+      return {
+        name: move.name || "めざめるパワー",
+        type,
+        power,
+        isPhysical,
+      };
+    }
+    return move;
+  })();
+
   // 防御側のステータスを計算
   const defenseStat = (() => {
     if ("value" in defender.stat) {
       return defender.stat.value;
     }
 
-    const baseStat = move.isPhysical
+    const baseStat = finalMove.isPhysical
       ? (defender.pokemon?.baseStats.def ?? 100)
       : (defender.pokemon?.baseStats.spd ?? 100);
 
@@ -129,10 +159,10 @@ const calculateDamageMatrix = (
     // ダメージ計算
     const damages = calculateDamageWithContext({
       move: {
-        name: move.name,
-        type: move.type,
-        power: move.power,
-        isPhysical: move.isPhysical,
+        name: finalMove.name,
+        type: finalMove.type,
+        power: finalMove.power,
+        isPhysical: finalMove.isPhysical,
       },
       attackStat,
       defenseStat,
