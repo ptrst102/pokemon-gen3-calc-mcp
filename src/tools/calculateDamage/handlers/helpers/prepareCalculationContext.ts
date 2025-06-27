@@ -4,6 +4,7 @@ import type { Pokemon } from "@/data/pokemon";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { DamageCalculationContext } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
+import { getHiddenPowerPower, getHiddenPowerType } from "@/utils/hiddenPower";
 import { getTypeEffectiveness } from "./typeEffectiveness";
 
 /**
@@ -29,20 +30,43 @@ interface PokemonInfo {
 }
 
 const prepareMoveInfo = (input: CalculateDamageInput): MoveInfo => {
-  if ("name" in input.move) {
-    return {
-      name: input.move.name,
-      type: input.move.type,
-      power: input.move.power,
-      isPhysical: input.move.isPhysical,
-    };
-  }
-
-  return {
+  const baseMove = {
+    name: "name" in input.move ? input.move.name : undefined,
     type: input.move.type,
     power: input.move.power,
     isPhysical: input.move.isPhysical,
   };
+
+  // めざめるパワーの処理
+  if (baseMove.name === "めざめるパワー") {
+    // 実数値のみ指定の場合はエラー
+    if ("value" in input.attacker.stat) {
+      throw new Error(
+        "めざめるパワーを使用する場合は、攻撃側ポケモンの個体値を指定する必要があります",
+      );
+    }
+
+    // allIVsが指定されていない場合、全て31として扱う
+    const ivs = input.attacker.allIVs || {
+      hp: 31,
+      attack: 31,
+      defense: 31,
+      specialAttack: 31,
+      specialDefense: 31,
+      speed: 31,
+    };
+
+    const hiddenPowerType = getHiddenPowerType(ivs);
+    const hiddenPowerPower = getHiddenPowerPower(ivs);
+
+    return {
+      ...baseMove,
+      type: hiddenPowerType as TypeName,
+      power: hiddenPowerPower,
+    };
+  }
+
+  return baseMove;
 };
 
 /**
@@ -81,15 +105,14 @@ export const prepareCalculationContext = (
     throw new Error("防御側のタイプ情報が必要です");
   }
 
-  const typeEffectiveness = getTypeEffectiveness(
-    input.move.type,
-    defenderTypes,
-  );
+  const move = prepareMoveInfo(input);
 
-  const isStab = checkStab(input.attacker.pokemon?.types, input.move.type);
+  const typeEffectiveness = getTypeEffectiveness(move.type, defenderTypes);
+
+  const isStab = checkStab(input.attacker.pokemon?.types, move.type);
 
   return {
-    move: prepareMoveInfo(input),
+    move,
     attacker: preparePokemonInfo(input.attacker),
     defender: preparePokemonInfo(input.defender),
     typeEffectiveness,

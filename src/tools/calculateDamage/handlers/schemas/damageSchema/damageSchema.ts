@@ -67,6 +67,16 @@ const moveInputSchema = z.union([
     })),
 ]);
 
+// 全ての個体値を指定するスキーマ
+const allIVsSchema = z.object({
+  hp: z.number().int().min(0).max(31),
+  attack: z.number().int().min(0).max(31),
+  defense: z.number().int().min(0).max(31),
+  specialAttack: z.number().int().min(0).max(31),
+  specialDefense: z.number().int().min(0).max(31),
+  speed: z.number().int().min(0).max(31),
+});
+
 // 能力値の入力スキーマ（2パターン）
 const statInputSchema = z.union([
   // パターン1: 実数値を直接指定
@@ -103,6 +113,11 @@ const createPokemonSchema = () =>
         ),
       stat: statInputSchema,
       statModifier: z.number().int().min(-6).max(6).optional().default(0),
+      allIVs: allIVsSchema
+        .optional()
+        .describe(
+          "めざめるパワーを使用する場合に必要な全ての個体値。通常のわざでは省略可能",
+        ),
     })
     .transform((input) => {
       // ポケモンの情報を取得

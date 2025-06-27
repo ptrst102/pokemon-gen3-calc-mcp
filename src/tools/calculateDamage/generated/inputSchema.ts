@@ -119,6 +119,52 @@ export const calculateDamageInputSchema = {
           maximum: 6,
           default: 0,
         },
+        allIVs: {
+          type: "object",
+          properties: {
+            hp: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            attack: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            defense: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            specialAttack: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            specialDefense: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            speed: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+          },
+          required: [
+            "hp",
+            "attack",
+            "defense",
+            "specialAttack",
+            "specialDefense",
+            "speed",
+          ],
+          additionalProperties: false,
+          description:
+            "めざめるパワーを使用する場合に必要な全ての個体値。通常のわざでは省略可能",
+        },
       },
       required: ["stat"],
       additionalProperties: false,
@@ -191,6 +237,52 @@ export const calculateDamageInputSchema = {
           minimum: -6,
           maximum: 6,
           default: 0,
+        },
+        allIVs: {
+          type: "object",
+          properties: {
+            hp: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            attack: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            defense: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            specialAttack: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            specialDefense: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+            speed: {
+              type: "integer",
+              minimum: 0,
+              maximum: 31,
+            },
+          },
+          required: [
+            "hp",
+            "attack",
+            "defense",
+            "specialAttack",
+            "specialDefense",
+            "speed",
+          ],
+          additionalProperties: false,
+          description:
+            "めざめるパワーを使用する場合に必要な全ての個体値。通常のわざでは省略可能",
         },
       },
       required: ["stat"],
