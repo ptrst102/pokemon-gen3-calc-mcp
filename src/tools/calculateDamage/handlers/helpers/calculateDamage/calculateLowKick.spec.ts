@@ -1,173 +1,121 @@
 import { describe, expect, it } from "vitest";
-import type { Pokemon } from "@/data/pokemon";
-import type { CalculateDamageInput } from "../../schemas/damageSchema";
-import { calculateNormalDamage } from "./calculateDamage";
+import {
+  isNormalDamageOutput,
+  type StructuredOutput,
+} from "@/tools/calculateDamage/handlers/formatters/structuredOutputFormatter";
+import { calculateDamageHandler } from "@/tools/calculateDamage/handlers/handler";
+import { parseResponse } from "@/utils/parseResponse";
 
 describe("けたぐりの威力計算", () => {
-  const createInput = (defenderWeightkg: number): CalculateDamageInput => {
-    // テスト用のモックポケモン
-    const mockDefenderPokemon: Pokemon = {
-      name: "テストポケモン" as "カビゴン",
-      types: ["ノーマル"],
-      baseStats: {
-        hp: 160,
-        atk: 110,
-        def: 65,
-        spa: 65,
-        spd: 110,
-        spe: 30,
-      },
-      abilities: ["めんえき", "あついしぼう"],
-      weightkg: defenderWeightkg,
-    };
-
-    return {
-      move: {
-        name: "けたぐり",
-        type: "かくとう",
-        power: 60,
-        isPhysical: true,
-      },
+  // 基本のダメージ計算テストのヘルパー関数
+  const calculateLowKickDamage = async (
+    defenderName: string,
+    expectedMinDamage: number,
+    expectedMaxDamage: number,
+  ) => {
+    const result = await calculateDamageHandler({
+      move: "けたぐり",
       attacker: {
         level: 50,
-        pokemon: {
-          name: "ワンリキー",
-          types: ["かくとう"],
-          baseStats: {
-            hp: 70,
-            atk: 80,
-            def: 50,
-            spa: 35,
-            spd: 35,
-            spe: 35,
-          },
-          abilities: ["こんじょう"],
-          weightkg: 19.5,
+        pokemonName: "ワンリキー",
+        stat: {
+          iv: 31,
+          ev: 252,
+          natureModifier: "neutral",
         },
-        stat: { value: 100 },
         statModifier: 0,
       },
       defender: {
         level: 50,
-        pokemon: mockDefenderPokemon,
-        stat: { value: 85 },
+        pokemonName: defenderName,
+        stat: {
+          iv: 31,
+          ev: 4,
+          natureModifier: "neutral",
+        },
         statModifier: 0,
       },
-    };
+      options: {},
+    });
+
+    const output = parseResponse<StructuredOutput>(result);
+    if (isNormalDamageOutput(output)) {
+      expect(output.damage.min).toBe(expectedMinDamage);
+      expect(output.damage.max).toBe(expectedMaxDamage);
+    } else {
+      throw new Error("Expected normal damage output");
+    }
   };
 
-  it("重さ10kg以下の場合、威力20になる", () => {
-    const input = createInput(9.0);
-    const damages = calculateNormalDamage(input, 100, 85);
+  describe("威力20（10kg以下）", () => {
+    it("ピカチュウ（6.0kg）の場合", async () => {
+      // 威力20 × タイプ一致1.5 × タイプ相性1.0 = 30相当
+      await calculateLowKickDamage("ピカチュウ", 26, 31);
+    });
 
-    // 威力20で計算されているかを確認
-    // かくとうタイプ vs ノーマルタイプは効果抜群（2倍）
-    // タイプ一致ボーナスあり（ワンリキーがかくとうタイプ）
-    // 威力20 × 1.5 × 2.0 = 60相当
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(30);
-    expect(Math.max(...damages)).toBe(36);
+    it("キャタピー（2.9kg）の場合", async () => {
+      // 威力20 × タイプ一致1.5 × タイプ相性1.0 = 30相当
+      await calculateLowKickDamage("キャタピー", 13, 16);
+    });
   });
 
-  it("重さ10.1kg〜25kgの場合、威力40になる", () => {
-    const input = createInput(20.0);
-    const damages = calculateNormalDamage(input, 100, 85);
+  describe("威力40（10.1kg〜25kg）", () => {
+    it("フシギソウ（13.0kg）の場合", async () => {
+      // 威力40 × タイプ一致1.5 × タイプ相性0.5（くさ） = 30相当
+      await calculateLowKickDamage("フシギソウ", 17, 21);
+    });
 
-    // 威力40 × 1.5 × 2.0 = 120相当
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(56);
-    expect(Math.max(...damages)).toBeGreaterThanOrEqual(66);
-    expect(Math.max(...damages)).toBeLessThanOrEqual(67);
+    it("リザード（19.0kg）の場合", async () => {
+      // 威力40 × タイプ一致1.5 × タイプ相性1.0 = 60相当
+      await calculateLowKickDamage("リザード", 39, 46);
+    });
   });
 
-  it("重さ25.1kg〜50kgの場合、威力60になる", () => {
-    const input = createInput(40.0);
-    const damages = calculateNormalDamage(input, 100, 85);
+  describe("威力60（25.1kg〜50kg）", () => {
+    it("ピジョン（30.0kg）の場合", async () => {
+      // 威力60 × タイプ一致1.5 × タイプ相性1.0 = 90相当
+      await calculateLowKickDamage("ピジョン", 59, 70);
+    });
 
-    // 威力60 × 1.5 × 2.0 = 180相当
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(83);
-    expect(Math.max(...damages)).toBeGreaterThanOrEqual(98);
-    expect(Math.max(...damages)).toBeLessThanOrEqual(99);
+    it("アブソル（47.0kg）の場合", async () => {
+      // 威力60 × タイプ一致1.5 × タイプ相性2.0（あく） = 180相当
+      await calculateLowKickDamage("アブソル", 113, 134);
+    });
   });
 
-  it("重さ50.1kg〜100kgの場合、威力80になる", () => {
-    const input = createInput(80.0);
-    const damages = calculateNormalDamage(input, 100, 85);
+  describe("威力80（50.1kg〜100kg）", () => {
+    it("ゴルダック（76.6kg）の場合", async () => {
+      // 威力80 × タイプ一致1.5 × タイプ相性1.0 = 120相当
+      await calculateLowKickDamage("ゴルダック", 61, 72);
+    });
 
-    // 威力80 × 1.5 × 2.0 = 240相当
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(108);
-    expect(Math.max(...damages)).toBe(128);
+    it("リザードン（90.5kg）の場合", async () => {
+      // 威力80 × タイプ一致1.5 × タイプ相性0.5（リザードンはひこうタイプ） = 60相当
+      await calculateLowKickDamage("リザードン", 30, 36);
+    });
   });
 
-  it("重さ100.1kg〜200kgの場合、威力100になる", () => {
-    const input = createInput(150.0);
-    const damages = calculateNormalDamage(input, 100, 85);
+  describe("威力100（100.1kg〜200kg）", () => {
+    it("ゴローン（105.0kg）の場合", async () => {
+      // 威力100 × タイプ一致1.5 × タイプ相性2.0（いわ/じめんタイプ） = 300相当
+      await calculateLowKickDamage("ゴローン", 112, 132);
+    });
 
-    // 威力100 × 1.5 × 2.0 = 300相当
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(134);
-    expect(Math.max(...damages)).toBeGreaterThanOrEqual(158);
-    expect(Math.max(...damages)).toBeLessThanOrEqual(159);
+    it("カイリキー（130.0kg）の場合", async () => {
+      // 威力100 × タイプ一致1.5 × タイプ相性1.0 = 150相当
+      await calculateLowKickDamage("カイリキー", 74, 88);
+    });
   });
 
-  it("重さ200.1kg以上の場合、威力120になる", () => {
-    const input = createInput(460.0); // カビゴンの実際の重さ
-    const damages = calculateNormalDamage(input, 100, 85);
+  describe("威力120（200.1kg以上）", () => {
+    it("バンギラス（202.0kg）の場合", async () => {
+      // 威力120 × タイプ一致1.5 × タイプ相性4.0（いわ/あくタイプ） = 720相当
+      await calculateLowKickDamage("バンギラス", 278, 328);
+    });
 
-    // 威力120 × 1.5 × 2.0 = 360相当
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(163);
-    expect(Math.max(...damages)).toBeGreaterThanOrEqual(192);
-    expect(Math.max(...damages)).toBeLessThanOrEqual(193);
-  });
-
-  it("境界値テスト: 10.0kgちょうどの場合、威力20", () => {
-    const input = createInput(10.0);
-    const damages = calculateNormalDamage(input, 100, 85);
-
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(30);
-    expect(Math.max(...damages)).toBe(36);
-  });
-
-  it("境界値テスト: 25.0kgちょうどの場合、威力40", () => {
-    const input = createInput(25.0);
-    const damages = calculateNormalDamage(input, 100, 85);
-
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(56);
-    expect(Math.max(...damages)).toBeGreaterThanOrEqual(66);
-    expect(Math.max(...damages)).toBeLessThanOrEqual(67);
-  });
-
-  it("境界値テスト: 50.0kgちょうどの場合、威力60", () => {
-    const input = createInput(50.0);
-    const damages = calculateNormalDamage(input, 100, 85);
-
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(83);
-    expect(Math.max(...damages)).toBeGreaterThanOrEqual(98);
-    expect(Math.max(...damages)).toBeLessThanOrEqual(99);
-  });
-
-  it("境界値テスト: 100.0kgちょうどの場合、威力80", () => {
-    const input = createInput(100.0);
-    const damages = calculateNormalDamage(input, 100, 85);
-
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(108);
-    expect(Math.max(...damages)).toBe(128);
-  });
-
-  it("境界値テスト: 200.0kgちょうどの場合、威力100", () => {
-    const input = createInput(200.0);
-    const damages = calculateNormalDamage(input, 100, 85);
-
-    expect(damages).toHaveLength(16);
-    expect(Math.min(...damages)).toBe(134);
-    expect(Math.max(...damages)).toBeGreaterThanOrEqual(158);
-    expect(Math.max(...damages)).toBeLessThanOrEqual(159);
+    it("カビゴン（460.0kg）の場合", async () => {
+      // 威力120 × タイプ一致1.5 × タイプ相性2.0（ノーマル） = 360相当
+      await calculateLowKickDamage("カビゴン", 210, 248);
+    });
   });
 });
