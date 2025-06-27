@@ -463,4 +463,260 @@ describe("calculateDamageHandler", () => {
       );
     });
   });
+
+  describe("天候効果", () => {
+    it("すなあらし時、いわタイプのとくぼうが1.5倍になる", async () => {
+      const normalInput = {
+        move: { type: "みず", power: 100 },
+        attacker: {
+          level: 50,
+          stat: { value: 150 },
+          statModifier: 0,
+        },
+        defender: {
+          level: 50,
+          pokemonName: "ソルロック",
+          stat: { value: 100 },
+          statModifier: 0,
+        },
+        options: {},
+      };
+
+      const sandstormInput = {
+        ...normalInput,
+        options: { weather: "すなあらし" },
+      };
+
+      const normalResult = await calculateDamageHandler(normalInput);
+      const sandstormResult = await calculateDamageHandler(sandstormInput);
+
+      const normalOutput = parseResponse<StructuredOutput>(normalResult);
+      const sandstormOutput = parseResponse<StructuredOutput>(sandstormResult);
+      const normalDamage = isNormalDamageOutput(normalOutput)
+        ? normalOutput.damage.min
+        : 0;
+      const sandstormDamage = isNormalDamageOutput(sandstormOutput)
+        ? sandstormOutput.damage.min
+        : 0;
+
+      // すなあらし時は防御側のとくぼうが1.5倍になるため、ダメージが2/3になる
+      expect(sandstormDamage).toBeLessThan(normalDamage);
+      // 乱数の影響で多少の誤差があるため、期待値の±5%の範囲で確認
+      const expectedDamage = Math.floor((normalDamage * 2) / 3);
+      expect(sandstormDamage).toBeGreaterThanOrEqual(expectedDamage - 3);
+      expect(sandstormDamage).toBeLessThanOrEqual(expectedDamage + 3);
+    });
+
+    it("すなあらし時、いわタイプ以外のとくぼうは変わらない", async () => {
+      const normalInput = {
+        move: { type: "みず", power: 100 },
+        attacker: {
+          level: 50,
+          stat: { value: 150 },
+          statModifier: 0,
+        },
+        defender: {
+          level: 50,
+          pokemonName: "フシギダネ",
+          stat: { value: 100 },
+          statModifier: 0,
+        },
+        options: {},
+      };
+
+      const sandstormInput = {
+        ...normalInput,
+        options: { weather: "すなあらし" },
+      };
+
+      const normalResult = await calculateDamageHandler(normalInput);
+      const sandstormResult = await calculateDamageHandler(sandstormInput);
+
+      const normalOutput = parseResponse<StructuredOutput>(normalResult);
+      const sandstormOutput = parseResponse<StructuredOutput>(sandstormResult);
+      const normalDamage = isNormalDamageOutput(normalOutput)
+        ? normalOutput.damage.min
+        : 0;
+      const sandstormDamage = isNormalDamageOutput(sandstormOutput)
+        ? sandstormOutput.damage.min
+        : 0;
+
+      // いわタイプ以外はすなあらしの影響を受けない
+      expect(sandstormDamage).toBe(normalDamage);
+    });
+  });
+
+  describe("ウェザーボール", () => {
+    it("天候なしの場合、ノーマルタイプ威力50", async () => {
+      const input = {
+        move: "ウェザーボール",
+        attacker: {
+          level: 50,
+          pokemonName: "ピカチュウ",
+          stat: { value: 150 },
+          statModifier: 0,
+        },
+        defender: {
+          level: 50,
+          pokemonName: "ハピナス",
+          stat: { value: 50 },
+          statModifier: 0,
+        },
+        options: {},
+      };
+
+      const result = await calculateDamageHandler(input);
+      const output = parseResponse<StructuredOutput>(result);
+      if (isNormalDamageOutput(output)) {
+        expect(output.damage).toBeDefined();
+        // ノーマルタイプの威力50の技として計算される
+        expect(output.damage.min).toBeGreaterThan(40);
+        expect(output.damage.max).toBeLessThan(100);
+      }
+    });
+
+    it("はれの場合、ほのおタイプ威力100", async () => {
+      const normalInput = {
+        move: "ウェザーボール",
+        attacker: {
+          level: 50,
+          pokemonName: "ピカチュウ",
+          stat: { value: 150 },
+          statModifier: 0,
+        },
+        defender: {
+          level: 50,
+          pokemonName: "ハピナス",
+          stat: { value: 50 },
+          statModifier: 0,
+        },
+        options: {},
+      };
+
+      const sunnyInput = {
+        ...normalInput,
+        options: { weather: "はれ" },
+      };
+
+      const normalResult = await calculateDamageHandler(normalInput);
+      const sunnyResult = await calculateDamageHandler(sunnyInput);
+
+      const normalOutput = parseResponse<StructuredOutput>(normalResult);
+      const sunnyOutput = parseResponse<StructuredOutput>(sunnyResult);
+
+      // デバッグ用にエラーチェック
+      if (!isNormalDamageOutput(normalOutput)) {
+        console.error("normalOutput:", normalOutput);
+        expect.fail("normalOutput is not NormalDamageOutput");
+      }
+      if (!isNormalDamageOutput(sunnyOutput)) {
+        console.error("sunnyOutput:", sunnyOutput);
+        expect.fail("sunnyOutput is not NormalDamageOutput");
+      }
+
+      const normalDamage = normalOutput.damage.min;
+      const sunnyDamage = sunnyOutput.damage.min;
+
+      // はれ時は威力が2倍(50→100)、さらに天候補正1.5倍で実質3倍
+      expect(sunnyDamage).toBeGreaterThan(normalDamage * 2.5);
+    });
+
+    it("あめの場合、みずタイプ威力100", async () => {
+      const normalInput = {
+        move: "ウェザーボール",
+        attacker: {
+          level: 50,
+          pokemonName: "ピカチュウ",
+          stat: { value: 150 },
+          statModifier: 0,
+        },
+        defender: {
+          level: 50,
+          pokemonName: "リザードン",
+          stat: { value: 100 },
+          statModifier: 0,
+        },
+        options: {},
+      };
+
+      const rainInput = {
+        ...normalInput,
+        options: { weather: "あめ" },
+      };
+
+      const normalResult = await calculateDamageHandler(normalInput);
+      const rainResult = await calculateDamageHandler(rainInput);
+
+      const normalOutput = parseResponse<StructuredOutput>(normalResult);
+      const rainOutput = parseResponse<StructuredOutput>(rainResult);
+
+      // デバッグ用にエラーチェック
+      if (!isNormalDamageOutput(normalOutput)) {
+        console.error("normalOutput (rain test):", normalOutput);
+        expect.fail("normalOutput is not NormalDamageOutput");
+      }
+      if (!isNormalDamageOutput(rainOutput)) {
+        console.error("rainOutput:", rainOutput);
+        expect.fail("rainOutput is not NormalDamageOutput");
+      }
+
+      const normalDamage = normalOutput.damage.min;
+      const rainDamage = rainOutput.damage.min;
+
+      // あめ時は威力が2倍(50→100)、さらに天候補正1.5倍で実質3倍
+      expect(rainDamage).toBeGreaterThan(normalDamage * 2.5);
+    });
+
+    it("あられの場合、こおりタイプ威力100", async () => {
+      const input = {
+        move: "ウェザーボール",
+        attacker: {
+          level: 50,
+          pokemonName: "ピカチュウ",
+          stat: { value: 150 },
+          statModifier: 0,
+        },
+        defender: {
+          level: 50,
+          pokemonName: "フシギダネ",
+          stat: { value: 100 },
+          statModifier: 0,
+        },
+        options: { weather: "あられ" },
+      };
+
+      const result = await calculateDamageHandler(input);
+      const output = parseResponse<StructuredOutput>(result);
+      if (isNormalDamageOutput(output)) {
+        // こおりタイプでくさ/どくタイプに等倍
+        expect(output.modifiers.typeEffectiveness).toBe(1);
+      }
+    });
+
+    it("すなあらしの場合、いわタイプ威力100", async () => {
+      const input = {
+        move: "ウェザーボール",
+        attacker: {
+          level: 50,
+          pokemonName: "ピカチュウ",
+          stat: { value: 150 },
+          statModifier: 0,
+        },
+        defender: {
+          level: 50,
+          pokemonName: "リザードン",
+          stat: { value: 100 },
+          statModifier: 0,
+        },
+        options: { weather: "すなあらし" },
+      };
+
+      const result = await calculateDamageHandler(input);
+      const output = parseResponse<StructuredOutput>(result);
+      if (isNormalDamageOutput(output)) {
+        // いわタイプでほのお/ひこうタイプに等倍
+        expect(output.modifiers.typeEffectiveness).toBe(1);
+      }
+    });
+  });
 });

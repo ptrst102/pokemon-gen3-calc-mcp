@@ -149,7 +149,7 @@ const defenderSchema = createPokemonSchema();
 // その他のオプション
 const optionsSchema = z
   .object({
-    weather: z.enum(["はれ", "あめ"]).optional(),
+    weather: z.enum(["はれ", "あめ", "あられ", "すなあらし"]).optional(),
     charge: z.boolean().optional().default(false), // じゅうでん
     reflect: z.boolean().optional().default(false), // リフレクター
     lightScreen: z.boolean().optional().default(false), // ひかりのかべ

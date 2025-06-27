@@ -33,7 +33,7 @@ export interface DamageCalculationParams {
     pokemonName?: string;
   };
   options: {
-    weather?: "はれ" | "あめ";
+    weather?: "はれ" | "あめ" | "あられ" | "すなあらし";
     charge?: boolean;
     reflect?: boolean;
     lightScreen?: boolean;

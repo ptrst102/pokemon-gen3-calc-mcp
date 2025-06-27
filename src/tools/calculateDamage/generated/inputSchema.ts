@@ -201,7 +201,7 @@ export const calculateDamageInputSchema = {
       properties: {
         weather: {
           type: "string",
-          enum: ["はれ", "あめ"],
+          enum: ["はれ", "あめ", "あられ", "すなあらし"],
         },
         charge: {
           type: "boolean",

@@ -20,7 +20,7 @@ export interface CalculatedStats {
  * ダメージ計算のオプション
  */
 export interface DamageOptions {
-  weather?: "はれ" | "あめ";
+  weather?: "はれ" | "あめ" | "あられ" | "すなあらし";
   charge?: boolean;
   reflect?: boolean;
   lightScreen?: boolean;

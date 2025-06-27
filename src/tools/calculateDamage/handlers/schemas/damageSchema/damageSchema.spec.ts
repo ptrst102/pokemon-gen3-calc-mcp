@@ -341,5 +341,41 @@ describe("calculateDamageInputSchema", () => {
         waterSport: false,
       });
     });
+
+    it("「あられ」と「すなあらし」の天候を指定できる", () => {
+      // あられ
+      const hailInput = {
+        move: "ふぶき",
+        attacker: {
+          stat: { value: 100 },
+        },
+        defender: {
+          stat: { value: 100 },
+        },
+        options: {
+          weather: "あられ",
+        },
+      };
+
+      const hailResult = calculateDamageInputSchema.parse(hailInput);
+      expect(hailResult.options.weather).toBe("あられ");
+
+      // すなあらし
+      const sandstormInput = {
+        move: "いわなだれ",
+        attacker: {
+          stat: { value: 100 },
+        },
+        defender: {
+          stat: { value: 100 },
+        },
+        options: {
+          weather: "すなあらし",
+        },
+      };
+
+      const sandstormResult = calculateDamageInputSchema.parse(sandstormInput);
+      expect(sandstormResult.options.weather).toBe("すなあらし");
+    });
   });
 });

@@ -95,11 +95,23 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
           defenderItemEffects.specialDefenseMultiplier.denominator,
       );
 
+  // すなあらし時のいわタイプとくぼう1.5倍
+  const weatherAdjustedDefenseStat = (() => {
+    if (
+      !move.isPhysical &&
+      options.weather === "すなあらし" &&
+      defender.types.includes("いわ")
+    ) {
+      return Math.floor(itemAdjustedDefenseStat * 1.5);
+    }
+    return itemAdjustedDefenseStat;
+  })();
+
   // じばく・だいばくはつの処理: 防御を半分にする
   const defenseStat =
     "name" in move && (move.name === "じばく" || move.name === "だいばくはつ")
-      ? Math.floor(itemAdjustedDefenseStat / 2)
-      : itemAdjustedDefenseStat;
+      ? Math.floor(weatherAdjustedDefenseStat / 2)
+      : weatherAdjustedDefenseStat;
 
   const baseDamage = calculateBaseDamage({
     level: attacker.level,
@@ -198,12 +210,52 @@ export const calculateNormalDamage = (
 ): number[] => {
   const defenderTypes = input.defender.pokemon?.types || [];
 
+  // ウェザーボールの処理
+  const adjustedMove = (() => {
+    if (input.move.name === "ウェザーボール") {
+      const weather = input.options?.weather;
+      if (weather === "はれ") {
+        return {
+          ...input.move,
+          type: "ほのお" as TypeName,
+          power: 100,
+          isPhysical: false,
+        };
+      }
+      if (weather === "あめ") {
+        return {
+          ...input.move,
+          type: "みず" as TypeName,
+          power: 100,
+          isPhysical: false,
+        };
+      }
+      if (weather === "あられ") {
+        return {
+          ...input.move,
+          type: "こおり" as TypeName,
+          power: 100,
+          isPhysical: false,
+        };
+      }
+      if (weather === "すなあらし") {
+        return {
+          ...input.move,
+          type: "いわ" as TypeName,
+          power: 100,
+          isPhysical: true,
+        };
+      }
+    }
+    return input.move;
+  })();
+
   return calculateDamageInternal({
     move: {
-      name: input.move.name,
-      type: input.move.type,
-      power: input.move.power,
-      isPhysical: input.move.isPhysical,
+      name: adjustedMove.name,
+      type: adjustedMove.type,
+      power: adjustedMove.power,
+      isPhysical: adjustedMove.isPhysical,
     },
     attacker: {
       level: input.attacker.level,
