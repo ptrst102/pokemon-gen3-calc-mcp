@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { prepareCalculationContext } from "./prepareCalculationContext";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
+import { prepareCalculationContext } from "./prepareCalculationContext";
 
 describe("prepareCalculationContext", () => {
   describe("めざめるパワーの処理", () => {
@@ -27,15 +27,20 @@ describe("prepareCalculationContext", () => {
             types: ["でんき"],
             baseStats: {
               hp: 65,
-              attack: 65,
-              defense: 60,
-              specialAttack: 110,
-              specialDefense: 95,
-              speed: 130,
+              atk: 65,
+              def: 60,
+              spa: 110,
+              spd: 95,
+              spe: 130,
             },
+            abilities: ["ちくでん"],
+            weightkg: 24.5,
           },
           stat: { value: 150 },
           statModifier: 0,
+          item: undefined,
+          ability: undefined,
+          abilityActive: false,
         },
         defender: {
           level: 50,
@@ -44,17 +49,28 @@ describe("prepareCalculationContext", () => {
             types: ["みず", "ひこう"],
             baseStats: {
               hp: 95,
-              attack: 125,
-              defense: 79,
-              specialAttack: 60,
-              specialDefense: 100,
-              speed: 81,
+              atk: 125,
+              def: 79,
+              spa: 60,
+              spd: 100,
+              spe: 81,
             },
+            abilities: ["いかく"],
+            weightkg: 235,
           },
           stat: { value: 120 },
           statModifier: 0,
+          item: undefined,
+          ability: undefined,
+          abilityActive: false,
         },
-        options: {},
+        options: {
+          charge: false,
+          reflect: false,
+          lightScreen: false,
+          mudSport: false,
+          waterSport: false,
+        },
       };
 
       const context = prepareCalculationContext(input);
@@ -62,6 +78,7 @@ describe("prepareCalculationContext", () => {
       expect(context.move.type).toBe("こおり");
       expect(context.move.power).toBe(70);
       expect(context.move.isPhysical).toBe(false);
+      expect(context.typeEffectiveness).toBe(1); // ギャラドスに対して等倍（みず0.5倍×ひこう2倍＝1倍）
     });
 
     it("個体値が指定されていない場合、デフォルト値が使用される", () => {
@@ -79,15 +96,20 @@ describe("prepareCalculationContext", () => {
             types: ["でんき"],
             baseStats: {
               hp: 65,
-              attack: 65,
-              defense: 60,
-              specialAttack: 110,
-              specialDefense: 95,
-              speed: 130,
+              atk: 65,
+              def: 60,
+              spa: 110,
+              spd: 95,
+              spe: 130,
             },
+            abilities: ["ちくでん"],
+            weightkg: 24.5,
           },
           stat: { value: 150 },
           statModifier: 0,
+          item: undefined,
+          ability: undefined,
+          abilityActive: false,
         },
         defender: {
           level: 50,
@@ -96,17 +118,28 @@ describe("prepareCalculationContext", () => {
             types: ["みず", "ひこう"],
             baseStats: {
               hp: 95,
-              attack: 125,
-              defense: 79,
-              specialAttack: 60,
-              specialDefense: 100,
-              speed: 81,
+              atk: 125,
+              def: 79,
+              spa: 60,
+              spd: 100,
+              spe: 81,
             },
+            abilities: ["いかく"],
+            weightkg: 235,
           },
           stat: { value: 120 },
           statModifier: 0,
+          item: undefined,
+          ability: undefined,
+          abilityActive: false,
         },
-        options: {},
+        options: {
+          charge: false,
+          reflect: false,
+          lightScreen: false,
+          mudSport: false,
+          waterSport: false,
+        },
       };
 
       const context = prepareCalculationContext(input);
@@ -138,15 +171,20 @@ describe("prepareCalculationContext", () => {
             types: ["ほのお"],
             baseStats: {
               hp: 65,
-              attack: 95,
-              defense: 57,
-              specialAttack: 100,
-              specialDefense: 85,
-              speed: 93,
+              atk: 95,
+              def: 57,
+              spa: 100,
+              spd: 85,
+              spe: 93,
             },
+            abilities: ["ほのおのからだ"],
+            weightkg: 44.5,
           },
           stat: { value: 150 },
           statModifier: 0,
+          item: undefined,
+          ability: undefined,
+          abilityActive: false,
         },
         defender: {
           level: 50,
@@ -155,17 +193,28 @@ describe("prepareCalculationContext", () => {
             types: ["くさ", "どく"],
             baseStats: {
               hp: 80,
-              attack: 82,
-              defense: 83,
-              specialAttack: 100,
-              specialDefense: 100,
-              speed: 80,
+              atk: 82,
+              def: 83,
+              spa: 100,
+              spd: 100,
+              spe: 80,
             },
+            abilities: ["しんりょく"],
+            weightkg: 100,
           },
           stat: { value: 120 },
           statModifier: 0,
+          item: undefined,
+          ability: undefined,
+          abilityActive: false,
         },
-        options: {},
+        options: {
+          charge: false,
+          reflect: false,
+          lightScreen: false,
+          mudSport: false,
+          waterSport: false,
+        },
       };
 
       const context = prepareCalculationContext(input);

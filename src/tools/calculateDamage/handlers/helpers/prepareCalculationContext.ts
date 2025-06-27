@@ -4,7 +4,7 @@ import type { Pokemon } from "@/data/pokemon";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { DamageCalculationContext } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
-import { getHiddenPowerType, getHiddenPowerPower } from "@/utils/hiddenPower";
+import { getHiddenPowerPower, getHiddenPowerType } from "@/utils/hiddenPower";
 import { getTypeEffectiveness } from "./typeEffectiveness";
 
 // わざのタイプから物理技か特殊技かを判定する
@@ -46,11 +46,15 @@ interface PokemonInfo {
 const prepareMoveInfo = (input: CalculateDamageInput): MoveInfo => {
   if ("name" in input.move) {
     // めざめるパワーの特別処理
-    if (input.move.name === "めざめるパワー" && "hiddenPowerIVs" in input.move && input.move.hiddenPowerIVs) {
+    if (
+      input.move.name === "めざめるパワー" &&
+      "hiddenPowerIVs" in input.move &&
+      input.move.hiddenPowerIVs
+    ) {
       const type = getHiddenPowerType(input.move.hiddenPowerIVs) as TypeName;
       const power = getHiddenPowerPower(input.move.hiddenPowerIVs);
       const isPhysical = isPhysicalType(type);
-      
+
       return {
         name: input.move.name,
         type,
@@ -58,7 +62,7 @@ const prepareMoveInfo = (input: CalculateDamageInput): MoveInfo => {
         isPhysical,
       };
     }
-    
+
     return {
       name: input.move.name,
       type: input.move.type,
@@ -72,7 +76,7 @@ const prepareMoveInfo = (input: CalculateDamageInput): MoveInfo => {
     const type = getHiddenPowerType(input.move.hiddenPowerIVs) as TypeName;
     const power = getHiddenPowerPower(input.move.hiddenPowerIVs);
     const isPhysical = isPhysicalType(type);
-    
+
     return {
       type,
       power,
@@ -123,12 +127,14 @@ export const prepareCalculationContext = (
     throw new Error("防御側のタイプ情報が必要です");
   }
 
-  const typeEffectiveness = getTypeEffectiveness(
-    input.move.type,
-    defenderTypes,
-  );
+  const moveType =
+    "hiddenPowerIVs" in input.move && input.move.hiddenPowerIVs
+      ? (getHiddenPowerType(input.move.hiddenPowerIVs) as TypeName)
+      : input.move.type;
 
-  const isStab = checkStab(input.attacker.pokemon?.types, input.move.type);
+  const typeEffectiveness = getTypeEffectiveness(moveType, defenderTypes);
+
+  const isStab = checkStab(input.attacker.pokemon?.types, moveType);
 
   return {
     move: prepareMoveInfo(input),

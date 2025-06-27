@@ -15,8 +15,14 @@ export const getHiddenPowerPower = (ivs: IVs): number => {
   const specialAttackValue = ivs.specialAttack % 4 >= 2 ? 16 : 0;
   const specialDefenseValue = ivs.specialDefense % 4 >= 2 ? 32 : 0;
 
-  const sum = hpValue + attackValue + defenseValue + speedValue + specialAttackValue + specialDefenseValue;
-  const power = Math.floor(sum * 40 / 63) + 30;
+  const sum =
+    hpValue +
+    attackValue +
+    defenseValue +
+    speedValue +
+    specialAttackValue +
+    specialDefenseValue;
+  const power = Math.floor((sum * 40) / 63) + 30;
 
   return power;
 };

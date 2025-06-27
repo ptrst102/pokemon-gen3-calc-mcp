@@ -15,8 +15,14 @@ export const getHiddenPowerType = (ivs: IVs): string => {
   const specialAttackOdd = ivs.specialAttack % 2 === 1 ? 16 : 0;
   const specialDefenseOdd = ivs.specialDefense % 2 === 1 ? 32 : 0;
 
-  const sum = hpOdd + attackOdd + defenseOdd + speedOdd + specialAttackOdd + specialDefenseOdd;
-  const typeIndex = Math.floor(sum * 15 / 63);
+  const sum =
+    hpOdd +
+    attackOdd +
+    defenseOdd +
+    speedOdd +
+    specialAttackOdd +
+    specialDefenseOdd;
+  const typeIndex = Math.floor((sum * 15) / 63);
 
   const types = [
     "かくとう",

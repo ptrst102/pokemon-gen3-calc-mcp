@@ -1,10 +1,10 @@
 import { ZodError } from "zod";
+import type { TypeName } from "@/types";
 import { calculateDamageWithContext } from "@/utils/calculateDamageWithContext";
 import { calculateHp } from "@/utils/calculateHp";
 import { calculateStat } from "@/utils/calculateStat";
+import { getHiddenPowerPower, getHiddenPowerType } from "@/utils/hiddenPower";
 import { NATURE_MODIFIER_MAP } from "@/utils/natureModifier";
-import { getHiddenPowerType, getHiddenPowerPower } from "@/utils/hiddenPower";
-import type { TypeName } from "@/types";
 import {
   type CalculateDamageMatrixVaryingDefenseInput,
   calculateDamageMatrixVaryingDefenseInputSchema,
@@ -104,7 +104,7 @@ const calculateDamageMatrix = (
         "ゴースト",
         "はがね",
       ].includes(type);
-      
+
       return {
         name: move.name || "めざめるパワー",
         type,
