@@ -1,15 +1,12 @@
-import type { Ability, AbilityName } from "@/data/abilities";
+import type { Ability } from "@/data/abilities";
 import type { Item, ItemName } from "@/data/items";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { DamageOptions } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
 import { adjustSpecialMoves } from "@/utils/adjustSpecialMoves";
-import { applyAbilityEffects } from "../abilityEffects";
-import { calculateBaseDamage } from "../calculateBaseDamage";
-import { getDamageRanges } from "../damageRanges";
+import { calculateDamageCore } from "@/utils/calculateDamageCore";
 import { calculateItemEffects } from "../itemEffects";
 import { getStatModifierRatio } from "../statModifier";
-import { getTypeEffectiveness } from "../typeEffectiveness";
 
 /**
  * 内部的なダメージ計算パラメータ
@@ -85,7 +82,7 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
     (defender.defense * defenseRatio.numerator) / defenseRatio.denominator,
   );
 
-  const itemAdjustedDefenseStat = move.isPhysical
+  const defenseStat = move.isPhysical
     ? Math.floor(
         (baseDefenseStat * defenderItemEffects.defenseMultiplier.numerator) /
           defenderItemEffects.defenseMultiplier.denominator,
@@ -96,97 +93,29 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
           defenderItemEffects.specialDefenseMultiplier.denominator,
       );
 
-  // じばく・だいばくはつの処理: 防御を半分にする
-  const defenseStat =
-    "name" in move && (move.name === "じばく" || move.name === "だいばくはつ")
-      ? Math.floor(itemAdjustedDefenseStat / 2)
-      : itemAdjustedDefenseStat;
-
-  const baseDamage = calculateBaseDamage({
-    level: attacker.level,
-    power: move.power,
-    attack: attackStat,
-    defense: defenseStat,
-    isPhysical: move.isPhysical,
+  // 共通ロジックを使用
+  return calculateDamageCore({
+    move: {
+      name: move.name,
+      type: move.type,
+      power: move.power,
+      isPhysical: move.isPhysical,
+    },
+    attacker: {
+      level: attacker.level,
+      attackStat,
+      types: attacker.types,
+      ability: attacker.ability,
+      abilityActive: attacker.abilityActive,
+    },
+    defender: {
+      defenseStat,
+      types: defender.types,
+      ability: defender.ability,
+      abilityActive: defender.abilityActive,
+    },
+    options,
   });
-
-  // タイプ一致ボーナス
-  const stabDamage = attacker.types?.some((type) => type === move.type)
-    ? Math.floor(baseDamage * 1.5)
-    : baseDamage;
-
-  // タイプ相性
-  const typeEffectiveness = getTypeEffectiveness(move.type, defender.types);
-  const typeAdjustedDamage = Math.floor(stabDamage * typeEffectiveness);
-
-  // 天候効果
-  const weatherAdjustedDamage = (() => {
-    if (options.weather === "はれ") {
-      if (move.type === "ほのお") {
-        return Math.floor(typeAdjustedDamage * 1.5);
-      }
-      if (move.type === "みず") {
-        return Math.floor(typeAdjustedDamage * 0.5);
-      }
-    }
-    if (options.weather === "あめ") {
-      if (move.type === "みず") {
-        return Math.floor(typeAdjustedDamage * 1.5);
-      }
-      if (move.type === "ほのお") {
-        return Math.floor(typeAdjustedDamage * 0.5);
-      }
-    }
-    return typeAdjustedDamage;
-  })();
-
-  // チャージ効果
-  const chargeAdjustedDamage =
-    options.charge && move.type === "でんき"
-      ? Math.floor(weatherAdjustedDamage * 2)
-      : weatherAdjustedDamage;
-
-  // 壁効果
-  const screenAdjustedDamage = (() => {
-    if (move.isPhysical && options.reflect) {
-      return Math.floor(chargeAdjustedDamage * 0.5);
-    }
-    if (!move.isPhysical && options.lightScreen) {
-      return Math.floor(chargeAdjustedDamage * 0.5);
-    }
-    return chargeAdjustedDamage;
-  })();
-
-  // スポーツ効果
-  const sportAdjustedDamage = (() => {
-    if (options.mudSport && move.type === "でんき") {
-      return Math.floor(screenAdjustedDamage * 0.5);
-    }
-    if (options.waterSport && move.type === "ほのお") {
-      return Math.floor(screenAdjustedDamage * 0.5);
-    }
-    return screenAdjustedDamage;
-  })();
-
-  // とくせい効果
-  const abilityAdjustedDamage = applyAbilityEffects({
-    damage: sportAdjustedDamage,
-    moveType: move.type,
-    attackerAbility: attacker.ability?.name as AbilityName | undefined,
-    defenderAbility: defender.ability?.name as AbilityName | undefined,
-    attackerAbilityActive: attacker.abilityActive,
-    defenderAbilityActive: defender.abilityActive,
-    typeEffectiveness,
-    isPhysical: move.isPhysical,
-  });
-
-  // 最小ダメージ保証
-  const finalDamage =
-    abilityAdjustedDamage > 0
-      ? Math.max(1, abilityAdjustedDamage)
-      : abilityAdjustedDamage;
-
-  return getDamageRanges(finalDamage);
 };
 
 /**
