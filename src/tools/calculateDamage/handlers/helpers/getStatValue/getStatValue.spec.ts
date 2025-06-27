@@ -41,5 +41,4 @@ describe("getStatValue", () => {
     // 107 * 1.1 = 117.7 → 117
     expect(result).toBe(117);
   });
-
 });

@@ -3,10 +3,7 @@ import { calculateNormalDamage } from "./helpers/calculateDamage";
 import { getCalculatedStats } from "./helpers/calculateStats";
 import { formatError } from "./helpers/formatError";
 import { prepareCalculationContext } from "./helpers/prepareCalculationContext";
-import {
-  type CalculateDamageInput,
-  calculateDamageInputSchema,
-} from "./schemas/damageSchema";
+import { calculateDamageInputSchema } from "./schemas/damageSchema";
 
 /**
  * 計算結果をMCPレスポンス形式に変換する共通関数
@@ -25,7 +22,6 @@ const createCalculationResponse = (
     ],
   };
 };
-
 
 /**
  * ダメージ計算ハンドラー
@@ -52,7 +48,7 @@ export const calculateDamageHandler = async (
       stats.attackStat,
       stats.defenseStat,
     );
-    
+
     const structuredOutput = createNormalDamageOutput({
       ...context,
       damages,

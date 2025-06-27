@@ -71,4 +71,3 @@ export interface NormalDamageResult extends DamageCalculationContext {
   attackStat: number;
   defenseStat: number;
 }
-
