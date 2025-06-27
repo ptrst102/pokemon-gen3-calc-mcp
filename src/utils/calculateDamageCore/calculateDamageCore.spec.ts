@@ -98,7 +98,7 @@ describe("calculateDamageCore", () => {
     expect(result[0]).toBe(113); // 防御半減、タイプ一致1.5倍、タイプ相性0.5倍
   });
 
-  it("チャージ効果を適用", () => {
+  it("じゅうでん効果を適用", () => {
     const params: DamageCoreParams = {
       move: {
         type: "でんき",
@@ -119,10 +119,10 @@ describe("calculateDamageCore", () => {
     };
 
     const result = calculateDamageCore(params);
-    expect(result[0]).toBe(156); // タイプ相性2倍 × チャージ2倍
+    expect(result[0]).toBe(156); // タイプ相性2倍 × じゅうでん2倍
   });
 
-  it("壁効果を適用", () => {
+  it("ひかりのかべ・リフレクター効果を適用", () => {
     const params: DamageCoreParams = {
       move: {
         type: "かくとう",
@@ -143,10 +143,10 @@ describe("calculateDamageCore", () => {
     };
 
     const result = calculateDamageCore(params);
-    expect(result[0]).toBe(39); // タイプ相性2倍 × 壁0.5倍
+    expect(result[0]).toBe(39); // タイプ相性2倍 × リフレクター0.5倍
   });
 
-  it("スポーツ効果を適用", () => {
+  it("どろあそび・みずあそび効果を適用", () => {
     const params: DamageCoreParams = {
       move: {
         type: "でんき",
@@ -167,7 +167,7 @@ describe("calculateDamageCore", () => {
     };
 
     const result = calculateDamageCore(params);
-    expect(result[0]).toBe(19); // スポーツ0.5倍
+    expect(result[0]).toBe(19); // どろあそび0.5倍
   });
 
   it("とくせい効果を適用", () => {
