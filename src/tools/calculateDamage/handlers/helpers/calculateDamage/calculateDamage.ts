@@ -3,9 +3,9 @@ import type { Item, ItemName } from "@/data/items";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { DamageOptions } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
+import { adjustSpecialMoves } from "@/utils/adjustSpecialMoves";
 import { applyAbilityEffects } from "../abilityEffects";
 import { calculateBaseDamage } from "../calculateBaseDamage";
-import { calculateLowKickPower } from "../calculateLowKickPower";
 import { getDamageRanges } from "../damageRanges";
 import { calculateItemEffects } from "../itemEffects";
 import { getStatModifierRatio } from "../statModifier";
@@ -199,57 +199,12 @@ export const calculateNormalDamage = (
 ): number[] => {
   const defenderTypes = input.defender.pokemon?.types || [];
 
-  // ウェザーボールの処理
-  const adjustedMove = (() => {
-    if (input.move.name === "ウェザーボール") {
-      const weather = input.options?.weather;
-      if (weather === "はれ") {
-        return {
-          ...input.move,
-          type: "ほのお" as TypeName,
-          power: 100,
-          isPhysical: false,
-        };
-      }
-      if (weather === "あめ") {
-        return {
-          ...input.move,
-          type: "みず" as TypeName,
-          power: 100,
-          isPhysical: false,
-        };
-      }
-      if (weather === "あられ") {
-        return {
-          ...input.move,
-          type: "こおり" as TypeName,
-          power: 100,
-          isPhysical: false,
-        };
-      }
-      if (weather === "すなあらし") {
-        return {
-          ...input.move,
-          type: "いわ" as TypeName,
-          power: 100,
-          isPhysical: true,
-        };
-      }
-    }
-
-    // けたぐりの処理
-    if (input.move.name === "けたぐり") {
-      const defenderWeight = input.defender.pokemon?.weightkg;
-      if (defenderWeight !== undefined) {
-        return {
-          ...input.move,
-          power: calculateLowKickPower(defenderWeight),
-        };
-      }
-    }
-
-    return input.move;
-  })();
+  // 特殊な技の処理
+  const adjustedMove = adjustSpecialMoves({
+    move: input.move,
+    weather: input.options?.weather,
+    defenderWeight: input.defender.pokemon?.weightkg,
+  });
 
   return calculateDamageInternal({
     move: {
