@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { parseResponse } from "@/utils/parseResponse";
 import {
   isErrorOutput,
-  isEvRangeDamageOutput,
   isNormalDamageOutput,
   type StructuredOutput,
 } from "./formatters/structuredOutputFormatter";
@@ -249,96 +248,55 @@ describe("calculateDamageHandler", () => {
     expect(powerDamage).toBeGreaterThan(normalDamage * 1.5);
   });
 
-  describe("calculateAllEvsを使った場合", () => {
-    it("攻撃側がcalculateAllEvsの場合の計算が動作する", async () => {
+  it("実際のバトルケース: サンダーの10まんボルトvsメタグロス", async () => {
+    const input = {
+      move: "10まんボルト",
+      attacker: {
+        stat: {
+          ev: 0,
+          iv: 31,
+          natureModifier: "neutral", // 性格補正なしで計算
+        },
+        level: 50,
+        pokemonName: "サンダー",
+        statModifier: 0,
+      },
+      defender: {
+        stat: {
+          ev: 0,
+          iv: 31,
+          natureModifier: "neutral",
+        },
+        level: 50,
+        pokemonName: "メタグロス",
+        statModifier: 0,
+      },
+    };
+
+    const result = await calculateDamageHandler(input);
+
+    // C145（性格補正なし）の場合、タイプ一致で72〜85付近のダメージ
+    const output = parseResponse<StructuredOutput>(result);
+    if (isNormalDamageOutput(output)) {
+      expect(output.damage.min).toBeGreaterThanOrEqual(72);
+      expect(output.damage.max).toBeLessThanOrEqual(85);
+    }
+  });
+
+  describe("calculateAllEvsオプションのサポート廃止", () => {
+    it("calculateAllEvsオプションはサポートされていないことを確認", async () => {
       const input = {
-        move: "かえんほうしゃ",
+        move: { type: "ノーマル", power: 100, isPhysical: true },
         attacker: {
           level: 50,
-          pokemonName: "リザードン",
-          stat: {
-            iv: 31,
-            calculateAllEvs: true,
-          },
-          statModifier: 0,
-        },
-        defender: {
-          level: 50,
-          pokemonName: "フシギバナ",
-          stat: {
-            iv: 31,
-            ev: 252,
-            natureModifier: "neutral",
-          },
-          statModifier: 0,
-        },
-        options: {},
-      };
-
-      const result = await calculateDamageHandler(input);
-      const output = parseResponse<StructuredOutput>(result);
-      if (isEvRangeDamageOutput(output)) {
-        expect(output.evRanges).toBeDefined();
-        expect(output.evRanges.length).toBeGreaterThan(0);
-        expect(output.evRanges[0].ev).toBe(0);
-        expect(output.evRanges[output.evRanges.length - 1].ev).toBe(252);
-      }
-    });
-
-    it("防御側がcalculateAllEvsの場合の計算が動作する", async () => {
-      const input = {
-        move: { type: "かくとう", power: 100 },
-        attacker: {
-          level: 50,
-          pokemonName: "カイリキー",
-          stat: {
-            iv: 31,
-            ev: 252,
-            natureModifier: "neutral",
-          },
-          statModifier: 0,
-        },
-        defender: {
-          level: 50,
-          pokemonName: "カビゴン",
-          stat: {
-            iv: 31,
-            calculateAllEvs: true,
-          },
-          statModifier: 0,
-        },
-        options: {},
-      };
-
-      const result = await calculateDamageHandler(input);
-      const output = parseResponse<StructuredOutput>(result);
-      if (isEvRangeDamageOutput(output)) {
-        expect(output.evRanges).toBeDefined();
-        expect(output.evRanges.length).toBeGreaterThan(0);
-        expect(output.evRanges[0].ev).toBe(0);
-        expect(output.evRanges[output.evRanges.length - 1].ev).toBe(252);
-      }
-    });
-
-    it("両方がcalculateAllEvsの場合はエラーを返す", async () => {
-      const input = {
-        move: { type: "ノーマル", power: 100 },
-        attacker: {
-          level: 50,
+          stat: { iv: 31, calculateAllEvs: true },
           pokemonName: "ケンタロス",
-          stat: {
-            iv: 31,
-            calculateAllEvs: true,
-          },
           statModifier: 0,
         },
         defender: {
           level: 50,
-          pokemonName: "プクリン",
-          stat: {
-            iv: 31,
-            calculateAllEvs: true,
-          },
+          stat: { iv: 31, ev: 0 },
+          pokemonName: "ハピナス",
           statModifier: 0,
         },
         options: {},
@@ -347,33 +305,27 @@ describe("calculateDamageHandler", () => {
       const result = await calculateDamageHandler(input);
       const output = parseResponse<StructuredOutput>(result);
       if (isErrorOutput(output)) {
-        expect(output.error).toBeDefined();
-        expect(output.error).toContain(
-          "攻撃側と防御側の両方でcalculateAllEvsを使うことはできません",
-        );
+        // calculateAllEvsはもはや有効なプロパティではないので、statの形式エラーになる
+        expect(output.error).toContain("stat");
+      } else {
+        // エラーが返されるべき
+        expect.fail("calculateAllEvsオプションはエラーを返すべき");
       }
     });
 
-    it("中間のEV値でもダメージが正しく計算される", async () => {
+    it("防御側のcalculateAllEvsオプションもサポートされていない", async () => {
       const input = {
-        move: { type: "みず", power: 95 },
+        move: { type: "ノーマル", power: 100, isPhysical: true },
         attacker: {
           level: 50,
-          pokemonName: "ラプラス",
-          stat: {
-            iv: 31,
-            calculateAllEvs: true,
-          },
+          stat: { iv: 31, ev: 252 },
+          pokemonName: "ケンタロス",
           statModifier: 0,
         },
         defender: {
           level: 50,
-          pokemonName: "ウインディ",
-          stat: {
-            iv: 31,
-            ev: 4,
-            natureModifier: "neutral",
-          },
+          stat: { iv: 31, calculateAllEvs: true },
+          pokemonName: "ハピナス",
           statModifier: 0,
         },
         options: {},
@@ -381,50 +333,41 @@ describe("calculateDamageHandler", () => {
 
       const result = await calculateDamageHandler(input);
       const output = parseResponse<StructuredOutput>(result);
-      if (isEvRangeDamageOutput(output)) {
-        expect(output.evRanges).toBeDefined();
-
-        // 中間のEV値（124）も含まれることを確認
-        const ev124Entry = output.evRanges.find((e) => e.ev === 124);
-        expect(ev124Entry).toBeDefined();
-
-        // タイプ相性が正しく設定されることを確認
-        expect(output.modifiers.typeEffectiveness).toBe(2);
+      if (isErrorOutput(output)) {
+        // calculateAllEvsはもはや有効なプロパティではないので、statの形式エラーになる
+        expect(output.error).toContain("stat");
+      } else {
+        // エラーが返されるべき
+        expect.fail("calculateAllEvsオプションはエラーを返すべき");
       }
     });
 
-    it("実際のバトルケース: サンダーの10まんボルトvsメタグロス", async () => {
+    it("calculateAllNaturesオプションもサポートされていない", async () => {
       const input = {
-        move: "10まんボルト",
+        move: { type: "ノーマル", power: 100, isPhysical: true },
         attacker: {
-          stat: {
-            ev: 0,
-            iv: 31,
-            natureModifier: "neutral", // 性格補正なしで計算
-          },
           level: 50,
-          pokemonName: "サンダー",
+          stat: { iv: 31, calculateAllEvs: true, calculateAllNatures: true },
+          pokemonName: "ケンタロス",
           statModifier: 0,
         },
         defender: {
-          stat: {
-            ev: 0,
-            iv: 31,
-            natureModifier: "neutral",
-          },
           level: 50,
-          pokemonName: "メタグロス",
+          stat: { iv: 31, ev: 0 },
+          pokemonName: "ハピナス",
           statModifier: 0,
         },
+        options: {},
       };
 
       const result = await calculateDamageHandler(input);
-
-      // C145（性格裍正なし）の場合、タイプ一致で72〜85付近のダメージ
       const output = parseResponse<StructuredOutput>(result);
-      if (isNormalDamageOutput(output)) {
-        expect(output.damage.min).toBeGreaterThanOrEqual(72);
-        expect(output.damage.max).toBeLessThanOrEqual(85);
+      if (isErrorOutput(output)) {
+        // calculateAllEvsはもはや有効なプロパティではないので、statの形式エラーになる
+        expect(output.error).toContain("stat");
+      } else {
+        // エラーが返されるべき
+        expect.fail("calculateAllEvsオプションはエラーを返すべき");
       }
     });
   });

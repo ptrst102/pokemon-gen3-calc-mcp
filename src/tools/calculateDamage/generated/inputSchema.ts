@@ -5,22 +5,22 @@
  */
 
 export const calculateDamageInputSchema = {
-  type: "object",
-  properties: {
-    move: {
-      anyOf: [
+  "type": "object",
+  "properties": {
+    "move": {
+      "anyOf": [
         {
-          type: "string",
+          "type": "string"
         },
         {
-          type: "object",
-          properties: {
-            name: {
-              type: "string",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
             },
-            type: {
-              type: "string",
-              enum: [
+            "type": {
+              "type": "string",
+              "enum": [
                 "ノーマル",
                 "ほのお",
                 "みず",
@@ -37,241 +37,229 @@ export const calculateDamageInputSchema = {
                 "ゴースト",
                 "ドラゴン",
                 "あく",
-                "はがね",
-              ],
+                "はがね"
+              ]
             },
-            power: {
-              type: "integer",
-              minimum: 0,
-            },
+            "power": {
+              "type": "integer",
+              "minimum": 0
+            }
           },
-          required: ["type", "power"],
-          additionalProperties: false,
+          "required": [
+            "type",
+            "power"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "attacker": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
         },
+        "pokemonName": {
+          "type": "string"
+        },
+        "item": {
+          "type": "string"
+        },
+        "ability": {
+          "type": "string"
+        },
+        "abilityActive": {
+          "type": "boolean",
+          "default": false,
+          "description": "条件付きとくせいが発動しているかどうか（もうか、げきりゅう、しんりょく等）。ちからもち、ヨガパワー等の常時発動するとくせいには影響しません"
+        },
+        "stat": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "こうげきまたはとくこうの実数値"
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false,
+              "description": "能力値を実数値で直接指定"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "iv": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
+                },
+                "ev": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 252
+                },
+                "natureModifier": {
+                  "type": "string",
+                  "enum": [
+                    "up",
+                    "down",
+                    "neutral"
+                  ],
+                  "default": "neutral"
+                }
+              },
+              "required": [
+                "iv",
+                "ev"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "statModifier": {
+          "type": "integer",
+          "minimum": -6,
+          "maximum": 6,
+          "default": 0
+        }
+      },
+      "required": [
+        "stat"
       ],
+      "additionalProperties": false
     },
-    attacker: {
-      type: "object",
-      properties: {
-        level: {
-          type: "integer",
-          minimum: 1,
-          maximum: 100,
-          default: 50,
+    "defender": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50
         },
-        pokemonName: {
-          type: "string",
+        "pokemonName": {
+          "type": "string"
         },
-        item: {
-          type: "string",
+        "item": {
+          "type": "string"
         },
-        ability: {
-          type: "string",
+        "ability": {
+          "type": "string"
         },
-        abilityActive: {
-          type: "boolean",
-          default: false,
-          description:
-            "条件付きとくせいが発動しているかどうか（もうか、げきりゅう、しんりょく等）。ちからもち、ヨガパワー等の常時発動するとくせいには影響しません",
+        "abilityActive": {
+          "type": "boolean",
+          "default": false,
+          "description": "条件付きとくせいが発動しているかどうか（もうか、げきりゅう、しんりょく等）。ちからもち、ヨガパワー等の常時発動するとくせいには影響しません"
         },
-        stat: {
-          anyOf: [
+        "stat": {
+          "anyOf": [
             {
-              type: "object",
-              properties: {
-                value: {
-                  type: "integer",
-                  minimum: 1,
-                  description: "こうげきまたはとくこうの実数値",
-                },
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "こうげきまたはとくこうの実数値"
+                }
               },
-              required: ["value"],
-              additionalProperties: false,
-              description: "能力値を実数値で直接指定",
+              "required": [
+                "value"
+              ],
+              "additionalProperties": false,
+              "description": "能力値を実数値で直接指定"
             },
             {
-              type: "object",
-              properties: {
-                iv: {
-                  type: "integer",
-                  minimum: 0,
-                  maximum: 31,
+              "type": "object",
+              "properties": {
+                "iv": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 31
                 },
-                ev: {
-                  type: "integer",
-                  minimum: 0,
-                  maximum: 252,
+                "ev": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 252
                 },
-                natureModifier: {
-                  type: "string",
-                  enum: ["up", "down", "neutral"],
-                  default: "neutral",
-                },
+                "natureModifier": {
+                  "type": "string",
+                  "enum": [
+                    "up",
+                    "down",
+                    "neutral"
+                  ],
+                  "default": "neutral"
+                }
               },
-              required: ["iv", "ev"],
-              additionalProperties: false,
-            },
-            {
-              type: "object",
-              properties: {
-                iv: {
-                  type: "integer",
-                  minimum: 0,
-                  maximum: 31,
-                },
-                calculateAllEvs: {
-                  type: "boolean",
-                  const: true,
-                },
-                calculateAllNatures: {
-                  type: "boolean",
-                  default: false,
-                  description: "性格補正も総当たりで計算するかどうか",
-                },
-              },
-              required: ["iv", "calculateAllEvs"],
-              additionalProperties: false,
-            },
-          ],
+              "required": [
+                "iv",
+                "ev"
+              ],
+              "additionalProperties": false
+            }
+          ]
         },
-        statModifier: {
-          type: "integer",
-          minimum: -6,
-          maximum: 6,
-          default: 0,
-        },
+        "statModifier": {
+          "type": "integer",
+          "minimum": -6,
+          "maximum": 6,
+          "default": 0
+        }
       },
-      required: ["stat"],
-      additionalProperties: false,
+      "required": [
+        "stat"
+      ],
+      "additionalProperties": false
     },
-    defender: {
-      type: "object",
-      properties: {
-        level: {
-          type: "integer",
-          minimum: 1,
-          maximum: 100,
-          default: 50,
+    "options": {
+      "type": "object",
+      "properties": {
+        "weather": {
+          "type": "string",
+          "enum": [
+            "はれ",
+            "あめ"
+          ]
         },
-        pokemonName: {
-          type: "string",
+        "charge": {
+          "type": "boolean",
+          "default": false
         },
-        item: {
-          type: "string",
+        "reflect": {
+          "type": "boolean",
+          "default": false
         },
-        ability: {
-          type: "string",
+        "lightScreen": {
+          "type": "boolean",
+          "default": false
         },
-        abilityActive: {
-          type: "boolean",
-          default: false,
-          description:
-            "条件付きとくせいが発動しているかどうか（もうか、げきりゅう、しんりょく等）。ちからもち、ヨガパワー等の常時発動するとくせいには影響しません",
+        "mudSport": {
+          "type": "boolean",
+          "default": false
         },
-        stat: {
-          anyOf: [
-            {
-              type: "object",
-              properties: {
-                value: {
-                  type: "integer",
-                  minimum: 1,
-                  description: "こうげきまたはとくこうの実数値",
-                },
-              },
-              required: ["value"],
-              additionalProperties: false,
-              description: "能力値を実数値で直接指定",
-            },
-            {
-              type: "object",
-              properties: {
-                iv: {
-                  type: "integer",
-                  minimum: 0,
-                  maximum: 31,
-                },
-                ev: {
-                  type: "integer",
-                  minimum: 0,
-                  maximum: 252,
-                },
-                natureModifier: {
-                  type: "string",
-                  enum: ["up", "down", "neutral"],
-                  default: "neutral",
-                },
-              },
-              required: ["iv", "ev"],
-              additionalProperties: false,
-            },
-            {
-              type: "object",
-              properties: {
-                iv: {
-                  type: "integer",
-                  minimum: 0,
-                  maximum: 31,
-                },
-                calculateAllEvs: {
-                  type: "boolean",
-                  const: true,
-                },
-                calculateAllNatures: {
-                  type: "boolean",
-                  default: false,
-                  description: "性格補正も総当たりで計算するかどうか",
-                },
-              },
-              required: ["iv", "calculateAllEvs"],
-              additionalProperties: false,
-            },
-          ],
-        },
-        statModifier: {
-          type: "integer",
-          minimum: -6,
-          maximum: 6,
-          default: 0,
-        },
+        "waterSport": {
+          "type": "boolean",
+          "default": false
+        }
       },
-      required: ["stat"],
-      additionalProperties: false,
-    },
-    options: {
-      type: "object",
-      properties: {
-        weather: {
-          type: "string",
-          enum: ["はれ", "あめ"],
-        },
-        charge: {
-          type: "boolean",
-          default: false,
-        },
-        reflect: {
-          type: "boolean",
-          default: false,
-        },
-        lightScreen: {
-          type: "boolean",
-          default: false,
-        },
-        mudSport: {
-          type: "boolean",
-          default: false,
-        },
-        waterSport: {
-          type: "boolean",
-          default: false,
-        },
-      },
-      additionalProperties: false,
-      default: {},
-    },
+      "additionalProperties": false,
+      "default": {}
+    }
   },
-  required: ["move", "attacker", "defender"],
-  additionalProperties: false,
+  "required": [
+    "move",
+    "attacker",
+    "defender"
+  ],
+  "additionalProperties": false
 } satisfies {
   [x: string]: unknown;
   type: "object";
