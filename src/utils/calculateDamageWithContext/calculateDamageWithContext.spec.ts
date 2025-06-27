@@ -36,7 +36,7 @@ describe("calculateDamageWithContext", () => {
       expect(result[15]).toBe(69); // 実際の最大ダメージ
     });
 
-    it("壁効果（リフレクター）の処理方法の違い", () => {
+    it("ひかりのかべ・リフレクター効果の処理方法の違い", () => {
       const params: DamageCalculationParams = {
         move: {
           type: "かくとう",
@@ -66,7 +66,7 @@ describe("calculateDamageWithContext", () => {
       expect(result[0]).toBe(39); // 実際のダメージ
     });
 
-    it("チャージ効果の処理タイミングの違い", () => {
+    it("じゅうでん効果の処理タイミングの違い", () => {
       const params: DamageCalculationParams = {
         move: {
           type: "でんき",
@@ -92,11 +92,11 @@ describe("calculateDamageWithContext", () => {
 
       const result = calculateDamageWithContext(params);
       // calculateDamageWithContextは威力に適用
-      // チャージ効果はダメージ計算後に適用
+      // じゅうでん効果はダメージ計算後に適用
       expect(result[0]).toBe(156); // 実際の値
     });
 
-    it("スポーツ効果（どろあそび）の処理タイミング", () => {
+    it("どろあそび・みずあそび効果の処理タイミング", () => {
       const params: DamageCalculationParams = {
         move: {
           type: "でんき",
@@ -122,7 +122,7 @@ describe("calculateDamageWithContext", () => {
 
       const result = calculateDamageWithContext(params);
       // calculateDamageWithContextは威力に適用
-      // スポーツ効果はダメージ計算後に適用
+      // どろあそび効果はダメージ計算後に適用
       expect(result[0]).toBe(19); // 実際のダメージ
     });
 

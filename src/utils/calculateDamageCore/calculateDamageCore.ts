@@ -86,13 +86,13 @@ export const calculateDamageCore = (params: DamageCoreParams): number[] => {
     return typeAdjustedDamage;
   })();
 
-  // チャージ効果
+  // じゅうでん効果
   const chargeAdjustedDamage =
     options.charge && move.type === "でんき"
       ? Math.floor(weatherAdjustedDamage * 2)
       : weatherAdjustedDamage;
 
-  // 壁効果
+  // ひかりのかべ・リフレクター効果
   const screenAdjustedDamage = (() => {
     if (move.isPhysical && options.reflect) {
       return Math.floor(chargeAdjustedDamage * 0.5);
@@ -103,7 +103,7 @@ export const calculateDamageCore = (params: DamageCoreParams): number[] => {
     return chargeAdjustedDamage;
   })();
 
-  // スポーツ効果
+  // どろあそび・みずあそび効果
   const sportAdjustedDamage = (() => {
     if (options.mudSport && move.type === "でんき") {
       return Math.floor(screenAdjustedDamage * 0.5);
