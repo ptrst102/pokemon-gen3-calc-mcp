@@ -95,23 +95,11 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
           defenderItemEffects.specialDefenseMultiplier.denominator,
       );
 
-  // すなあらし時のいわタイプとくぼう1.5倍
-  const weatherAdjustedDefenseStat = (() => {
-    if (
-      !move.isPhysical &&
-      options.weather === "すなあらし" &&
-      defender.types.includes("いわ")
-    ) {
-      return Math.floor(itemAdjustedDefenseStat * 1.5);
-    }
-    return itemAdjustedDefenseStat;
-  })();
-
   // じばく・だいばくはつの処理: 防御を半分にする
   const defenseStat =
     "name" in move && (move.name === "じばく" || move.name === "だいばくはつ")
-      ? Math.floor(weatherAdjustedDefenseStat / 2)
-      : weatherAdjustedDefenseStat;
+      ? Math.floor(itemAdjustedDefenseStat / 2)
+      : itemAdjustedDefenseStat;
 
   const baseDamage = calculateBaseDamage({
     level: attacker.level,
