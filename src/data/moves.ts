@@ -228,6 +228,11 @@ export const MOVES = [
     power: 70,
   },
   {
+    name: "けたぐり",
+    type: "かくとう",
+    power: 60,
+  },
+  {
     name: "ぎんいろのかぜ",
     type: "むし",
     power: 60,
