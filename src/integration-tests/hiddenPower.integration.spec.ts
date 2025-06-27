@@ -211,7 +211,8 @@ const runHiddenPowerTests = async () => {
         },
       });
 
-      console.log("結果（一部）:", JSON.stringify(result5.content[0].text.substring(0, 200), null, 2));
+      // result5の型が推論されないため、全体を出力
+      console.log("結果:", JSON.stringify(result5, null, 2));
       console.log("✅ テスト5成功\n");
     } catch (error) {
       console.error("❌ テスト5失敗:", error);

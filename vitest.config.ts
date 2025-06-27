@@ -7,6 +7,11 @@ export default defineConfig({
     environment: "node",
     includeSource: ["src/**/*.ts"],
     include: ["src/**/*.{spec,test}.ts"],
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/*.integration.{spec,test}.ts",
+    ],
   },
   resolve: {
     alias: {
