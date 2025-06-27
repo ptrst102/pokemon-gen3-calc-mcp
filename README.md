@@ -10,7 +10,6 @@
 
 - **ステータス計算** (`calculate_status`): 種族値、個体値、努力値、せいかくを考慮した正確な実数値計算
 - **ダメージ計算** (`calculate_damage`): タイプ相性、とくせい、もちもの、天候などを考慮した総合的なダメージ計算
-- **努力値別ダメージ計算**: 努力値を 0〜252 の全パターンでダメージを計算
 - **攻撃側努力値総当たり計算** (`calculate_damage_matrix_varying_attack`): 防御側の努力値を固定し、攻撃側の努力値を総当たりしてダメージ行列を計算
 - **防御側努力値総当たり計算** (`calculate_damage_matrix_varying_defense`): 攻撃側の努力値を固定し、防御側の努力値を総当たりしてダメージ行列を計算
 
@@ -89,7 +88,6 @@ npm run test:integration
 - `calculate_damage` ツールによるダメージ計算
 - `calculate_damage_matrix_varying_attack` ツールによる攻撃側努力値総当たり計算
 - `calculate_damage_matrix_varying_defense` ツールによる防御側努力値総当たり計算
-- 努力値別ダメージ計算機能
 - エラーハンドリング
 
 ### 推奨開発環境

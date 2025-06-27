@@ -37,7 +37,6 @@ interface NormalDamageStructuredOutput extends BaseStructuredOutput {
   };
 }
 
-
 const createBaseOutput = (
   context: DamageCalculationContext,
 ): BaseStructuredOutput => {
@@ -97,7 +96,6 @@ export const createNormalDamageOutput = (
     },
   };
 };
-
 
 interface ErrorStructuredOutput {
   error: string;
