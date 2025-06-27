@@ -464,87 +464,8 @@ describe("calculateDamageHandler", () => {
     });
   });
 
-  describe("天候効果", () => {
-    it("すなあらし時、いわタイプのとくぼうが1.5倍になる", async () => {
-      const normalInput = {
-        move: { type: "みず", power: 100 },
-        attacker: {
-          level: 50,
-          stat: { value: 150 },
-          statModifier: 0,
-        },
-        defender: {
-          level: 50,
-          pokemonName: "ソルロック",
-          stat: { value: 100 },
-          statModifier: 0,
-        },
-        options: {},
-      };
-
-      const sandstormInput = {
-        ...normalInput,
-        options: { weather: "すなあらし" },
-      };
-
-      const normalResult = await calculateDamageHandler(normalInput);
-      const sandstormResult = await calculateDamageHandler(sandstormInput);
-
-      const normalOutput = parseResponse<StructuredOutput>(normalResult);
-      const sandstormOutput = parseResponse<StructuredOutput>(sandstormResult);
-      const normalDamage = isNormalDamageOutput(normalOutput)
-        ? normalOutput.damage.min
-        : 0;
-      const sandstormDamage = isNormalDamageOutput(sandstormOutput)
-        ? sandstormOutput.damage.min
-        : 0;
-
-      // すなあらし時は防御側のとくぼうが1.5倍になるため、ダメージが2/3になる
-      expect(sandstormDamage).toBeLessThan(normalDamage);
-      // 乱数の影響で多少の誤差があるため、期待値の±5%の範囲で確認
-      const expectedDamage = Math.floor((normalDamage * 2) / 3);
-      expect(sandstormDamage).toBeGreaterThanOrEqual(expectedDamage - 3);
-      expect(sandstormDamage).toBeLessThanOrEqual(expectedDamage + 3);
-    });
-
-    it("すなあらし時、いわタイプ以外のとくぼうは変わらない", async () => {
-      const normalInput = {
-        move: { type: "みず", power: 100 },
-        attacker: {
-          level: 50,
-          stat: { value: 150 },
-          statModifier: 0,
-        },
-        defender: {
-          level: 50,
-          pokemonName: "フシギダネ",
-          stat: { value: 100 },
-          statModifier: 0,
-        },
-        options: {},
-      };
-
-      const sandstormInput = {
-        ...normalInput,
-        options: { weather: "すなあらし" },
-      };
-
-      const normalResult = await calculateDamageHandler(normalInput);
-      const sandstormResult = await calculateDamageHandler(sandstormInput);
-
-      const normalOutput = parseResponse<StructuredOutput>(normalResult);
-      const sandstormOutput = parseResponse<StructuredOutput>(sandstormResult);
-      const normalDamage = isNormalDamageOutput(normalOutput)
-        ? normalOutput.damage.min
-        : 0;
-      const sandstormDamage = isNormalDamageOutput(sandstormOutput)
-        ? sandstormOutput.damage.min
-        : 0;
-
-      // いわタイプ以外はすなあらしの影響を受けない
-      expect(sandstormDamage).toBe(normalDamage);
-    });
-  });
+  // 天候効果のテスト
+  // 第三世代では、すなあらし時のいわタイプとくぼう1.5倍の仕様は存在しない
 
   describe("ウェザーボール", () => {
     it("天候なしの場合、ノーマルタイプ威力50", async () => {
