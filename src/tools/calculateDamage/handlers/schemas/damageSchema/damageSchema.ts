@@ -19,6 +19,16 @@ const isPhysicalType = (type: TypeName): boolean =>
     "はがね",
   ].includes(type);
 
+// めざめるパワーの個体値スキーマ
+const hiddenPowerIVsSchema = z.object({
+  hp: z.number().int().min(0).max(31),
+  attack: z.number().int().min(0).max(31),
+  defense: z.number().int().min(0).max(31),
+  specialAttack: z.number().int().min(0).max(31),
+  specialDefense: z.number().int().min(0).max(31),
+  speed: z.number().int().min(0).max(31),
+});
+
 // わざの入力スキーマ
 const moveInputSchema = z.union([
   // 技名から変換
@@ -60,6 +70,7 @@ const moveInputSchema = z.union([
         "はがね",
       ]),
       power: z.number().int().min(0),
+      hiddenPowerIVs: hiddenPowerIVsSchema.optional(),
     })
     .transform((input) => ({
       ...input,

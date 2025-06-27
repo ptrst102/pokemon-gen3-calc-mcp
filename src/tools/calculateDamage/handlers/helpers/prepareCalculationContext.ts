@@ -4,7 +4,22 @@ import type { Pokemon } from "@/data/pokemon";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { DamageCalculationContext } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
+import { getHiddenPowerType, getHiddenPowerPower } from "@/utils/hiddenPower";
 import { getTypeEffectiveness } from "./typeEffectiveness";
+
+// わざのタイプから物理技か特殊技かを判定する
+const isPhysicalType = (type: TypeName): boolean =>
+  [
+    "ノーマル",
+    "かくとう",
+    "どく",
+    "じめん",
+    "ひこう",
+    "むし",
+    "いわ",
+    "ゴースト",
+    "はがね",
+  ].includes(type);
 
 /**
  * わざの情報
@@ -30,11 +45,38 @@ interface PokemonInfo {
 
 const prepareMoveInfo = (input: CalculateDamageInput): MoveInfo => {
   if ("name" in input.move) {
+    // めざめるパワーの特別処理
+    if (input.move.name === "めざめるパワー" && "hiddenPowerIVs" in input.move && input.move.hiddenPowerIVs) {
+      const type = getHiddenPowerType(input.move.hiddenPowerIVs) as TypeName;
+      const power = getHiddenPowerPower(input.move.hiddenPowerIVs);
+      const isPhysical = isPhysicalType(type);
+      
+      return {
+        name: input.move.name,
+        type,
+        power,
+        isPhysical,
+      };
+    }
+    
     return {
       name: input.move.name,
       type: input.move.type,
       power: input.move.power,
       isPhysical: input.move.isPhysical,
+    };
+  }
+
+  // タイプと威力を直接指定した場合でも、めざめるパワーの個体値が指定されていれば計算
+  if ("hiddenPowerIVs" in input.move && input.move.hiddenPowerIVs) {
+    const type = getHiddenPowerType(input.move.hiddenPowerIVs) as TypeName;
+    const power = getHiddenPowerPower(input.move.hiddenPowerIVs);
+    const isPhysical = isPhysicalType(type);
+    
+    return {
+      type,
+      power,
+      isPhysical,
     };
   }
 
