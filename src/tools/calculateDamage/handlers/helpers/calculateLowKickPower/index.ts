@@ -1,0 +1,1 @@
+export { calculateLowKickPower } from "./calculateLowKickPower";

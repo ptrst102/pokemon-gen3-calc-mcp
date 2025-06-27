@@ -5,6 +5,7 @@ import type { DamageOptions } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
 import { applyAbilityEffects } from "../abilityEffects";
 import { calculateBaseDamage } from "../calculateBaseDamage";
+import { calculateLowKickPower } from "../calculateLowKickPower";
 import { getDamageRanges } from "../damageRanges";
 import { calculateItemEffects } from "../itemEffects";
 import { getStatModifierRatio } from "../statModifier";
@@ -240,28 +241,9 @@ export const calculateNormalDamage = (
     if (input.move.name === "けたぐり") {
       const defenderWeight = input.defender.pokemon?.weightkg;
       if (defenderWeight !== undefined) {
-        const power = (() => {
-          if (defenderWeight <= 10.0) {
-            return 20;
-          }
-          if (defenderWeight <= 25.0) {
-            return 40;
-          }
-          if (defenderWeight <= 50.0) {
-            return 60;
-          }
-          if (defenderWeight <= 100.0) {
-            return 80;
-          }
-          if (defenderWeight <= 200.0) {
-            return 100;
-          }
-          return 120;
-        })();
-
         return {
           ...input.move,
-          power,
+          power: calculateLowKickPower(defenderWeight),
         };
       }
     }
