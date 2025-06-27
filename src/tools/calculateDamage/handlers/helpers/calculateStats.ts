@@ -25,22 +25,3 @@ export const getCalculatedStats = (
   };
 };
 
-export const hasEvCalculation = (stats: CalculatedStats): boolean => {
-  return Array.isArray(stats.attackStat) || Array.isArray(stats.defenseStat);
-};
-
-export const hasBothEvArrays = (stats: CalculatedStats): boolean => {
-  return Array.isArray(stats.attackStat) && Array.isArray(stats.defenseStat);
-};
-
-export const isAttackerEvArray = (
-  attackStat: StatValue,
-): attackStat is number[] => {
-  return Array.isArray(attackStat);
-};
-
-export const isDefenderEvArray = (
-  defenseStat: StatValue,
-): defenseStat is number[] => {
-  return Array.isArray(defenseStat);
-};

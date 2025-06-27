@@ -148,30 +148,6 @@ describe("calculateDamageInputSchema", () => {
       });
     });
 
-    it("努力値全パターン計算を指定できる", () => {
-      const input = {
-        move: "１０まんボルト",
-        attacker: {
-          pokemonName: "ピカチュウ",
-          stat: {
-            iv: 31,
-            calculateAllEvs: true,
-          },
-        },
-        defender: {
-          stat: { value: 100 },
-        },
-      };
-
-      const result = calculateDamageInputSchema.parse(input);
-      expect(result.attacker.pokemonName).toBe("ピカチュウ");
-      expect(result.attacker.stat).toEqual({
-        iv: 31,
-        calculateAllEvs: true,
-        calculateAllNatures: false,
-      });
-    });
-
     it("能力補正のデフォルト値は0", () => {
       const input = {
         move: "１０まんボルト",
