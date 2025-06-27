@@ -1,6 +1,5 @@
 import type {
   DamageCalculationContext,
-  EvRangeDamageResult,
   NormalDamageResult,
 } from "@/tools/calculateDamage/types";
 
@@ -38,16 +37,6 @@ interface NormalDamageStructuredOutput extends BaseStructuredOutput {
   };
 }
 
-interface EvRangeDamageStructuredOutput extends BaseStructuredOutput {
-  evRanges: Array<{
-    ev: number;
-    stat: number;
-    damage: {
-      min: number;
-      max: number;
-    };
-  }>;
-}
 
 const createBaseOutput = (
   context: DamageCalculationContext,
@@ -109,44 +98,6 @@ export const createNormalDamageOutput = (
   };
 };
 
-export const createEvRangeDamageOutput = (
-  result: EvRangeDamageResult,
-): EvRangeDamageStructuredOutput => {
-  const base = createBaseOutput(result);
-
-  const evRanges = result.evResults.map((entry) => ({
-    ev: entry.ev,
-    stat: entry.stat,
-    damage: {
-      min: Math.min(...entry.damages),
-      max: Math.max(...entry.damages),
-    },
-  }));
-
-  if (result.isAttackerEv) {
-    return {
-      ...base,
-      defender: base.defender
-        ? {
-            ...base.defender,
-            stat: result.fixedStat,
-          }
-        : { level: result.defender.level, stat: result.fixedStat },
-      evRanges,
-    };
-  } else {
-    return {
-      ...base,
-      attacker: base.attacker
-        ? {
-            ...base.attacker,
-            stat: result.fixedStat,
-          }
-        : { level: result.attacker.level, stat: result.fixedStat },
-      evRanges,
-    };
-  }
-};
 
 interface ErrorStructuredOutput {
   error: string;
@@ -154,7 +105,6 @@ interface ErrorStructuredOutput {
 
 export type StructuredOutput =
   | NormalDamageStructuredOutput
-  | EvRangeDamageStructuredOutput
   | ErrorStructuredOutput;
 
 // Type guards
@@ -162,12 +112,6 @@ export const isNormalDamageOutput = (
   output: StructuredOutput,
 ): output is NormalDamageStructuredOutput => {
   return "damage" in output;
-};
-
-export const isEvRangeDamageOutput = (
-  output: StructuredOutput,
-): output is EvRangeDamageStructuredOutput => {
-  return "evRanges" in output;
 };
 
 export const isErrorOutput = (

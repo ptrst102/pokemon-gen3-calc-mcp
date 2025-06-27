@@ -1,0 +1,1 @@
+export { calculateNormalDamage } from "./calculateDamage";

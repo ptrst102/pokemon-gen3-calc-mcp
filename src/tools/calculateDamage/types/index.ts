@@ -5,16 +5,15 @@ import type { TypeName } from "@/types";
 
 /**
  * ステータス計算結果の型
- * 単一の値または努力値別の配列
  */
-export type StatValue = number | number[];
+export type StatValue = number;
 
 /**
  * 計算済みのステータス値
  */
 export interface CalculatedStats {
-  attackStat: StatValue;
-  defenseStat: StatValue;
+  attackStat: number;
+  defenseStat: number;
 }
 
 /**
@@ -73,15 +72,3 @@ export interface NormalDamageResult extends DamageCalculationContext {
   defenseStat: number;
 }
 
-/**
- * EV別ダメージ計算結果
- */
-export interface EvRangeDamageResult extends DamageCalculationContext {
-  evResults: Array<{
-    ev: number;
-    stat: number;
-    damages: number[];
-  }>;
-  fixedStat: number;
-  isAttackerEv: boolean;
-}

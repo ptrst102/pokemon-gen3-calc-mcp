@@ -11,15 +11,6 @@ import { getStatModifierRatio } from "../statModifier";
 import { getTypeEffectiveness } from "../typeEffectiveness";
 
 /**
- * EV別のダメージ情報
- */
-export interface EvDamageEntry {
-  ev: number;
-  stat: number;
-  damages: number[];
-}
-
-/**
  * 内部的なダメージ計算パラメータ
  */
 interface InternalDamageParams {
@@ -195,99 +186,6 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
       : abilityAdjustedDamage;
 
   return getDamageRanges(finalDamage);
-};
-
-/**
- * EV別ダメージ計算のパラメータ
- */
-type EvDamageCalculationParams = {
-  input: CalculateDamageInput;
-  statArray: number[];
-  fixedStat: number;
-  isAttackerEv: boolean;
-};
-
-/**
- * EV別ダメージを計算する共通関数
- */
-const calculateEvDamagesCommon = ({
-  input,
-  statArray,
-  fixedStat,
-  isAttackerEv,
-}: EvDamageCalculationParams): EvDamageEntry[] => {
-  const defenderTypes = input.defender.pokemon?.types || [];
-  const results: EvDamageEntry[] = [];
-
-  for (let i = 0; i < statArray.length; i++) {
-    const ev = i * 4;
-    const stat = statArray[i];
-
-    const damages = calculateDamageInternal({
-      move: {
-        name: input.move.name,
-        type: input.move.type,
-        power: input.move.power,
-        isPhysical: input.move.isPhysical,
-      },
-      attacker: {
-        level: input.attacker.level,
-        attack: isAttackerEv ? stat : fixedStat,
-        attackModifier: input.attacker.statModifier,
-        types: input.attacker.pokemon?.types,
-        pokemonName: input.attacker.pokemon?.name,
-        ability: input.attacker.ability,
-        abilityActive: input.attacker.abilityActive,
-        item: input.attacker.item,
-      },
-      defender: {
-        defense: isAttackerEv ? fixedStat : stat,
-        defenseModifier: input.defender.statModifier,
-        types: defenderTypes,
-        pokemonName: input.defender.pokemon?.name,
-        ability: input.defender.ability,
-        abilityActive: input.defender.abilityActive,
-        item: input.defender.item,
-      },
-      options: input.options || {},
-    });
-
-    results.push({ ev, stat, damages });
-  }
-
-  return results;
-};
-
-/**
- * 防御側のステータスを固定し、攻撃側のEV別ダメージを計算
- */
-export const calculateAttackerEvDamages = (
-  input: CalculateDamageInput,
-  attackStatArray: number[],
-  fixedDefenseStat: number,
-): EvDamageEntry[] => {
-  return calculateEvDamagesCommon({
-    input,
-    statArray: attackStatArray,
-    fixedStat: fixedDefenseStat,
-    isAttackerEv: true,
-  });
-};
-
-/**
- * 攻撃側のステータスを固定し、防御側のEV別ダメージを計算
- */
-export const calculateDefenderEvDamages = (
-  input: CalculateDamageInput,
-  fixedAttackStat: number,
-  defenseStatArray: number[],
-): EvDamageEntry[] => {
-  return calculateEvDamagesCommon({
-    input,
-    statArray: defenseStatArray,
-    fixedStat: fixedAttackStat,
-    isAttackerEv: false,
-  });
 };
 
 /**
