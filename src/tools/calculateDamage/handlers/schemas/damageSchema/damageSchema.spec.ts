@@ -61,6 +61,42 @@ describe("calculateDamageInputSchema", () => {
       );
     });
 
+    it("未対応の威力不定技はエラーになる", () => {
+      const unsupportedMoves = [
+        "ころがる",
+        "れんぞくぎり",
+        "アイスボール",
+        "いかり",
+        "しおふき",
+        "ふんか",
+        "マグニチュード",
+        "プレゼント",
+        "トリプルキック",
+        "めざめるパワー",
+        "はきだす",
+        "サイコウェーブ",
+        "ふくろだたき",
+        "みらいよち",
+        "はめつのねがい",
+      ];
+
+      for (const moveName of unsupportedMoves) {
+        const input = {
+          move: moveName,
+          attacker: {
+            stat: { value: 100 },
+          },
+          defender: {
+            stat: { value: 100 },
+          },
+        };
+
+        expect(() => calculateDamageInputSchema.parse(input)).toThrow(
+          `${moveName}には対応していません`,
+        );
+      }
+    });
+
     it("物理技と特殊技を正しく判定する", () => {
       // 物理技
       const physicalInput = {

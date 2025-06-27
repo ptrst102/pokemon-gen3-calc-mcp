@@ -3,6 +3,7 @@ import { ABILITIES } from "@/data/abilities";
 import { ITEMS } from "@/data/items";
 import { MOVES } from "@/data/moves";
 import { POKEMONS } from "@/data/pokemon";
+import { UNSUPPORTED_MOVES } from "@/data/unsupportedMoves";
 import type { TypeName } from "@/types";
 
 // わざのタイプから物理技か特殊技かを判定する
@@ -25,6 +26,15 @@ const moveInputSchema = z.union([
   z
     .string()
     .transform((moveName) => {
+      // 未対応技のチェック
+      if (
+        UNSUPPORTED_MOVES.includes(
+          moveName as (typeof UNSUPPORTED_MOVES)[number],
+        )
+      ) {
+        throw new Error(`${moveName}には対応していません`);
+      }
+
       const move = MOVES.find((m) => m.name === moveName);
       if (!move) {
         throw new Error(`わざ「${moveName}」が見つかりません`);

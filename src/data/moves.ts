@@ -28,11 +28,6 @@ export const MOVES = [
     power: 100,
   },
   {
-    name: "アイスボール",
-    type: "こおり",
-    power: 30,
-  },
-  {
     name: "あてみなげ",
     type: "かくとう",
     power: 70,
@@ -56,11 +51,6 @@ export const MOVES = [
     name: "いあいぎり",
     type: "ノーマル",
     power: 50,
-  },
-  {
-    name: "いかり",
-    type: "ノーマル",
-    power: 20,
   },
   {
     name: "いびき",
@@ -288,11 +278,6 @@ export const MOVES = [
     power: 100,
   },
   {
-    name: "ころがる",
-    type: "いわ",
-    power: 30,
-  },
-  {
     name: "サイケこうせん",
     type: "エスパー",
     power: 65,
@@ -311,11 +296,6 @@ export const MOVES = [
     name: "さわぐ",
     type: "ノーマル",
     power: 90,
-  },
-  {
-    name: "しおふき",
-    type: "みず",
-    power: 150,
   },
   {
     name: "シグナルビーム",
@@ -588,11 +568,6 @@ export const MOVES = [
     power: 80,
   },
   {
-    name: "トリプルキック",
-    type: "かくとう",
-    power: 10,
-  },
-  {
     name: "ドリルくちばし",
     type: "ひこう",
     power: 80,
@@ -718,11 +693,6 @@ export const MOVES = [
     power: 65,
   },
   {
-    name: "はめつのねがい",
-    type: "はがね",
-    power: 140,
-  },
-  {
     name: "ひっかく",
     type: "ノーマル",
     power: 40,
@@ -771,11 +741,6 @@ export const MOVES = [
     name: "ブレイズキック",
     type: "ほのお",
     power: 85,
-  },
-  {
-    name: "ふんか",
-    type: "ほのお",
-    power: 150,
   },
   {
     name: "ヘドロこうげき",
@@ -888,11 +853,6 @@ export const MOVES = [
     power: 40,
   },
   {
-    name: "みらいよち",
-    type: "エスパー",
-    power: 80,
-  },
-  {
     name: "メガドレイン",
     type: "くさ",
     power: 40,
@@ -911,11 +871,6 @@ export const MOVES = [
     name: "メガホーン",
     type: "むし",
     power: 120,
-  },
-  {
-    name: "めざめるパワー",
-    type: "ノーマル",
-    power: 70,
   },
   {
     name: "やつあたり",
@@ -966,11 +921,6 @@ export const MOVES = [
     name: "れいとうビーム",
     type: "こおり",
     power: 95,
-  },
-  {
-    name: "れんぞくぎり",
-    type: "むし",
-    power: 10,
   },
   {
     name: "れんぞくパンチ",
