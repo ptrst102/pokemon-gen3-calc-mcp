@@ -61,9 +61,9 @@ describe("calculateDamageWithContext", () => {
       };
 
       const result = calculateDamageWithContext(params);
-      // calculateDamageWithContextは防御を2倍にする
-      // 防御を2倍にして計算
-      expect(result[0]).toBe(40); // 実際のダメージ（タイプ相性2倍）
+      // calculateDamageWithContextもcalculateDamageと同じ計算順序に統一
+      // ダメージを0.5倍にする（calculateDamageと同じ方式）
+      expect(result[0]).toBe(39); // 実際のダメージ
     });
 
     it("チャージ効果の処理タイミングの違い", () => {
@@ -92,8 +92,8 @@ describe("calculateDamageWithContext", () => {
 
       const result = calculateDamageWithContext(params);
       // calculateDamageWithContextは威力に適用
-      // 威力200で計算、タイプ相性2倍
-      expect(result[0]).toBe(153); // 実際の値（威力2倍×タイプ相性2倍）
+      // チャージ効果はダメージ計算後に適用
+      expect(result[0]).toBe(156); // 実際の値
     });
 
     it("スポーツ効果（どろあそび）の処理タイミング", () => {
@@ -122,8 +122,8 @@ describe("calculateDamageWithContext", () => {
 
       const result = calculateDamageWithContext(params);
       // calculateDamageWithContextは威力に適用
-      // 威力を0.5倍にして計算
-      expect(result[0]).toBe(20); // 実際のダメージ
+      // スポーツ効果はダメージ計算後に適用
+      expect(result[0]).toBe(19); // 実際のダメージ
     });
 
     describe("特殊な技の処理", () => {
