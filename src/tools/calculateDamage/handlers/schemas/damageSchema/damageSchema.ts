@@ -67,7 +67,7 @@ const moveInputSchema = z.union([
     })),
 ]);
 
-// 能力値の入力スキーマ（3パターン）
+// 能力値の入力スキーマ（2パターン）
 const statInputSchema = z.union([
   // パターン1: 実数値を直接指定
   z
@@ -83,16 +83,6 @@ const statInputSchema = z.union([
       .enum(["up", "down", "neutral"])
       .optional()
       .default("neutral"),
-  }),
-  // パターン3: 個体値（努力値は全ケース試す）
-  z.object({
-    iv: z.number().int().min(0).max(31),
-    calculateAllEvs: z.literal(true),
-    calculateAllNatures: z
-      .boolean()
-      .optional()
-      .default(false)
-      .describe("性格補正も総当たりで計算するかどうか"),
   }),
 ]);
 
