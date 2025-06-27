@@ -27,11 +27,7 @@ const moveInputSchema = z.union([
     .string()
     .transform((moveName) => {
       // 未対応技のチェック
-      if (
-        UNSUPPORTED_MOVES.includes(
-          moveName as (typeof UNSUPPORTED_MOVES)[number],
-        )
-      ) {
+      if (UNSUPPORTED_MOVES.some((m) => m === moveName)) {
         throw new Error(`${moveName}には対応していません`);
       }
 
