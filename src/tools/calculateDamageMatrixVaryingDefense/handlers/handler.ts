@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+import { resolveMove } from "@/tools/calculateDamage/handlers/helpers/resolveMove";
 import { calculateDamageWithContext } from "@/utils/calculateDamageWithContext";
 import { calculateHp } from "@/utils/calculateHp";
 import { calculateStat } from "@/utils/calculateStat";
@@ -25,7 +26,15 @@ export const calculateDamageMatrixVaryingDefenseHandler = async (
 }> => {
   try {
     const input = calculateDamageMatrixVaryingDefenseInputSchema.parse(args);
-    const results = calculateDamageMatrix(input);
+
+    // 技の解決処理を追加
+    const resolvedMove = resolveMove(input.move);
+    const inputWithResolvedMove = {
+      ...input,
+      move: resolvedMove,
+    };
+
+    const results = calculateDamageMatrix(inputWithResolvedMove);
 
     return {
       content: [
@@ -81,7 +90,9 @@ export const calculateDamageMatrixVaryingDefenseHandler = async (
  * ダメージマトリックスを計算
  */
 const calculateDamageMatrix = (
-  input: CalculateDamageMatrixVaryingDefenseInput,
+  input: CalculateDamageMatrixVaryingDefenseInput & {
+    move: ReturnType<typeof resolveMove>;
+  },
 ): { damageMatrix: DamageMatrixEntry[] } => {
   const { move, attacker, defender, options } = input;
 

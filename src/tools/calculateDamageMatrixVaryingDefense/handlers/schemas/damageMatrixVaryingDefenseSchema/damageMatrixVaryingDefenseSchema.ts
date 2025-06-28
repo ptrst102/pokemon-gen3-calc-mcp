@@ -1,76 +1,37 @@
 import { z } from "zod";
 import { ABILITIES } from "@/data/abilities";
 import { ITEMS } from "@/data/items";
-import { MOVES } from "@/data/moves";
 import { POKEMONS } from "@/data/pokemon";
-import { UNSUPPORTED_MOVES } from "@/data/unsupportedMoves";
-import type { TypeName } from "@/types";
-
-// わざのタイプから物理技か特殊技かを判定する
-const isPhysicalType = (type: TypeName): boolean =>
-  [
-    "ノーマル",
-    "かくとう",
-    "どく",
-    "じめん",
-    "ひこう",
-    "むし",
-    "いわ",
-    "ゴースト",
-    "はがね",
-  ].includes(type);
 
 // わざの入力スキーマ
 const moveInputSchema = z.union([
-  // 技名から変換
-  z
-    .string()
-    .transform((moveName) => {
-      // 未対応技のチェック
-      if (UNSUPPORTED_MOVES.some((m) => m === moveName)) {
-        throw new Error(`${moveName}には対応していません`);
-      }
-
-      const move = MOVES.find((m) => m.name === moveName);
-      if (!move) {
-        throw new Error(`わざ「${moveName}」が見つかりません`);
-      }
-      return {
-        name: moveName,
-        type: move.type,
-        power: move.power,
-        isPhysical: isPhysicalType(move.type),
-      };
-    }),
-  // タイプと威力を直接指定
-  z
-    .object({
-      name: z.string().optional(),
-      type: z.enum([
-        "ノーマル",
-        "ほのお",
-        "みず",
-        "でんき",
-        "くさ",
-        "こおり",
-        "かくとう",
-        "どく",
-        "じめん",
-        "ひこう",
-        "エスパー",
-        "むし",
-        "いわ",
-        "ゴースト",
-        "ドラゴン",
-        "あく",
-        "はがね",
-      ]),
-      power: z.number().int().min(0),
-    })
-    .transform((input) => ({
-      ...input,
-      isPhysical: isPhysicalType(input.type),
-    })),
+  // 技名
+  z.string(),
+  // カスタム技
+  z.object({
+    name: z.string().optional(),
+    type: z.enum([
+      "ノーマル",
+      "ほのお",
+      "みず",
+      "でんき",
+      "くさ",
+      "こおり",
+      "かくとう",
+      "どく",
+      "じめん",
+      "ひこう",
+      "エスパー",
+      "むし",
+      "いわ",
+      "ゴースト",
+      "ドラゴン",
+      "あく",
+      "はがね",
+    ]),
+    power: z.number().int().min(0),
+    isPhysical: z.boolean().optional(),
+  }),
 ]);
 
 // 攻撃側の能力値の入力スキーマ（固定値のみ）

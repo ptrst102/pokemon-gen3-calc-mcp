@@ -6,6 +6,7 @@ import type { TypeName } from "@/types";
 import { adjustSpecialMoves } from "@/utils/adjustSpecialMoves";
 import { calculateDamageCore } from "@/utils/calculateDamageCore";
 import { calculateItemEffects } from "../itemEffects";
+import type { ResolvedMove } from "../resolveMove";
 import { getStatModifierRatio } from "../statModifier";
 
 /**
@@ -122,7 +123,7 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
  * 通常のダメージを計算
  */
 export const calculateNormalDamage = (
-  input: CalculateDamageInput,
+  input: CalculateDamageInput & { move: ResolvedMove },
   attackStat: number,
   defenseStat: number,
 ): number[] => {

@@ -3,7 +3,7 @@ import { calculateDamageInputSchema } from "./damageSchema";
 
 describe("calculateDamageInputSchema", () => {
   describe("わざの入力", () => {
-    it("技名から変換できる", () => {
+    it("技名を文字列として受け取れる", () => {
       const input = {
         move: "１０まんボルト",
         attacker: {
@@ -15,12 +15,7 @@ describe("calculateDamageInputSchema", () => {
       };
 
       const result = calculateDamageInputSchema.parse(input);
-      expect(result.move).toEqual({
-        name: "１０まんボルト",
-        type: "でんき",
-        power: 95,
-        isPhysical: false,
-      });
+      expect(result.move).toEqual("１０まんボルト");
     });
 
     it("タイプと威力を直接指定できる", () => {
@@ -41,13 +36,16 @@ describe("calculateDamageInputSchema", () => {
       expect(result.move).toEqual({
         type: "ほのお",
         power: 80,
-        isPhysical: false,
       });
     });
 
-    it("存在しない技名はエラーになる", () => {
+    it("カスタム技にisPhysicalを指定できる", () => {
       const input = {
-        move: "存在しない技",
+        move: {
+          type: "ほのお",
+          power: 80,
+          isPhysical: true,
+        },
         attacker: {
           stat: { value: 100 },
         },
@@ -56,51 +54,21 @@ describe("calculateDamageInputSchema", () => {
         },
       };
 
-      expect(() => calculateDamageInputSchema.parse(input)).toThrow(
-        "わざ「存在しない技」が見つかりません",
-      );
+      const result = calculateDamageInputSchema.parse(input);
+      expect(result.move).toEqual({
+        type: "ほのお",
+        power: 80,
+        isPhysical: true,
+      });
     });
 
-    it("未対応の威力不定技はエラーになる", () => {
-      const unsupportedMoves = [
-        "ころがる",
-        "れんぞくぎり",
-        "アイスボール",
-        "いかり",
-        "しおふき",
-        "ふんか",
-        "マグニチュード",
-        "プレゼント",
-        "トリプルキック",
-        "めざめるパワー",
-        "はきだす",
-        "サイコウェーブ",
-        "ふくろだたき",
-        "みらいよち",
-        "はめつのねがい",
-      ];
-
-      for (const moveName of unsupportedMoves) {
-        const input = {
-          move: moveName,
-          attacker: {
-            stat: { value: 100 },
-          },
-          defender: {
-            stat: { value: 100 },
-          },
-        };
-
-        expect(() => calculateDamageInputSchema.parse(input)).toThrow(
-          `${moveName}には対応していません`,
-        );
-      }
-    });
-
-    it("物理技と特殊技を正しく判定する", () => {
-      // 物理技
-      const physicalInput = {
-        move: "アイアンテール",
+    it("カスタム技に名前を指定できる", () => {
+      const input = {
+        move: {
+          name: "カスタム技",
+          type: "ほのお",
+          power: 80,
+        },
         attacker: {
           stat: { value: 100 },
         },
@@ -109,22 +77,12 @@ describe("calculateDamageInputSchema", () => {
         },
       };
 
-      const physicalResult = calculateDamageInputSchema.parse(physicalInput);
-      expect(physicalResult.move.isPhysical).toBe(true);
-
-      // 特殊技
-      const specialInput = {
-        move: "１０まんボルト",
-        attacker: {
-          stat: { value: 100 },
-        },
-        defender: {
-          stat: { value: 100 },
-        },
-      };
-
-      const specialResult = calculateDamageInputSchema.parse(specialInput);
-      expect(specialResult.move.isPhysical).toBe(false);
+      const result = calculateDamageInputSchema.parse(input);
+      expect(result.move).toEqual({
+        name: "カスタム技",
+        type: "ほのお",
+        power: 80,
+      });
     });
   });
 

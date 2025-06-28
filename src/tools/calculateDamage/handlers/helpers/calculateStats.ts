@@ -1,9 +1,10 @@
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { CalculatedStats } from "@/tools/calculateDamage/types";
 import { getStatValue } from "./getStatValue";
+import type { ResolvedMove } from "./resolveMove";
 
 export const getCalculatedStats = (
-  input: CalculateDamageInput,
+  input: CalculateDamageInput & { move: ResolvedMove },
 ): CalculatedStats => {
   const attackStat = getStatValue({
     stat: input.attacker.stat,

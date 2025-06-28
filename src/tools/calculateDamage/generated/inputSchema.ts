@@ -44,6 +44,9 @@ export const calculateDamageInputSchema = {
               type: "integer",
               minimum: 0,
             },
+            isPhysical: {
+              type: "boolean",
+            },
           },
           required: ["type", "power"],
           additionalProperties: false,
