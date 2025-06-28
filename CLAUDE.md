@@ -58,6 +58,13 @@ npm run test -- src/tools/calculateDamage  # 特定ディレクトリのテス�
 npm run test -- --watch  # ウォッチモード
 npm run test:integration  # 結合テスト（MCPサーバーへの実際のリクエストをテスト）
 
+# テストカバレッジ測定
+npm run test:coverage  # カバレッジ付きでテストを実行
+# カバレッジレポート：
+# - コンソールに概要が表示される
+# - HTMLレポートは coverage/index.html で詳細を確認可能
+# - 現在のカバレッジ率: 98.75%（ステートメント）
+
 # リント・フォーマット
 npm run lint        # リントのみ
 npm run format      # フォーマット実行
