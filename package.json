@@ -8,6 +8,7 @@
     "build": "tsx scripts/build.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:integration": "tsx scripts/integration-test.ts",
     "lint": "biome check .",
     "format": "biome check --write .",
