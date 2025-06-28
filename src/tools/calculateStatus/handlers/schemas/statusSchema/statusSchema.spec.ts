@@ -181,7 +181,7 @@ describe("calculateStatusInputSchema", () => {
       };
 
       expect(() => calculateStatusInputSchema.parse(input)).toThrow(
-        "せいかく「存在しないせいかく」が見つかりません",
+        "無効なせいかくです",
       );
     });
   });

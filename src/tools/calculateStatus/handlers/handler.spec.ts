@@ -64,7 +64,7 @@ describe("calculate-status tool", () => {
     const output = parseResponse<CalculateStatusErrorOutput>(result);
     expect("error" in output).toBe(true);
     if ("error" in output) {
-      expect(output.error).toContain("せいかく「つよき」が見つかりません");
+      expect(output.error).toContain("無効なせいかくです");
     }
   });
 
