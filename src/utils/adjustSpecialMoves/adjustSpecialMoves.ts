@@ -67,20 +67,5 @@ export const adjustSpecialMoves = (
     };
   }
 
-  // ソーラービームの処理
-  if (move.name === "ソーラービーム") {
-    // あめ、すなあらし、あられの場合、威力が半分になる
-    if (
-      weather === "あめ" ||
-      weather === "すなあらし" ||
-      weather === "あられ"
-    ) {
-      return {
-        ...move,
-        power: 60, // 120 / 2
-      };
-    }
-  }
-
   return move;
 };

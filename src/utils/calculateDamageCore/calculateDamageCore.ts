@@ -3,6 +3,7 @@ import { calculateBaseDamage } from "@/tools/calculateDamage/handlers/helpers/ca
 import { getDamageRanges } from "@/tools/calculateDamage/handlers/helpers/damageRanges";
 import { getTypeEffectiveness } from "@/tools/calculateDamage/handlers/helpers/typeEffectiveness";
 import type { TypeName } from "@/types";
+import { applySolarBeamPenalty } from "@/utils/applySolarBeamPenalty";
 
 export interface DamageCoreParams {
   move: {
@@ -133,5 +134,8 @@ export const calculateDamageCore = (params: DamageCoreParams): number[] => {
       : abilityAdjustedDamage;
 
   // ダメージ乱数（16通り）を計算
-  return getDamageRanges(finalDamage);
+  const damageRanges = getDamageRanges(finalDamage);
+
+  // ソーラービームの天候補正を適用
+  return applySolarBeamPenalty(damageRanges, move.name, options.weather);
 };
