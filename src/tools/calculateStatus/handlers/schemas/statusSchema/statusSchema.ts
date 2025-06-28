@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { NATURES } from "@/data/natures";
+import { NATURES, type NatureName } from "@/data/natures";
 import { POKEMONS } from "@/data/pokemon";
 
 // 個体値のスキーマ
@@ -42,7 +42,12 @@ export const calculateStatusInputSchema = z
       .string()
       .describe('ポケモン名（例: "フシギダネ"、"メタグロス"）'),
     level: z.number().int().min(1).max(100).describe("レベル（1-100）"),
-    nature: z.string().describe('せいかく（例: "いじっぱり"、"ひかえめ"）'),
+    nature: z
+      .string()
+      .refine((val): val is NatureName => NATURES.some((n) => n.name === val), {
+        message: "無効なせいかくです",
+      })
+      .describe('せいかく（例: "いじっぱり"、"ひかえめ"）'),
     ivs: ivsSchema,
     evs: evsSchema,
   })

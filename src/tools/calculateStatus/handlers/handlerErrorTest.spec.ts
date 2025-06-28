@@ -52,9 +52,7 @@ describe("calculateStatusHandler エラーハンドリング", () => {
     const output = parseResponse<{ error: string }>(result);
     expect("error" in output).toBe(true);
     if ("error" in output) {
-      expect(output.error).toContain(
-        "せいかく「無効なせいかく」が見つかりません",
-      );
+      expect(output.error).toContain("無効なせいかくです");
     }
   });
 
