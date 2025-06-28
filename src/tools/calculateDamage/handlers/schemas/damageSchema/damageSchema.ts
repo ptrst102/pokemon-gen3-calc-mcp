@@ -138,8 +138,10 @@ const createPokemonSchema = () =>
         throw new Error(`とくせい「${input.ability}」が見つかりません`);
       }
 
+      // pokemonNameを削除し、pokemonオブジェクトのみを使用
+      const { pokemonName: _, ...restInput } = input;
       return {
-        ...input,
+        ...restInput,
         pokemon,
         item,
         ability,

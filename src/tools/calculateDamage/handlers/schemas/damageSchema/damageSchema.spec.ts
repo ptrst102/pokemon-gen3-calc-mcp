@@ -176,7 +176,7 @@ describe("calculateDamageInputSchema", () => {
       };
 
       const result = calculateDamageInputSchema.parse(input);
-      expect(result.attacker.pokemonName).toBe("ピカチュウ");
+      expect(result.attacker.pokemon?.name).toBe("ピカチュウ");
       expect(result.attacker.stat).toMatchObject({
         iv: 31,
         ev: 252,

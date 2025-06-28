@@ -23,7 +23,7 @@ interface InternalDamageParams {
     attack: number;
     attackModifier: number;
     types?: TypeName[];
-    pokemonName?: string;
+    pokemon?: { name: string };
     ability?: Ability;
     abilityActive?: boolean;
     item?: Item;
@@ -32,7 +32,7 @@ interface InternalDamageParams {
     defense: number;
     defenseModifier: number;
     types: TypeName[];
-    pokemonName?: string;
+    pokemon?: { name: string };
     ability?: Ability;
     abilityActive?: boolean;
     item?: Item;
@@ -49,14 +49,14 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
 
   const attackerItemEffects = calculateItemEffects(
     attacker.item,
-    attacker.pokemonName,
+    attacker.pokemon?.name,
     move.type,
     move.isPhysical,
   );
 
   const defenderItemEffects = calculateItemEffects(
     defender.item,
-    defender.pokemonName,
+    defender.pokemon?.name,
     move.type,
     move.isPhysical,
   );
@@ -147,7 +147,9 @@ export const calculateNormalDamage = (
       attack: attackStat,
       attackModifier: input.attacker.statModifier,
       types: input.attacker.pokemon?.types,
-      pokemonName: input.attacker.pokemon?.name,
+      pokemon: input.attacker.pokemon
+        ? { name: input.attacker.pokemon.name }
+        : undefined,
       ability: input.attacker.ability,
       abilityActive: input.attacker.abilityActive,
       item: input.attacker.item,
@@ -156,7 +158,9 @@ export const calculateNormalDamage = (
       defense: defenseStat,
       defenseModifier: input.defender.statModifier,
       types: defenderTypes,
-      pokemonName: input.defender.pokemon?.name,
+      pokemon: input.defender.pokemon
+        ? { name: input.defender.pokemon.name }
+        : undefined,
       ability: input.defender.ability,
       abilityActive: input.defender.abilityActive,
       item: input.defender.item,

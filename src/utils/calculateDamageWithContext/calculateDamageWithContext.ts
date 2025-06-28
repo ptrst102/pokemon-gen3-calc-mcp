@@ -18,19 +18,17 @@ export interface DamageCalculationParams {
   attacker: {
     level: number;
     statModifier: number;
-    pokemon?: { types?: TypeName[] };
+    pokemon?: { name: string; types?: TypeName[] };
     ability?: Ability;
     abilityActive?: boolean;
     item?: Item;
-    pokemonName?: string;
   };
   defender: {
     statModifier: number;
-    pokemon?: { types?: TypeName[]; weightkg?: number };
+    pokemon?: { name: string; types?: TypeName[]; weightkg?: number };
     ability?: Ability;
     abilityActive?: boolean;
     item?: Item;
-    pokemonName?: string;
   };
   options: {
     weather?: "はれ" | "あめ" | "あられ" | "すなあらし";
@@ -60,14 +58,14 @@ export const calculateDamageWithContext = (
   // もちもの効果を計算
   const attackerItemEffects = calculateItemEffects(
     attacker.item,
-    attacker.pokemonName || undefined,
+    attacker.pokemon?.name,
     move.type,
     move.isPhysical,
   );
 
   const defenderItemEffects = calculateItemEffects(
     defender.item,
-    defender.pokemonName || undefined,
+    defender.pokemon?.name,
     move.type,
     move.isPhysical,
   );
