@@ -1,4 +1,5 @@
 import type { Ability } from "@/data/abilities";
+import type { Item } from "@/data/items";
 import { calculateItemEffects } from "@/tools/calculateDamage/handlers/helpers/itemEffects";
 import { getStatModifierRatio } from "@/tools/calculateDamage/handlers/helpers/statModifier";
 import type { TypeName } from "@/types";
@@ -20,7 +21,7 @@ export interface DamageCalculationParams {
     pokemon?: { types?: TypeName[] };
     ability?: Ability;
     abilityActive?: boolean;
-    item?: { name?: string };
+    item?: Item;
     pokemonName?: string;
   };
   defender: {
@@ -28,7 +29,7 @@ export interface DamageCalculationParams {
     pokemon?: { types?: TypeName[]; weightkg?: number };
     ability?: Ability;
     abilityActive?: boolean;
-    item?: { name?: string };
+    item?: Item;
     pokemonName?: string;
   };
   options: {
@@ -58,14 +59,14 @@ export const calculateDamageWithContext = (
 
   // もちもの効果を計算
   const attackerItemEffects = calculateItemEffects(
-    attacker.item?.name,
+    attacker.item,
     attacker.pokemonName || undefined,
     move.type,
     move.isPhysical,
   );
 
   const defenderItemEffects = calculateItemEffects(
-    defender.item?.name,
+    defender.item,
     defender.pokemonName || undefined,
     move.type,
     move.isPhysical,
