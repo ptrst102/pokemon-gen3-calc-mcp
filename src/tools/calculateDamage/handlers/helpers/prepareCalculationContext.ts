@@ -28,20 +28,12 @@ interface PokemonInfo {
   statModifier: number;
 }
 
-const prepareMoveInfo = (input: CalculateDamageInput): MoveInfo => {
-  if ("name" in input.move) {
-    return {
-      name: input.move.name,
-      type: input.move.type,
-      power: input.move.power,
-      isPhysical: input.move.isPhysical,
-    };
-  }
-
+const prepareMoveInfo = (move: MoveInfo): MoveInfo => {
   return {
-    type: input.move.type,
-    power: input.move.power,
-    isPhysical: input.move.isPhysical,
+    name: move.name,
+    type: move.type,
+    power: move.power,
+    isPhysical: move.isPhysical,
   };
 };
 
@@ -74,7 +66,7 @@ const checkStab = (
  * ダメージ計算に必要な共通情報を準備
  */
 export const prepareCalculationContext = (
-  input: CalculateDamageInput,
+  input: CalculateDamageInput & { move: MoveInfo },
 ): DamageCalculationContext => {
   const defenderTypes = input.defender.pokemon?.types || [];
   if (defenderTypes.length === 0) {
@@ -89,7 +81,7 @@ export const prepareCalculationContext = (
   const isStab = checkStab(input.attacker.pokemon?.types, input.move.type);
 
   return {
-    move: prepareMoveInfo(input),
+    move: prepareMoveInfo(input.move),
     attacker: preparePokemonInfo(input.attacker),
     defender: preparePokemonInfo(input.defender),
     typeEffectiveness,

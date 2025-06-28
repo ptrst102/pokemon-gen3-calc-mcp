@@ -3,6 +3,7 @@ import { calculateNormalDamage } from "./helpers/calculateDamage";
 import { getCalculatedStats } from "./helpers/calculateStats";
 import { formatError } from "./helpers/formatError";
 import { prepareCalculationContext } from "./helpers/prepareCalculationContext";
+import { resolveMove } from "./helpers/resolveMove";
 import { calculateDamageInputSchema } from "./schemas/damageSchema";
 
 /**
@@ -40,11 +41,18 @@ export const calculateDamageHandler = async (
   try {
     const input = calculateDamageInputSchema.parse(args);
 
-    const stats = getCalculatedStats(input);
-    const context = prepareCalculationContext(input);
+    // 技の解決処理を追加
+    const resolvedMove = resolveMove(input.move);
+    const inputWithResolvedMove = {
+      ...input,
+      move: resolvedMove,
+    };
+
+    const stats = getCalculatedStats(inputWithResolvedMove);
+    const context = prepareCalculationContext(inputWithResolvedMove);
 
     const damages = calculateNormalDamage(
-      input,
+      inputWithResolvedMove,
       stats.attackStat,
       stats.defenseStat,
     );

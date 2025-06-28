@@ -3,7 +3,7 @@ import { calculateDamageMatrixVaryingAttackInputSchema } from "./damageMatrixVar
 
 describe("calculateDamageMatrixVaryingAttackInputSchema", () => {
   describe("moveスキーマ", () => {
-    it("わざ名からわざ情報に変換される", () => {
+    it("わざ名を文字列として受け取れる", () => {
       const input = {
         move: "かえんほうしゃ",
         attacker: {
@@ -17,12 +17,7 @@ describe("calculateDamageMatrixVaryingAttackInputSchema", () => {
       };
 
       const result = calculateDamageMatrixVaryingAttackInputSchema.parse(input);
-      expect(result.move).toEqual({
-        name: "かえんほうしゃ",
-        type: "ほのお",
-        power: 95,
-        isPhysical: false,
-      });
+      expect(result.move).toEqual("かえんほうしゃ");
     });
 
     it("わざオブジェクトを直接指定できる", () => {
@@ -45,8 +40,6 @@ describe("calculateDamageMatrixVaryingAttackInputSchema", () => {
       expect(result.move).toEqual({
         type: "みず",
         power: 110,
-        isPhysical: false,
-        name: undefined,
       });
     });
 
@@ -77,7 +70,9 @@ describe("calculateDamageMatrixVaryingAttackInputSchema", () => {
 
         const result =
           calculateDamageMatrixVaryingAttackInputSchema.parse(input);
-        expect(result.move.isPhysical).toBe(false);
+        // スキーマではisPhysicalを判定しないので、moveオブジェクトにはisPhysicalは含まれない
+        expect(result.move).toHaveProperty("type", type);
+        expect(result.move).toHaveProperty("power", 80);
       });
     });
   });
@@ -285,7 +280,7 @@ describe("calculateDamageMatrixVaryingAttackInputSchema", () => {
   });
 
   describe("エラーケース", () => {
-    it("存在しないわざ名でエラーになる", () => {
+    it("存在しないわざ名でもスキーマではエラーにならない", () => {
       const input = {
         move: "存在しないわざ",
         attacker: {
@@ -298,9 +293,9 @@ describe("calculateDamageMatrixVaryingAttackInputSchema", () => {
         },
       };
 
-      expect(() => {
-        calculateDamageMatrixVaryingAttackInputSchema.parse(input);
-      }).toThrow("わざ「存在しないわざ」が見つかりません");
+      // スキーマではエラーにならず、文字列として受け取る
+      const result = calculateDamageMatrixVaryingAttackInputSchema.parse(input);
+      expect(result.move).toEqual("存在しないわざ");
     });
 
     it("存在しないポケモン名でエラーになる", () => {

@@ -3,7 +3,7 @@ import { calculateDamageMatrixVaryingDefenseInputSchema } from "./damageMatrixVa
 
 describe("calculateDamageMatrixVaryingDefenseInputSchema", () => {
   describe("moveスキーマ", () => {
-    it("わざ名からわざ情報に変換される", () => {
+    it("わざ名を文字列として受け取れる", () => {
       const input = {
         move: "10まんボルト",
         attacker: {
@@ -18,12 +18,7 @@ describe("calculateDamageMatrixVaryingDefenseInputSchema", () => {
 
       const result =
         calculateDamageMatrixVaryingDefenseInputSchema.parse(input);
-      expect(result.move).toEqual({
-        name: "10まんボルト",
-        type: "でんき",
-        power: 95,
-        isPhysical: false,
-      });
+      expect(result.move).toEqual("10まんボルト");
     });
 
     it("わざオブジェクトを直接指定できる", () => {
@@ -47,8 +42,6 @@ describe("calculateDamageMatrixVaryingDefenseInputSchema", () => {
       expect(result.move).toEqual({
         type: "ほのお",
         power: 120,
-        isPhysical: false,
-        name: undefined,
       });
     });
 
@@ -78,7 +71,9 @@ describe("calculateDamageMatrixVaryingDefenseInputSchema", () => {
 
         const result =
           calculateDamageMatrixVaryingDefenseInputSchema.parse(input);
-        expect(result.move.isPhysical).toBe(true);
+        // スキーマではisPhysicalを判定しないので、moveオブジェクトにはisPhysicalは含まれない
+        expect(result.move).toHaveProperty("type", type);
+        expect(result.move).toHaveProperty("power", 80);
       });
     });
   });
@@ -272,7 +267,7 @@ describe("calculateDamageMatrixVaryingDefenseInputSchema", () => {
   });
 
   describe("エラーケース", () => {
-    it("存在しないわざ名でエラーになる", () => {
+    it("存在しないわざ名でもスキーマではエラーにならない", () => {
       const input = {
         move: "存在しないわざ",
         attacker: {
@@ -285,9 +280,10 @@ describe("calculateDamageMatrixVaryingDefenseInputSchema", () => {
         },
       };
 
-      expect(() => {
+      // スキーマではエラーにならず、文字列として受け取る
+      const result =
         calculateDamageMatrixVaryingDefenseInputSchema.parse(input);
-      }).toThrow("わざ「存在しないわざ」が見つかりません");
+      expect(result.move).toEqual("存在しないわざ");
     });
 
     it("努力値が範囲外でエラーになる", () => {
