@@ -180,7 +180,7 @@ describe("calculateDamageCore", () => {
       attacker: {
         level: 50,
         attackStat: 100,
-        ability: { name: "げきりゅう" },
+        ability: { name: "げきりゅう", description: "" },
         abilityActive: true,
       },
       defender: {
@@ -205,13 +205,13 @@ describe("calculateDamageCore", () => {
         level: 50,
         attackStat: 100,
         types: ["みず"],
-        ability: { name: "げきりゅう" },
+        ability: { name: "げきりゅう", description: "" },
         abilityActive: true,
       },
       defender: {
         defenseStat: 100,
         types: ["ほのお"],
-        ability: { name: "あついしぼう" },
+        ability: { name: "あついしぼう", description: "" },
         abilityActive: false,
       },
       options: {

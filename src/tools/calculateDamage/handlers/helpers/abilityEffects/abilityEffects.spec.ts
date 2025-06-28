@@ -7,7 +7,7 @@ describe("applyAbilityEffects", () => {
       damage: 100,
       moveType: "じめん",
       attackerAbility: undefined,
-      defenderAbility: "ふゆう",
+      defenderAbility: { name: "ふゆう", description: "" },
     });
     expect(result).toBe(0);
   });
@@ -16,7 +16,7 @@ describe("applyAbilityEffects", () => {
     const result = applyAbilityEffects({
       damage: 100,
       moveType: "ノーマル",
-      attackerAbility: "ちからもち",
+      attackerAbility: { name: "ちからもち", description: "" },
       defenderAbility: undefined,
       isPhysical: true,
     });
@@ -27,7 +27,7 @@ describe("applyAbilityEffects", () => {
     const result = applyAbilityEffects({
       damage: 100,
       moveType: "ノーマル",
-      attackerAbility: "ヨガパワー",
+      attackerAbility: { name: "ヨガパワー", description: "" },
       defenderAbility: undefined,
       isPhysical: true,
     });
@@ -38,7 +38,7 @@ describe("applyAbilityEffects", () => {
     const result = applyAbilityEffects({
       damage: 100,
       moveType: "ノーマル",
-      attackerAbility: "はりきり",
+      attackerAbility: { name: "はりきり", description: "" },
       defenderAbility: undefined,
       isPhysical: true,
     });
@@ -49,7 +49,7 @@ describe("applyAbilityEffects", () => {
     const result = applyAbilityEffects({
       damage: 100,
       moveType: "エスパー",
-      attackerAbility: "ちからもち",
+      attackerAbility: { name: "ちからもち", description: "" },
       defenderAbility: undefined,
       isPhysical: false,
     });
@@ -61,7 +61,7 @@ describe("applyAbilityEffects", () => {
       damage: 100,
       moveType: "でんき",
       attackerAbility: undefined,
-      defenderAbility: "ふゆう",
+      defenderAbility: { name: "ふゆう", description: "" },
     });
     expect(result).toBe(100);
   });
@@ -71,7 +71,7 @@ describe("applyAbilityEffects", () => {
       damage: 50,
       moveType: "ノーマル",
       attackerAbility: undefined,
-      defenderAbility: "ふしぎなまもり",
+      defenderAbility: { name: "ふしぎなまもり", description: "" },
       typeEffectiveness: 1,
     });
     expect(result).toBe(0);
@@ -82,7 +82,7 @@ describe("applyAbilityEffects", () => {
       damage: 100,
       moveType: "いわ",
       attackerAbility: undefined,
-      defenderAbility: "ふしぎなまもり",
+      defenderAbility: { name: "ふしぎなまもり", description: "" },
       typeEffectiveness: 2,
     });
     expect(result).toBe(100);
@@ -114,7 +114,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "ほのお",
-          attackerAbility: "もうか",
+          attackerAbility: { name: "もうか", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
         });
@@ -125,7 +125,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "みず",
-          attackerAbility: "もうか",
+          attackerAbility: { name: "もうか", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
         });
@@ -136,7 +136,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "ほのお",
-          attackerAbility: "もうか",
+          attackerAbility: { name: "もうか", description: "" },
           attackerAbilityActive: false,
           defenderAbility: undefined,
         });
@@ -149,7 +149,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "みず",
-          attackerAbility: "げきりゅう",
+          attackerAbility: { name: "げきりゅう", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
         });
@@ -162,7 +162,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "くさ",
-          attackerAbility: "しんりょく",
+          attackerAbility: { name: "しんりょく", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
         });
@@ -175,7 +175,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "むし",
-          attackerAbility: "むしのしらせ",
+          attackerAbility: { name: "むしのしらせ", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
         });
@@ -188,7 +188,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "ノーマル",
-          attackerAbility: "こんじょう",
+          attackerAbility: { name: "こんじょう", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
           isPhysical: true,
@@ -200,7 +200,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "エスパー",
-          attackerAbility: "こんじょう",
+          attackerAbility: { name: "こんじょう", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
           isPhysical: false,
@@ -215,7 +215,7 @@ describe("applyAbilityEffects", () => {
           damage: 150,
           moveType: "ノーマル",
           attackerAbility: undefined,
-          defenderAbility: "ふしぎなうろこ",
+          defenderAbility: { name: "ふしぎなうろこ", description: "" },
           defenderAbilityActive: true,
           isPhysical: true,
         });
@@ -227,7 +227,7 @@ describe("applyAbilityEffects", () => {
           damage: 100,
           moveType: "エスパー",
           attackerAbility: undefined,
-          defenderAbility: "ふしぎなうろこ",
+          defenderAbility: { name: "ふしぎなうろこ", description: "" },
           defenderAbilityActive: true,
           isPhysical: false,
         });
@@ -240,7 +240,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "でんき",
-          attackerAbility: "プラス",
+          attackerAbility: { name: "プラス", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
           isPhysical: false,
@@ -252,7 +252,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "でんき",
-          attackerAbility: "マイナス",
+          attackerAbility: { name: "マイナス", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
           isPhysical: false,
@@ -264,7 +264,7 @@ describe("applyAbilityEffects", () => {
         const result = applyAbilityEffects({
           damage: 100,
           moveType: "ノーマル",
-          attackerAbility: "プラス",
+          attackerAbility: { name: "プラス", description: "" },
           attackerAbilityActive: true,
           defenderAbility: undefined,
           isPhysical: true,

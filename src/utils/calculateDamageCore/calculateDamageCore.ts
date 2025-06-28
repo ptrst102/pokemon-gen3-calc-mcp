@@ -1,3 +1,4 @@
+import type { Ability } from "@/data/abilities";
 import { applyAbilityEffects } from "@/tools/calculateDamage/handlers/helpers/abilityEffects";
 import { calculateBaseDamage } from "@/tools/calculateDamage/handlers/helpers/calculateBaseDamage";
 import { getDamageRanges } from "@/tools/calculateDamage/handlers/helpers/damageRanges";
@@ -16,13 +17,13 @@ export interface DamageCoreParams {
     level: number;
     attackStat: number;
     types?: TypeName[];
-    ability?: { name?: string };
+    ability?: Ability;
     abilityActive?: boolean;
   };
   defender: {
     defenseStat: number;
     types: TypeName[];
-    ability?: { name?: string };
+    ability?: Ability;
     abilityActive?: boolean;
   };
   options: {
@@ -119,9 +120,9 @@ export const calculateDamageCore = (params: DamageCoreParams): number[] => {
   const abilityAdjustedDamage = applyAbilityEffects({
     damage: sportAdjustedDamage,
     moveType: move.type,
-    attackerAbility: attacker.ability?.name,
+    attackerAbility: attacker.ability,
     attackerAbilityActive: attacker.abilityActive,
-    defenderAbility: defender.ability?.name,
+    defenderAbility: defender.ability,
     defenderAbilityActive: defender.abilityActive,
     typeEffectiveness,
     isPhysical: move.isPhysical,

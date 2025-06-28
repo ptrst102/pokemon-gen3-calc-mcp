@@ -263,7 +263,7 @@ describe("calculateDamageWithContext", () => {
         attacker: {
           level: 50,
           statModifier: 0,
-          ability: { name: "げきりゅう" },
+          ability: { name: "げきりゅう", description: "" },
           abilityActive: true,
         },
         defender: {
