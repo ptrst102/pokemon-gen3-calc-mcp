@@ -17,12 +17,14 @@ describe("calculateDamageWithContext", () => {
           level: 50,
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["ノーマル"],
           },
         },
         defender: {
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["ノーマル"],
           },
         },
@@ -52,6 +54,7 @@ describe("calculateDamageWithContext", () => {
         defender: {
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["ノーマル"],
           },
         },
@@ -82,6 +85,7 @@ describe("calculateDamageWithContext", () => {
         defender: {
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["みず"],
           },
         },
@@ -112,6 +116,7 @@ describe("calculateDamageWithContext", () => {
         defender: {
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["ノーマル"],
           },
         },
@@ -141,12 +146,14 @@ describe("calculateDamageWithContext", () => {
             level: 50,
             statModifier: 0,
             pokemon: {
+              name: "ポケモン",
               types: ["ノーマル"],
             },
           },
           defender: {
             statModifier: 0,
             pokemon: {
+              name: "ポケモン",
               types: ["いわ"],
             },
           },
@@ -175,6 +182,7 @@ describe("calculateDamageWithContext", () => {
           defender: {
             statModifier: 0,
             pokemon: {
+              name: "ポケモン",
               types: ["ノーマル"],
             },
           },
@@ -205,6 +213,7 @@ describe("calculateDamageWithContext", () => {
           defender: {
             statModifier: 0,
             pokemon: {
+              name: "カビゴン",
               types: ["ノーマル"],
               weightkg: 460.0, // カビゴンの体重
             },
@@ -231,12 +240,14 @@ describe("calculateDamageWithContext", () => {
           level: 50,
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["みず"],
           },
         },
         defender: {
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["ほのお"],
           },
         },
@@ -269,6 +280,7 @@ describe("calculateDamageWithContext", () => {
         defender: {
           statModifier: 0,
           pokemon: {
+            name: "ポケモン",
             types: ["ほのお"],
           },
         },

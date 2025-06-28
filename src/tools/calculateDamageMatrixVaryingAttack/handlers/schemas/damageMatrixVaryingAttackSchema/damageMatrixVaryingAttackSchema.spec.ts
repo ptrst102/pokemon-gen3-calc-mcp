@@ -221,7 +221,7 @@ describe("calculateDamageMatrixVaryingAttackInputSchema", () => {
       };
 
       const result = calculateDamageMatrixVaryingAttackInputSchema.parse(input);
-      expect(result.defender.pokemonName).toBeUndefined();
+      expect(result.defender.pokemon).toBeUndefined();
     });
   });
 
