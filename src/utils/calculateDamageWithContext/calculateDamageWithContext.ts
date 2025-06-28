@@ -1,3 +1,4 @@
+import type { Ability } from "@/data/abilities";
 import { calculateItemEffects } from "@/tools/calculateDamage/handlers/helpers/itemEffects";
 import { getStatModifierRatio } from "@/tools/calculateDamage/handlers/helpers/statModifier";
 import type { TypeName } from "@/types";
@@ -17,7 +18,7 @@ export interface DamageCalculationParams {
     level: number;
     statModifier: number;
     pokemon?: { types?: TypeName[] };
-    ability?: { name?: string };
+    ability?: Ability;
     abilityActive?: boolean;
     item?: { name?: string };
     pokemonName?: string;
@@ -25,7 +26,7 @@ export interface DamageCalculationParams {
   defender: {
     statModifier: number;
     pokemon?: { types?: TypeName[]; weightkg?: number };
-    ability?: { name?: string };
+    ability?: Ability;
     abilityActive?: boolean;
     item?: { name?: string };
     pokemonName?: string;

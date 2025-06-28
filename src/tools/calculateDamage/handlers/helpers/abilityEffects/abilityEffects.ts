@@ -1,10 +1,11 @@
+import type { Ability } from "@/data/abilities";
 import type { TypeName } from "@/types";
 
 interface ApplyAbilityEffectsParams {
   damage: number;
   moveType: TypeName;
-  attackerAbility?: string;
-  defenderAbility?: string;
+  attackerAbility?: Ability;
+  defenderAbility?: Ability;
   attackerAbilityActive?: boolean;
   defenderAbilityActive?: boolean;
   typeEffectiveness?: number;
@@ -27,12 +28,12 @@ export const applyAbilityEffects = (
 
   // 防御側とくせいによる無効化チェック（早期return）
   if (defenderAbility) {
-    if (defenderAbility === "ふゆう" && moveType === "じめん") {
+    if (defenderAbility.name === "ふゆう" && moveType === "じめん") {
       return 0;
     }
 
     if (
-      defenderAbility === "ふしぎなまもり" &&
+      defenderAbility.name === "ふしぎなまもり" &&
       typeEffectiveness !== undefined &&
       typeEffectiveness <= 1
     ) {
@@ -49,14 +50,14 @@ export const applyAbilityEffects = (
     // 常時発動とくせい
     const constantAbilityDamage = (() => {
       if (
-        (attackerAbility === "ちからもち" ||
-          attackerAbility === "ヨガパワー") &&
+        (attackerAbility.name === "ちからもち" ||
+          attackerAbility.name === "ヨガパワー") &&
         isPhysical
       ) {
         return Math.floor(damage * 2);
       }
 
-      if (attackerAbility === "はりきり" && isPhysical) {
+      if (attackerAbility.name === "はりきり" && isPhysical) {
         return Math.floor(damage * 1.5);
       }
 
@@ -70,22 +71,23 @@ export const applyAbilityEffects = (
 
     // HP1/3以下で発動するタイプ強化とくせい
     if (
-      (attackerAbility === "もうか" && moveType === "ほのお") ||
-      (attackerAbility === "げきりゅう" && moveType === "みず") ||
-      (attackerAbility === "しんりょく" && moveType === "くさ") ||
-      (attackerAbility === "むしのしらせ" && moveType === "むし")
+      (attackerAbility.name === "もうか" && moveType === "ほのお") ||
+      (attackerAbility.name === "げきりゅう" && moveType === "みず") ||
+      (attackerAbility.name === "しんりょく" && moveType === "くさ") ||
+      (attackerAbility.name === "むしのしらせ" && moveType === "むし")
     ) {
       return Math.floor(constantAbilityDamage * 1.5);
     }
 
     // こんじょう（状態異常時、物理攻撃1.5倍）
-    if (attackerAbility === "こんじょう" && isPhysical) {
+    if (attackerAbility.name === "こんじょう" && isPhysical) {
       return Math.floor(constantAbilityDamage * 1.5);
     }
 
     // プラス/マイナス（ダブルバトルで相手がプラス/マイナス持ちの時、特殊攻撃1.5倍）
     if (
-      (attackerAbility === "プラス" || attackerAbility === "マイナス") &&
+      (attackerAbility.name === "プラス" ||
+        attackerAbility.name === "マイナス") &&
       !isPhysical
     ) {
       return Math.floor(constantAbilityDamage * 1.5);
@@ -96,7 +98,8 @@ export const applyAbilityEffects = (
 
   // 防御側とくせいによるダメージ軽減
   if (
-    defenderAbility === "ふしぎなうろこ" &&
+    defenderAbility &&
+    defenderAbility.name === "ふしぎなうろこ" &&
     defenderAbilityActive &&
     isPhysical
   ) {

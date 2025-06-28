@@ -152,7 +152,7 @@ const calculateDamageMatrix = (
         level: attacker.level,
         statModifier: attacker.statModifier,
         pokemon: attacker.pokemon,
-        ability: attacker.ability ? { name: attacker.ability.name } : undefined,
+        ability: attacker.ability,
         abilityActive: attacker.abilityActive,
         item: attacker.item ? { name: attacker.item.name } : undefined,
         pokemonName: attacker.pokemonName,
@@ -160,7 +160,7 @@ const calculateDamageMatrix = (
       defender: {
         statModifier: defender.statModifier,
         pokemon: defender.pokemon,
-        ability: defender.ability ? { name: defender.ability.name } : undefined,
+        ability: defender.ability,
         abilityActive: defender.abilityActive,
         item: defender.item ? { name: defender.item.name } : undefined,
         pokemonName: defender.pokemonName,
