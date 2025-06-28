@@ -23,6 +23,7 @@ MCP プロトコルの詳細については、`docs/what-is-MCP.md`を参照し�
    - 天候効果（はれ、あめ）
    - 場の状態（リフレクター、ひかりのかべ、どろあそび、みずあそび）
    - 能力ランク補正（-6〜+6）
+   - 特殊な技の処理（ウェザーボール、けたぐり、じばく・だいばくはつ、ソーラービーム）
 
 3. **攻撃側努力値総当たり計算** (`calculate_damage_matrix_varying_attack`)
    - 防御側の努力値を固定し、攻撃側の努力値を総当たりしてダメージ行列を計算
@@ -31,6 +32,13 @@ MCP プロトコルの詳細については、`docs/what-is-MCP.md`を参照し�
 4. **防御側努力値総当たり計算** (`calculate_damage_matrix_varying_defense`)
    - 攻撃側の努力値を固定し、防御側の努力値を総当たりしてダメージ行列を計算
    - 特定の攻撃を耐えるために必要な防御努力値配分を検討する際に使用
+
+### 特殊な技の処理
+
+- **ウェザーボール**: 天候によってタイプと威力が変化（晴れ→ほのお、雨→みず、霰→こおり、砂嵐→いわ）
+- **けたぐり**: 相手の体重によって威力が変化
+- **じばく・だいばくはつ**: 相手の防御を半分として計算
+- **ソーラービーム**: あめ・すなあらし・あられの場合、威力が半分（60）になる
 
 ## 開発コマンド
 
@@ -62,6 +70,9 @@ npm run build
 
 # スキーマ生成（ZodスキーマからMCP用JSONスキーマを生成）
 npm run schemagen
+
+# 特定ファイルのテスト実行（例）
+npm run test -- src/utils/adjustSpecialMoves/adjustSpecialMoves.spec.ts
 ```
 
 ## コーディング規約
@@ -234,7 +245,9 @@ src/
 │   └── parseResponse.ts    # MCPレスポンスパーサー
 ├── types/                   # 共通型定義
 └── utils/                   # 共通ユーティリティ
-    ├── calculateDamageWithContext/  # ダメージ計算コンテキスト（移動済み）
+    ├── adjustSpecialMoves/ # 特殊な技の処理（ウェザーボール、けたぐり、ソーラービーム）
+    ├── calculateDamageCore/  # ダメージ計算コアロジック
+    ├── calculateDamageWithContext/  # ダメージ計算コンテキスト
     ├── calculateHp/        # HP計算
     ├── calculateStat/      # ステータス計算
     ├── error/              # エラーハンドリング（共通化）
@@ -242,7 +255,8 @@ src/
     │   ├── formatZodError.ts
     │   └── index.ts
     ├── getTypeEffectivenessText/  # タイプ相性テキスト
-    └── natureModifier/     # せいかく補正
+    ├── natureModifier/     # せいかく補正
+    └── parseResponse/      # MCPレスポンスパーサー
 ```
 
 ### 開発パターン
@@ -265,10 +279,12 @@ src/
 
    - 各モジュールに対応する`.spec.ts`ファイル
    - Vitest による高速なユニットテスト
+   - 結合テスト（`*.integration.spec.ts`）で実際のMCPサーバーへのリクエストを検証
 
 4. **モジュール設計**:
    - 単一責任の原則に従った小さなモジュール
    - index.ts による明確なパブリック API
+   - 共通ロジックのユーティリティへの切り出し（`adjustSpecialMoves`、`calculateDamageCore`など）
 
 5. **エラーハンドリング**:
    - 共通のエラーハンドリングユーティリティ（`utils/error/`）
