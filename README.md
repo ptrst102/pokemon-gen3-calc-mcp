@@ -159,6 +159,13 @@ npm run test -- --watch         # ウォッチモードでテスト実行
 npm run test -- src/tools/calculateDamage  # 特定ディレクトリのテスト
 npm run test -- src/utils/adjustSpecialMoves/adjustSpecialMoves.spec.ts  # 特定ファイルのテスト
 
+# テストカバレッジ測定
+npm run test:coverage           # カバレッジ付きでテスト実行
+# カバレッジレポート：
+# - コンソールに概要が表示されます
+# - HTMLレポートは coverage/index.html で確認できます
+# - 現在のカバレッジ率: 98.75%
+
 # リント・フォーマット
 npm run lint    # チェックのみ
 npm run format  # 自動修正
