@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ItemName } from "@/data/items";
+import type { Item } from "@/data/items";
 import type { TypeName } from "@/types";
 import { calculateItemEffects } from "./itemEffects";
 
@@ -26,7 +26,7 @@ describe("calculateItemEffects", () => {
   describe("タイプ強化アイテム", () => {
     it("もくたん: ほのおタイプの物理技で攻撃1.1倍", () => {
       const result = calculateItemEffects(
-        "もくたん",
+        { name: "もくたん", description: "" },
         "リザードン",
         "ほのお",
         true,
@@ -43,7 +43,7 @@ describe("calculateItemEffects", () => {
 
     it("もくたん: ほのおタイプの特殊技で特攻1.1倍", () => {
       const result = calculateItemEffects(
-        "もくたん",
+        { name: "もくたん", description: "" },
         "リザードン",
         "ほのお",
         false,
@@ -57,7 +57,7 @@ describe("calculateItemEffects", () => {
 
     it("しんぴのしずく: みずタイプの技で効果発動", () => {
       const result = calculateItemEffects(
-        "しんぴのしずく",
+        { name: "しんぴのしずく", description: "" },
         "カメックス",
         "みず",
         false,
@@ -70,7 +70,7 @@ describe("calculateItemEffects", () => {
 
     it("タイプ不一致の場合は効果なし", () => {
       const result = calculateItemEffects(
-        "もくたん",
+        { name: "もくたん", description: "" },
         "フシギダネ",
         "くさ",
         true,
@@ -86,7 +86,7 @@ describe("calculateItemEffects", () => {
   describe("特殊効果アイテム", () => {
     it("こだわりハチマキ: 攻撃1.5倍、技固定", () => {
       const result = calculateItemEffects(
-        "こだわりハチマキ",
+        { name: "こだわりハチマキ", description: "" },
         "リザードン",
         "ドラゴン",
         true,
@@ -97,7 +97,7 @@ describe("calculateItemEffects", () => {
 
     it("でんきだま: ピカチュウの特攻2倍", () => {
       const result = calculateItemEffects(
-        "でんきだま",
+        { name: "でんきだま", description: "" },
         "ピカチュウ",
         "でんき",
         false,
@@ -110,7 +110,7 @@ describe("calculateItemEffects", () => {
 
     it("でんきだま: ピカチュウ以外には効果なし", () => {
       const result = calculateItemEffects(
-        "でんきだま",
+        { name: "でんきだま", description: "" },
         "ライチュウ",
         "でんき",
         false,
@@ -123,7 +123,7 @@ describe("calculateItemEffects", () => {
 
     it("ふといホネ: カラカラの攻撃2倍", () => {
       const result = calculateItemEffects(
-        "ふといホネ",
+        { name: "ふといホネ", description: "" },
         "カラカラ",
         "じめん",
         true,
@@ -133,7 +133,7 @@ describe("calculateItemEffects", () => {
 
     it("ふといホネ: ガラガラの攻撃2倍", () => {
       const result = calculateItemEffects(
-        "ふといホネ",
+        { name: "ふといホネ", description: "" },
         "ガラガラ",
         "じめん",
         true,
@@ -143,7 +143,7 @@ describe("calculateItemEffects", () => {
 
     it("しんかいのキバ: パールルの特攻2倍", () => {
       const result = calculateItemEffects(
-        "しんかいのキバ",
+        { name: "しんかいのキバ", description: "" },
         "パールル",
         "みず",
         false,
@@ -156,7 +156,7 @@ describe("calculateItemEffects", () => {
 
     it("こころのしずく: ラティオスの特攻1.5倍", () => {
       const result = calculateItemEffects(
-        "こころのしずく",
+        { name: "こころのしずく", description: "" },
         "ラティオス",
         "エスパー",
         false,
@@ -169,7 +169,7 @@ describe("calculateItemEffects", () => {
 
     it("こころのしずく: ラティアスの特攻1.5倍", () => {
       const result = calculateItemEffects(
-        "こころのしずく",
+        { name: "こころのしずく", description: "" },
         "ラティアス",
         "エスパー",
         false,
@@ -184,7 +184,7 @@ describe("calculateItemEffects", () => {
   describe("防御系アイテム", () => {
     it("メタルパウダー: メタモンの防御2倍", () => {
       const result = calculateItemEffects(
-        "メタルパウダー",
+        { name: "メタルパウダー", description: "" },
         "メタモン",
         "ノーマル",
         true,
@@ -197,7 +197,7 @@ describe("calculateItemEffects", () => {
 
     it("メタルパウダー: メタモン以外には効果なし", () => {
       const result = calculateItemEffects(
-        "メタルパウダー",
+        { name: "メタルパウダー", description: "" },
         "ピカチュウ",
         "でんき",
         true,
@@ -210,7 +210,7 @@ describe("calculateItemEffects", () => {
 
     it("しんかいのウロコ: パールルの特防2倍", () => {
       const result = calculateItemEffects(
-        "しんかいのウロコ",
+        { name: "しんかいのウロコ", description: "" },
         "パールル",
         "みず",
         false,
@@ -223,7 +223,7 @@ describe("calculateItemEffects", () => {
 
     it("しんかいのウロコ: パールル以外には効果なし", () => {
       const result = calculateItemEffects(
-        "しんかいのウロコ",
+        { name: "しんかいのウロコ", description: "" },
         "ハンテール",
         "みず",
         false,
@@ -236,7 +236,7 @@ describe("calculateItemEffects", () => {
 
     it("こころのしずく: ラティオスの特攻と特防1.5倍", () => {
       const result = calculateItemEffects(
-        "こころのしずく",
+        { name: "こころのしずく", description: "" },
         "ラティオス",
         "エスパー",
         false,
@@ -253,7 +253,7 @@ describe("calculateItemEffects", () => {
 
     it("こころのしずく: ラティアスの特攻と特防1.5倍", () => {
       const result = calculateItemEffects(
-        "こころのしずく",
+        { name: "こころのしずく", description: "" },
         "ラティアス",
         "ドラゴン",
         false,
@@ -270,26 +270,26 @@ describe("calculateItemEffects", () => {
   });
 
   describe("複数のタイプ強化アイテムのテスト", () => {
-    const typeItems: Array<{ item: ItemName; type: TypeName }> = [
-      { item: "きせきのタネ", type: "くさ" },
-      { item: "じしゃく", type: "でんき" },
-      { item: "とけないこおり", type: "こおり" },
-      { item: "どくバリ", type: "どく" },
-      { item: "やわらかいすな", type: "じめん" },
-      { item: "かたいいし", type: "いわ" },
-      { item: "ぎんのこな", type: "むし" },
-      { item: "のろいのおふだ", type: "ゴースト" },
-      { item: "りゅうのキバ", type: "ドラゴン" },
-      { item: "くろいメガネ", type: "あく" },
-      { item: "メタルコート", type: "はがね" },
-      { item: "シルクのスカーフ", type: "ノーマル" },
-      { item: "くろおび", type: "かくとう" },
-      { item: "するどいくちばし", type: "ひこう" },
-      { item: "まがったスプーン", type: "エスパー" },
+    const typeItems: Array<{ item: Item; type: TypeName }> = [
+      { item: { name: "きせきのタネ", description: "" }, type: "くさ" },
+      { item: { name: "じしゃく", description: "" }, type: "でんき" },
+      { item: { name: "とけないこおり", description: "" }, type: "こおり" },
+      { item: { name: "どくバリ", description: "" }, type: "どく" },
+      { item: { name: "やわらかいすな", description: "" }, type: "じめん" },
+      { item: { name: "かたいいし", description: "" }, type: "いわ" },
+      { item: { name: "ぎんのこな", description: "" }, type: "むし" },
+      { item: { name: "のろいのおふだ", description: "" }, type: "ゴースト" },
+      { item: { name: "りゅうのキバ", description: "" }, type: "ドラゴン" },
+      { item: { name: "くろいメガネ", description: "" }, type: "あく" },
+      { item: { name: "メタルコート", description: "" }, type: "はがね" },
+      { item: { name: "シルクのスカーフ", description: "" }, type: "ノーマル" },
+      { item: { name: "くろおび", description: "" }, type: "かくとう" },
+      { item: { name: "するどいくちばし", description: "" }, type: "ひこう" },
+      { item: { name: "まがったスプーン", description: "" }, type: "エスパー" },
     ];
 
     typeItems.forEach(({ item, type }) => {
-      it(`${item}: ${type}タイプの物理技で攻撃1.1倍`, () => {
+      it(`${item.name}: ${type}タイプの物理技で攻撃1.1倍`, () => {
         const result = calculateItemEffects(item, undefined, type, true);
         expect(result.attackMultiplier).toEqual({
           numerator: 11,
@@ -297,7 +297,7 @@ describe("calculateItemEffects", () => {
         });
       });
 
-      it(`${item}: ${type}タイプの特殊技で特攻1.1倍`, () => {
+      it(`${item.name}: ${type}タイプの特殊技で特攻1.1倍`, () => {
         const result = calculateItemEffects(item, undefined, type, false);
         expect(result.specialAttackMultiplier).toEqual({
           numerator: 11,

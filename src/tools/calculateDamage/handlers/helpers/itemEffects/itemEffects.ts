@@ -1,3 +1,4 @@
+import type { Item } from "@/data/items";
 import type { TypeName } from "@/types";
 
 export interface ItemEffectResult {
@@ -10,7 +11,7 @@ export interface ItemEffectResult {
 }
 
 export const calculateItemEffects = (
-  item: string | undefined,
+  item: Item | undefined,
   pokemonName: string | undefined,
   moveType: TypeName,
   isPhysical: boolean,
@@ -48,7 +49,7 @@ export const calculateItemEffects = (
     まがったスプーン: "エスパー",
   };
 
-  const enhancedType = typeEnhancingItems[item];
+  const enhancedType = item.name ? typeEnhancingItems[item.name] : undefined;
   if (enhancedType && enhancedType === moveType) {
     if (isPhysical) {
       return {
@@ -63,7 +64,7 @@ export const calculateItemEffects = (
     }
   }
 
-  switch (item) {
+  switch (item.name) {
     case "こだわりハチマキ":
       return {
         ...defaultResult,

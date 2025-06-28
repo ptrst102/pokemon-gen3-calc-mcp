@@ -1,5 +1,5 @@
 import type { Ability } from "@/data/abilities";
-import type { Item, ItemName } from "@/data/items";
+import type { Item } from "@/data/items";
 import type { CalculateDamageInput } from "@/tools/calculateDamage/handlers/schemas/damageSchema";
 import type { DamageOptions } from "@/tools/calculateDamage/types";
 import type { TypeName } from "@/types";
@@ -48,14 +48,14 @@ const calculateDamageInternal = (params: InternalDamageParams): number[] => {
   const { move, attacker, defender, options } = params;
 
   const attackerItemEffects = calculateItemEffects(
-    attacker.item?.name as ItemName | undefined,
+    attacker.item,
     attacker.pokemonName,
     move.type,
     move.isPhysical,
   );
 
   const defenderItemEffects = calculateItemEffects(
-    defender.item?.name as ItemName | undefined,
+    defender.item,
     defender.pokemonName,
     move.type,
     move.isPhysical,
