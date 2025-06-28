@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "typescript": {
+    "lsmcp": {
       "command": "npx",
-      "args": ["-y", "@mizchi/lsmcp", "--language=typescript"]
+      "args": ["-y", "@mizchi/lsmcp", "--language", "typescript"]
     }
   }
 }
