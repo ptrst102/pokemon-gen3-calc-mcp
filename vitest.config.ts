@@ -7,6 +7,19 @@ export default defineConfig({
     environment: "node",
     includeSource: ["src/**/*.ts"],
     include: ["src/**/*.{spec,test}.ts"],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'scripts/',
+        'src/tools/*/generated/',
+        '**/*.spec.ts',
+        '**/*.test.ts',
+        '**/index.ts',
+      ],
+    },
   },
   resolve: {
     alias: {
