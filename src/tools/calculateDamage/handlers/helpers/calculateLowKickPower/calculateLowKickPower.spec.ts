@@ -16,19 +16,19 @@ describe("calculateLowKickPower", () => {
     // 10kg境界
     expect(calculateLowKickPower(10.0)).toBe(20);
     expect(calculateLowKickPower(10.1)).toBe(40);
-    
+
     // 25kg境界
     expect(calculateLowKickPower(25.0)).toBe(40);
     expect(calculateLowKickPower(25.1)).toBe(60);
-    
+
     // 50kg境界
     expect(calculateLowKickPower(50.0)).toBe(60);
     expect(calculateLowKickPower(50.1)).toBe(80);
-    
+
     // 100kg境界
     expect(calculateLowKickPower(100.0)).toBe(80);
     expect(calculateLowKickPower(100.1)).toBe(100);
-    
+
     // 200kg境界
     expect(calculateLowKickPower(200.0)).toBe(100);
     expect(calculateLowKickPower(200.1)).toBe(120);
