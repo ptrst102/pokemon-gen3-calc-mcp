@@ -15,16 +15,16 @@ export const formatZodError = (error: ZodError): string => {
         return `「${path}」は${issue.expected}型である必要があります（現在: ${issue.received}型）`;
 
       case "invalid_union": {
-        // Unionタイプの検証失敗時は、最初の失敗理由から必須フィールドエラーを判定
-        const unionErrors = error.errors.filter(
-          (e) => e.path.join(".") === path,
-        );
-        if (
-          unionErrors.some(
-            (e) => e.code === "invalid_type" && e.received === "undefined",
-          )
-        ) {
-          return `「${path}」フィールドが必須です`;
+        // Unionタイプの検証失敗時は、unionErrorsから必須フィールドエラーを判定
+        if ("unionErrors" in issue) {
+          const hasUndefinedError = issue.unionErrors.some((unionError) =>
+            unionError.issues.some(
+              (e) => e.code === "invalid_type" && e.received === "undefined",
+            ),
+          );
+          if (hasUndefinedError) {
+            return `「${path}」フィールドが必須です`;
+          }
         }
 
         // moveフィールドの場合は特別なメッセージを返す
