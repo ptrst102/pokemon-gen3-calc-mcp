@@ -78,6 +78,7 @@ describe("getStatValue", () => {
     it("無効なステータス入力の場合、エラーを投げる", () => {
       expect(() =>
         getStatValue({
+          // biome-ignore lint/suspicious/noExplicitAny: テストのため意図的に無効な型を使用
           stat: {} as any, // 空のオブジェクトは無効
           level: 50,
           statName: "atk",
@@ -91,6 +92,7 @@ describe("getStatValue", () => {
           stat: {
             iv: 31,
             // evが指定されていない
+            // biome-ignore lint/suspicious/noExplicitAny: テストのため意図的に不完全な型を使用
           } as any,
           level: 50,
           statName: "atk",
