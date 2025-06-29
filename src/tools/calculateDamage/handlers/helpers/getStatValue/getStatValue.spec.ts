@@ -72,7 +72,7 @@ describe("getStatValue", () => {
           statName: "atk",
           pokemonName: "存在しないポケモン",
         }),
-      ).toThrowError('ポケモン「存在しないポケモン」が見つかりません');
+      ).toThrowError("ポケモン「存在しないポケモン」が見つかりません");
     });
 
     it("無効なステータス入力の場合、エラーを投げる", () => {

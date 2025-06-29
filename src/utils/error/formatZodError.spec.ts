@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { z, ZodError } from "zod";
+import { ZodError, z } from "zod";
 import { formatZodError } from "./formatZodError";
 
 describe("formatZodError", () => {
@@ -9,7 +9,9 @@ describe("formatZodError", () => {
       z.object({ name: z.string() }).parse({});
     } catch (error) {
       if (error instanceof ZodError) {
-        expect(formatZodError(error)).toBe("入力エラー:\n「name」フィールドが必須です");
+        expect(formatZodError(error)).toBe(
+          "入力エラー:\n「name」フィールドが必須です",
+        );
       }
     }
 
@@ -18,7 +20,9 @@ describe("formatZodError", () => {
       z.object({ age: z.number() }).parse({ age: "20" });
     } catch (error) {
       if (error instanceof ZodError) {
-        expect(formatZodError(error)).toBe("入力エラー:\n「age」はnumber型である必要があります（現在: string型）");
+        expect(formatZodError(error)).toBe(
+          "入力エラー:\n「age」はnumber型である必要があります（現在: string型）",
+        );
       }
     }
 
@@ -27,22 +31,27 @@ describe("formatZodError", () => {
       z.object({ level: z.number().min(1) }).parse({ level: 0 });
     } catch (error) {
       if (error instanceof ZodError) {
-        expect(formatZodError(error)).toBe("入力エラー:\n「level」は1以上である必要があります");
+        expect(formatZodError(error)).toBe(
+          "入力エラー:\n「level」は1以上である必要があります",
+        );
       }
     }
   });
 
   it("union型のmoveフィールドで特別なメッセージを表示する", () => {
     const schema = z.object({
-      move: z.union([z.string(), z.object({ type: z.string(), power: z.number() })]),
+      move: z.union([
+        z.string(),
+        z.object({ type: z.string(), power: z.number() }),
+      ]),
     });
-    
+
     try {
       schema.parse({ move: true });
     } catch (error) {
       if (error instanceof ZodError) {
         expect(formatZodError(error)).toBe(
-          '入力エラー:\n「move」は文字列（わざ名）または { type: "タイプ名", power: 威力 } の形式で指定してください'
+          '入力エラー:\n「move」は文字列（わざ名）または { type: "タイプ名", power: 威力 } の形式で指定してください',
         );
       }
     }
@@ -53,7 +62,9 @@ describe("formatZodError", () => {
       z.object({ value: z.union([z.string(), z.number()]) }).parse({});
     } catch (error) {
       if (error instanceof ZodError) {
-        expect(formatZodError(error)).toBe("入力エラー:\n「value」フィールドが必須です");
+        expect(formatZodError(error)).toBe(
+          "入力エラー:\n「value」フィールドが必須です",
+        );
       }
     }
   });

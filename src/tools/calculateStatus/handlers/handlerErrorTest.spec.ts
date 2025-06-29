@@ -13,7 +13,9 @@ describe("calculateStatusHandler エラーハンドリング", () => {
       evs: { hp: 0, atk: 0, def: 0, spa: 252, spd: 4, spe: 252 },
     });
     const output1 = parseResponse<{ error: string }>(result1);
-    expect(output1.error).toContain("ポケモン「存在しないポケモン」が見つかりません");
+    expect(output1.error).toContain(
+      "ポケモン「存在しないポケモン」が見つかりません",
+    );
 
     // 無効なせいかく
     const result2 = await calculateStatusHandler({
