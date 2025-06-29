@@ -3,6 +3,7 @@ import type { DamageCoreParams } from "./calculateDamageCore";
 import { calculateDamageCore } from "./calculateDamageCore";
 
 describe("calculateDamageCore", () => {
+  describe("基本機能", () => {
   it("基本的なダメージ計算", () => {
     const params: DamageCoreParams = {
       move: {
@@ -194,34 +195,143 @@ describe("calculateDamageCore", () => {
     expect(result[0]).toBe(117); // タイプ相性2倍 × げきりゅう1.5倍
   });
 
-  it("すべての効果を組み合わせた計算", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "みず",
-        power: 100,
-        isPhysical: false,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-        types: ["みず"],
-        ability: { name: "げきりゅう", description: "" },
-        abilityActive: true,
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["ほのお"],
-        ability: { name: "あついしぼう", description: "" },
-        abilityActive: false,
-      },
-      options: {
-        weather: "あめ",
-        lightScreen: false,
-      },
-    };
+    it("すべての効果を組み合わせた計算", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "みず",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+          types: ["みず"],
+          ability: { name: "げきりゅう", description: "" },
+          abilityActive: true,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["ほのお"],
+          ability: { name: "あついしぼう", description: "" },
+          abilityActive: false,
+        },
+        options: {
+          weather: "あめ",
+          lightScreen: false,
+        },
+      };
 
-    const result = calculateDamageCore(params);
-    // タイプ一致1.5倍 × タイプ相性2倍 × 天候1.5倍 × げきりゅう1.5倍
-    expect(result[0]).toBe(263);
+      const result = calculateDamageCore(params);
+      // タイプ一致1.5倍 × タイプ相性2倍 × 天候1.5倍 × げきりゅう1.5倍
+      expect(result[0]).toBe(263);
+    });
+  });
+
+  describe("天候効果の境界ケース", () => {
+    it("あめ天候時にほのおタイプの技のダメージが半減する", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "ほのお",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["くさ"],
+        },
+        options: {
+          weather: "あめ",
+        },
+      };
+
+      const result = calculateDamageCore(params);
+      // タイプ相性2倍 × 天候0.5倍
+      expect(result[0]).toBe(39);
+    });
+  });
+
+  describe("場の効果の境界ケース", () => {
+    it("みずあそび時にほのおタイプの技のダメージが半減する", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "ほのお",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["くさ"],
+        },
+        options: {
+          waterSport: true,
+        },
+      };
+
+      const result = calculateDamageCore(params);
+      // タイプ相性2倍 × みずあそび0.5倍
+      expect(result[0]).toBe(39);
+    });
+
+    it("ひかりのかべが特殊技に効果を発揮する", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "エスパー",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["かくとう"],
+        },
+        options: {
+          lightScreen: true,
+        },
+      };
+
+      const result = calculateDamageCore(params);
+      // タイプ相性2倍 × ひかりのかべ0.5倍
+      expect(result[0]).toBe(39);
+    });
+  });
+
+  describe("最小ダメージ保証", () => {
+    it("計算結果が0以下でも最小1ダメージが保証される", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "ノーマル",
+          power: 1,
+          isPhysical: true,
+        },
+        attacker: {
+          level: 1,
+          attackStat: 1,
+        },
+        defender: {
+          defenseStat: 999,
+          types: ["はがね"],
+          ability: { name: "がんじょう", description: "" },
+          abilityActive: true,
+        },
+        options: {},
+      };
+
+      const result = calculateDamageCore(params);
+      // すべてのダメージが最小1になることを確認
+      result.forEach((damage) => {
+        expect(damage).toBeGreaterThanOrEqual(1);
+      });
+    });
   });
 });

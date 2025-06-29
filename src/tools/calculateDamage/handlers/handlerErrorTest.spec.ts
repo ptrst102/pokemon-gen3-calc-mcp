@@ -21,7 +21,7 @@ describe("calculateDamageHandler エラーハンドリング", () => {
     const result = await calculateDamageHandler(input);
     const output = parseResponse<{ error: string }>(result);
     expect("error" in output && output.error).toContain(
-      '「move」は文字列（わざ名）または { type: "タイプ名", power: 威力 } の形式で指定してください',
+      "「move」フィールドが必須です",
     );
   });
 
