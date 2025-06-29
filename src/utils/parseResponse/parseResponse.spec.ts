@@ -11,18 +11,18 @@ describe("parseResponse", () => {
 
   it("不正な形式でエラーを投げる", () => {
     // textタイプでない場合
-    expect(() => 
-      parseResponse({ content: [{ type: "image", text: "{}" }] })
+    expect(() =>
+      parseResponse({ content: [{ type: "image", text: "{}" }] }),
     ).toThrowError("Unexpected response format");
-    
+
     // 空のcontent
-    expect(() => 
-      parseResponse({ content: [] })
-    ).toThrowError("Unexpected response format");
-    
+    expect(() => parseResponse({ content: [] })).toThrowError(
+      "Unexpected response format",
+    );
+
     // 無効なJSON
-    expect(() => 
-      parseResponse({ content: [{ type: "text", text: "invalid" }] })
+    expect(() =>
+      parseResponse({ content: [{ type: "text", text: "invalid" }] }),
     ).toThrow();
   });
 });

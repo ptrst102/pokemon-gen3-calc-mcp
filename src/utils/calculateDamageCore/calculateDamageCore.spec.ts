@@ -4,196 +4,196 @@ import { calculateDamageCore } from "./calculateDamageCore";
 
 describe("calculateDamageCore", () => {
   describe("基本機能", () => {
-  it("基本的なダメージ計算", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "ノーマル",
-        power: 100,
-        isPhysical: true,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-        types: ["ノーマル"],
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["ノーマル"],
-      },
-      options: {},
-    };
+    it("基本的なダメージ計算", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "ノーマル",
+          power: 100,
+          isPhysical: true,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+          types: ["ノーマル"],
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["ノーマル"],
+        },
+        options: {},
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result).toHaveLength(16);
-    expect(result[0]).toBe(58); // タイプ一致1.5倍
-    expect(result[15]).toBe(69);
-  });
+      const result = calculateDamageCore(params);
+      expect(result).toHaveLength(16);
+      expect(result[0]).toBe(58); // タイプ一致1.5倍
+      expect(result[15]).toBe(69);
+    });
 
-  it("タイプ相性を考慮", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "かくとう",
-        power: 100,
-        isPhysical: true,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["ノーマル"],
-      },
-      options: {},
-    };
+    it("タイプ相性を考慮", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "かくとう",
+          power: 100,
+          isPhysical: true,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["ノーマル"],
+        },
+        options: {},
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result[0]).toBe(78); // タイプ相性2倍
-  });
+      const result = calculateDamageCore(params);
+      expect(result[0]).toBe(78); // タイプ相性2倍
+    });
 
-  it("天候効果を適用", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "ほのお",
-        power: 100,
-        isPhysical: false,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["くさ"],
-      },
-      options: {
-        weather: "はれ",
-      },
-    };
+    it("天候効果を適用", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "ほのお",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["くさ"],
+        },
+        options: {
+          weather: "はれ",
+        },
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result[0]).toBe(117); // タイプ相性2倍 × 天候1.5倍
-  });
+      const result = calculateDamageCore(params);
+      expect(result[0]).toBe(117); // タイプ相性2倍 × 天候1.5倍
+    });
 
-  it("じばく・だいばくはつの防御半減処理", () => {
-    const params: DamageCoreParams = {
-      move: {
-        name: "じばく",
-        type: "ノーマル",
-        power: 200,
-        isPhysical: true,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-        types: ["ノーマル"],
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["いわ"],
-      },
-      options: {},
-    };
+    it("じばく・だいばくはつの防御半減処理", () => {
+      const params: DamageCoreParams = {
+        move: {
+          name: "じばく",
+          type: "ノーマル",
+          power: 200,
+          isPhysical: true,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+          types: ["ノーマル"],
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["いわ"],
+        },
+        options: {},
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result[0]).toBe(113); // 防御半減、タイプ一致1.5倍、タイプ相性0.5倍
-  });
+      const result = calculateDamageCore(params);
+      expect(result[0]).toBe(113); // 防御半減、タイプ一致1.5倍、タイプ相性0.5倍
+    });
 
-  it("じゅうでん効果を適用", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "でんき",
-        power: 100,
-        isPhysical: false,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["みず"],
-      },
-      options: {
-        charge: true,
-      },
-    };
+    it("じゅうでん効果を適用", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "でんき",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["みず"],
+        },
+        options: {
+          charge: true,
+        },
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result[0]).toBe(156); // タイプ相性2倍 × じゅうでん2倍
-  });
+      const result = calculateDamageCore(params);
+      expect(result[0]).toBe(156); // タイプ相性2倍 × じゅうでん2倍
+    });
 
-  it("ひかりのかべ・リフレクター効果を適用", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "かくとう",
-        power: 100,
-        isPhysical: true,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["ノーマル"],
-      },
-      options: {
-        reflect: true,
-      },
-    };
+    it("ひかりのかべ・リフレクター効果を適用", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "かくとう",
+          power: 100,
+          isPhysical: true,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["ノーマル"],
+        },
+        options: {
+          reflect: true,
+        },
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result[0]).toBe(39); // タイプ相性2倍 × リフレクター0.5倍
-  });
+      const result = calculateDamageCore(params);
+      expect(result[0]).toBe(39); // タイプ相性2倍 × リフレクター0.5倍
+    });
 
-  it("どろあそび・みずあそび効果を適用", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "でんき",
-        power: 100,
-        isPhysical: false,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["ノーマル"],
-      },
-      options: {
-        mudSport: true,
-      },
-    };
+    it("どろあそび・みずあそび効果を適用", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "でんき",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["ノーマル"],
+        },
+        options: {
+          mudSport: true,
+        },
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result[0]).toBe(19); // どろあそび0.5倍
-  });
+      const result = calculateDamageCore(params);
+      expect(result[0]).toBe(19); // どろあそび0.5倍
+    });
 
-  it("とくせい効果を適用", () => {
-    const params: DamageCoreParams = {
-      move: {
-        type: "みず",
-        power: 100,
-        isPhysical: false,
-      },
-      attacker: {
-        level: 50,
-        attackStat: 100,
-        ability: { name: "げきりゅう", description: "" },
-        abilityActive: true,
-      },
-      defender: {
-        defenseStat: 100,
-        types: ["ほのお"],
-      },
-      options: {},
-    };
+    it("とくせい効果を適用", () => {
+      const params: DamageCoreParams = {
+        move: {
+          type: "みず",
+          power: 100,
+          isPhysical: false,
+        },
+        attacker: {
+          level: 50,
+          attackStat: 100,
+          ability: { name: "げきりゅう", description: "" },
+          abilityActive: true,
+        },
+        defender: {
+          defenseStat: 100,
+          types: ["ほのお"],
+        },
+        options: {},
+      };
 
-    const result = calculateDamageCore(params);
-    expect(result[0]).toBe(117); // タイプ相性2倍 × げきりゅう1.5倍
-  });
+      const result = calculateDamageCore(params);
+      expect(result[0]).toBe(117); // タイプ相性2倍 × げきりゅう1.5倍
+    });
 
     it("すべての効果を組み合わせた計算", () => {
       const params: DamageCoreParams = {
