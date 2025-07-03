@@ -38,6 +38,17 @@
 
 ## インストール
 
+### npmパッケージとして使用（推奨）
+
+このMCPサーバーはnpmパッケージとして公開されているため、npxを使用して直接実行できます：
+
+```bash
+# インストール不要で直接使用可能
+npx pokemon-gen3-calc-mcp
+```
+
+### ローカルでの開発
+
 ```bash
 # リポジトリのクローン
 git clone https://github.com/ptrst102/pokemon-gen3-calc-mcp.git
@@ -45,11 +56,31 @@ cd pokemon-gen3-calc-mcp
 
 # 依存関係のインストール
 npm install
+
+# ビルド
+npm run build
 ```
 
 ## 使い方
 
 ### MCP クライアントとの連携
+
+#### npx を使用する場合（推奨）
+
+MCP クライアント（Claude Desktop など）の設定ファイルに以下を追加：
+
+```json
+{
+  "mcpServers": {
+    "pokemon-gen3-calc": {
+      "command": "npx",
+      "args": ["-y", "pokemon-gen3-calc-mcp"]
+    }
+  }
+}
+```
+
+#### ローカルビルドを使用する場合
 
 1. ビルドを実行して dist ディレクトリにファイルを生成：
 
@@ -57,7 +88,7 @@ npm install
 npm run build
 ```
 
-2. MCP クライアント（Claude Desktop など）の設定ファイルに以下を追加：
+2. MCP クライアントの設定ファイルに以下を追加：
 
 ```json
 {
