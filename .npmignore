@@ -1,0 +1,48 @@
+# Development files
+src/
+scripts/
+tests/
+*.spec.ts
+*.test.ts
+
+# Configuration files
+biome.json
+tsconfig.json
+vitest.config.ts
+renovate.json
+
+# Build artifacts
+coverage/
+.cache/
+
+# Documentation for development
+docs/
+CLAUDE.md
+
+# Git
+.git/
+.gitignore
+
+# Node
+node_modules/
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.env.local
+.env.development
+
+# Example files
+*.example
+examples/

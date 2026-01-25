@@ -3,6 +3,16 @@
   "version": "1.0.0",
   "description": "Pokemon Generation 3 damage and status calculator MCP server",
   "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "pokemon-gen3-calc-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsx scripts/build.ts",
