@@ -24,7 +24,7 @@
     "@biomejs/biome": "^2.0.0",
     "@types/node": "^24.0.3",
     "@vitest/coverage-v8": "^3.2.4",
-    "esbuild": "^0.25.5",
+    "esbuild": "^0.28.0",
     "npm-run-all2": "^8.0.4",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
@@ -37,6 +37,6 @@
     "zod": "^3.25.67"
   },
   "volta": {
-    "node": "22.21.0"
+    "node": "22.23.2"
   }
 }
